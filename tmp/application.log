@@ -1,0 +1,161 @@
+{"level":"debug","time":"2025-06-19T03:42:30+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:42:43+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:43:53+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:43:53+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017/magazin","time":"2025-06-19T03:43:53+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"fatal","error":"connection() error occurred during connection handshake: auth error: sasl conversation error: unable to authenticate using mechanism \"SCRAM-SHA-1\": (AuthenticationFailed) Authentication failed.","time":"2025-06-19T03:43:53+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:33","message":"Failed to ping MongoDB"}
+{"level":"debug","time":"2025-06-19T03:44:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:44:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017/%!s(MISSING)","time":"2025-06-19T03:44:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"fatal","error":"error parsing uri: invalid database \"%!s(MISSING)\": invalid URL escape \"%!s\"","time":"2025-06-19T03:44:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:27","message":"Failed to connect to MongoDB"}
+{"level":"debug","time":"2025-06-19T03:44:26+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:44:26+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:44:26+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:44:26+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:44:26+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"info","method":"GET","url":"/","status":200,"latency":0.008583,"ip":"127.0.0.1","time":"2025-06-19T03:44:32+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:179","message":"Handled request"}
+{"level":"debug","time":"2025-06-19T03:46:17+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:46:17+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:46:17+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:46:17+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:46:17+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:46:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:20+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:21+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:28+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:47:52+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:24+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:33+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:36+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:48:57+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:06+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:27+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:37+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:49:55+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:50:01+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:50:48+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:51:14+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:51:51+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:52:25+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
+{"level":"debug","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/logger/setup_logger.go:237","message":"Logger setup complete"}
+{"level":"debug","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:11","message":"Initializing Redis connection"}
+{"level":"info","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/cache/cache.go:24","message":"Successfully connected to Redis"}
+{"level":"debug","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:14","message":"Initializing database connection"}
+{"level":"debug","uri":"mongodb://admin:admin@localhost:27017","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:23","message":"Connecting to MongoDB"}
+{"level":"info","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/platform/database/database.go:36","message":"Successfully connected to MongoDB"}
+{"level":"info","time":"2025-06-19T03:52:35+05:00","caller":"/Users/aslonkhamidov/Desktop/code/magazin/pos/cmd/main.go:9","message":"Starting server..."}
