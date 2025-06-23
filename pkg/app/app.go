@@ -10,6 +10,10 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
+
+	_ "aslon1213/magazin_pos/docs"
+
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -25,6 +29,7 @@ func NewFiberApp() *fiber.App {
 	app := fiber.New()
 
 	app.Use(logger.CustomZerologMiddleware)
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 	return app
 }
 
@@ -44,5 +49,9 @@ func NewApp() *App {
 }
 
 func (a *App) Run() {
+	controllers := NewControllers(a.DB.Database(a.Config.DB.Database))
+
+	SetupRoutes(a.Router, controllers)
+
 	a.Router.Listen(a.Config.Server.Port)
 }

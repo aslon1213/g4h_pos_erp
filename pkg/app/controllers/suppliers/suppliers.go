@@ -1,7 +1,6 @@
 package suppliers
 
 import (
-	"aslon1213/magazin_pos/pkg/app"
 	models "aslon1213/magazin_pos/pkg/repository"
 	"context"
 	"time"
@@ -16,17 +15,31 @@ import (
 type SuppliersController struct {
 	suppliersCollection    *mongo.Collection
 	transactionsCollection *mongo.Collection
+	financeCollection      *mongo.Collection
 	DB                     *mongo.Database
 }
 
-func NewSuppliersController(app *app.App) *SuppliersController {
+func New(db *mongo.Database) *SuppliersController {
+	// suppliers collection
+	// suppliersCollection := db.Collection("suppliers")
+
 	return &SuppliersController{
-		suppliersCollection:    app.DB.Database(app.Config.DB.Database).Collection("companies"),
-		transactionsCollection: app.DB.Database(app.Config.DB.Database).Collection("transactions"),
-		DB:                     app.DB.Database(app.Config.DB.Database),
+		suppliersCollection:    db.Collection("suppliers"),
+		transactionsCollection: db.Collection("transactions"),
+		financeCollection:      db.Collection("finance"),
+		DB:                     db,
 	}
 }
 
+// GetSuppliers godoc
+// @Summary Get all suppliers
+// @Description Get all suppliers from the database
+// @Tags suppliers
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /suppliers [get]
 func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 	log.Debug().Msg("Getting all suppliers")
 
@@ -52,6 +65,17 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 	return c.JSON(models.NewOutput(suppliers))
 }
 
+// GetSupplierByID godoc
+// @Summary Get a supplier by ID
+// @Description Get a supplier by its ID
+// @Tags suppliers
+// @Accept json
+// @Produce json
+// @Param id path string true "Supplier ID"
+// @Success 200 {object} models.Output
+// @Failure 404 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /suppliers/{id} [get]
 func (s *SuppliersController) GetSupplierByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Debug().Str("id", id).Msg("Getting supplier by ID")
@@ -77,6 +101,18 @@ func (s *SuppliersController) GetSupplierByID(c *fiber.Ctx) error {
 	return c.JSON(models.NewOutput(supplier))
 }
 
+// CreateSupplier godoc
+// @Summary Create a new supplier
+// @Description Create a new supplier in the database
+// @Tags suppliers
+// @Accept json
+// @Produce json
+// @Param supplier body models.SupplierBase true "Supplier data"
+// @Success 201 {object} models.Output
+// @Failure 400 {object} models.Output
+// @Failure 404 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /suppliers [post]
 func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	log.Debug().Msg("Creating new supplier")
 
@@ -103,7 +139,20 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 		UpdatedAt: now,
 	}
 
-	_, err := s.suppliersCollection.InsertOne(context.Background(), supplier)
+	// check the branch exists
+	branch := models.BranchFinance{}
+	err := s.financeCollection.FindOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": supplierBase.Branch}, {"branch_name": supplierBase.Branch}}}).Decode(&branch)
+	if err != nil {
+		log.Error().Err(err).Str("id", supplierBase.Branch).Msg("Branch not found")
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+			Message: "Branch not found",
+			Code:    fiber.StatusNotFound,
+		}))
+	}
+
+	supplier.Branch = branch.BranchID // set the branch id to the supplier ensuring that the supplier is associated with the branch
+
+	_, err = s.suppliersCollection.InsertOne(context.Background(), supplier)
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -112,10 +161,34 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 		}))
 	}
 
+	// insert to supplier to finance collection
+	_, err = s.financeCollection.UpdateOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": supplierBase.Branch}, {"branch_name": supplierBase.Branch}}}, bson.M{"$push": bson.M{"suppliers": bson.M{
+		"$each": []string{supplier.ID},
+	}}})
+	if err != nil {
+		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier to finance")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			Message: err.Error(),
+			Code:    fiber.StatusInternalServerError,
+		}))
+	}
 	log.Debug().Str("id", supplier.ID).Msg("Successfully created supplier")
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(supplier))
 }
 
+// UpdateSupplier godoc
+// @Summary Update a supplier
+// @Description Update a supplier's information
+// @Tags suppliers
+// @Accept json
+// @Produce json
+// @Param id path string true "Supplier ID"
+// @Param supplier body models.SupplierBase true "Supplier data"
+// @Success 200 {object} models.Output
+// @Failure 400 {object} models.Output
+// @Failure 404 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /suppliers/{id} [put]
 func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Debug().Str("id", id).Msg("Updating supplier")
@@ -152,9 +225,6 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 	if supplierBase.Notes != "" {
 		update["$set"].(bson.M)["notes"] = supplierBase.Notes
 	}
-	if supplierBase.Branch != "" {
-		update["$set"].(bson.M)["branch"] = supplierBase.Branch
-	}
 
 	result, err := s.suppliersCollection.UpdateOne(context.Background(), bson.M{"_id": id}, update)
 	if err != nil {
@@ -177,6 +247,17 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 	return c.JSON(models.NewOutput(fiber.Map{"message": "Supplier updated successfully"}))
 }
 
+// DeleteSupplier godoc
+// @Summary Delete a supplier
+// @Description Delete a supplier from the database
+// @Tags suppliers
+// @Accept json
+// @Produce json
+// @Param id path string true "Supplier ID"
+// @Success 200 {object} models.Output
+// @Failure 404 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /suppliers/{id} [delete]
 func (s *SuppliersController) DeleteSupplier(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Debug().Str("id", id).Msg("Deleting supplier")
