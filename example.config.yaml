@@ -1,0 +1,17 @@
+database:
+  host: "localhost"
+  port: "27017"
+  username: "admin"
+  password: "admin"
+  database: "magazin"
+  max_connections: 10
+  min_pool_size: 1
+
+redis:
+  host: "localhost"
+  port: "6379"
+  password: ""
+  database: 0
+
+server:
+  port: ":9999"
