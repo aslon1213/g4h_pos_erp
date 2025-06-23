@@ -4,6 +4,7 @@ import (
 	"aslon1213/magazin_pos/pkg/configs"
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -20,9 +21,9 @@ func NewDB() *mongo.Client {
 
 	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s", config.DB.Username, config.DB.Password, config.DB.Host, config.DB.Port)
 
-	log.Debug().Str("uri", uri).Msg("Connecting to MongoDB")
+	log.Debug().Str("uri", uri).Str("max_connections", strconv.FormatUint(config.DB.MaxConnections, 10)).Str("min_pool_size", strconv.FormatUint(config.DB.MinPoolSize, 10)).Msg("Connecting to MongoDB")
 
-	client, err := mongo.Connect(options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(options.Client().ApplyURI(uri).SetMaxConnecting(config.DB.MaxConnections).SetMinPoolSize(config.DB.MinPoolSize))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to connect to MongoDB")
 	}

@@ -1,8 +1,6 @@
 package internalexpenses
 
 import (
-	"aslon1213/magazin_pos/pkg/app"
-
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -11,9 +9,9 @@ type InternalExpensesController struct {
 	collection *mongo.Collection
 }
 
-func NewInternalExpensesController(app *app.App) *InternalExpensesController {
+func New(db *mongo.Database) *InternalExpensesController {
 	return &InternalExpensesController{
-		collection: app.DB.Database(app.Config.DB.Database).Collection("internal_expenses"),
+		collection: db.Collection("internal_expenses"),
 	}
 }
 

@@ -13,10 +13,10 @@ type SupplierBase struct {
 }
 
 type FinancialData struct {
-	Balance       float64       `json:"balance" bson:"balance"`
+	Balance       int32         `json:"balance" bson:"balance"`
 	Transactions  []Transaction `json:"transactions" bson:"transactions"`
-	TotalIncome   float64       `json:"total_income" bson:"total_income"`
-	TotalExpenses float64       `json:"total_expenses" bson:"total_expenses"`
+	TotalIncome   int32         `json:"total_income" bson:"total_income"`
+	TotalExpenses int32         `json:"total_expenses" bson:"total_expenses"`
 }
 
 type Supplier struct {
@@ -25,4 +25,14 @@ type Supplier struct {
 	FinancialData FinancialData `json:"financial_data" bson:"financial_data"`
 	CreatedAt     time.Time     `json:"created_at" bson:"created_at"`
 	UpdatedAt     time.Time     `json:"updated_at" bson:"updated_at"`
+}
+
+type SupplierOutput struct {
+	Data  []Supplier `json:"data" bson:"data"`
+	Error []Error    `json:"error" bson:"error"`
+}
+
+type SupplierOutputSingle struct {
+	Data  Supplier `json:"data" bson:"data"`
+	Error []Error  `json:"error" bson:"error"`
 }

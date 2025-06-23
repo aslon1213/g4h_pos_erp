@@ -4,6 +4,8 @@ database:
   username: "admin"
   password: "admin"
   database: "magazin"
+  max_connections: 10
+  min_pool_size: 1
 
 redis:
   host: "localhost"

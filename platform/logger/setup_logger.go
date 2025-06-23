@@ -207,9 +207,17 @@ func SetupLogger() *zerolog.Logger {
 	zerolog.TimeFieldFormat = time.RFC3339
 
 	// Set up output to file
+
 	logFile, err := os.OpenFile("./tmp/application.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to open log file")
+		if err == os.ErrNotExist {
+			logfile, err := os.Create("/application.log")
+			if err != nil {
+				log.Fatal().Err(err).Msg("Failed to create log file")
+			}
+			logFile = logfile
+		}
+		// log.Fatal().Err(err).Msg("Failed to open log file")
 	}
 
 	// set up log output to telegraf

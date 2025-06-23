@@ -11,11 +11,13 @@ type Config struct {
 }
 
 type DBConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
-	Database string `mapstructure:"database"`
+	Host           string `mapstructure:"host"`
+	Port           string `mapstructure:"port"`
+	Username       string `mapstructure:"username"`
+	Password       string `mapstructure:"password"`
+	Database       string `mapstructure:"database"`
+	MaxConnections uint64 `mapstructure:"max_connections"`
+	MinPoolSize    uint64 `mapstructure:"min_pool_size"`
 }
 
 type RedisConfig struct {
@@ -33,6 +35,8 @@ func LoadConfig(path string) (*Config, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path)
+	viper.AddConfigPath("../")
+	viper.AddConfigPath("../../")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
