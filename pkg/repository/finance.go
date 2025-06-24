@@ -1,6 +1,7 @@
 package models
 
 import (
+	"aslon1213/magazin_pos/pkg/utils"
 	"context"
 	"fmt"
 	"slices"
@@ -16,6 +17,33 @@ type InitiatorType string
 const (
 	TransactionTypeCredit TransactionType = "credit" // credit means - income - when money is gained or received into an account
 	TransactionTypeDebit  TransactionType = "debit"  // debit means - outcome - when money is lost, spent, or withdrawn from an account
+)
+
+type TransactionOutputSingle struct {
+	Data  Transaction `json:"data" bson:"data"`
+	Error []Error     `json:"error" bson:"error"`
+}
+
+type TransactionOutput struct {
+	Data  []Transaction `json:"data" bson:"data"`
+	Error []Error       `json:"error" bson:"error"`
+}
+
+func NewTransactionBase(amount uint32, description string, typeOfTransaction TransactionType) *TransactionBase {
+	return &TransactionBase{
+		Amount:      amount,
+		Description: description,
+		Type:        typeOfTransaction,
+	}
+}
+
+const (
+	InitiatorTypeSalary    InitiatorType = "salary"
+	InitiatorTypeRent      InitiatorType = "rent"
+	InitiatorTypeUtilities InitiatorType = "utilities"
+	InitiatorTypeOther     InitiatorType = "other"
+	InitiatorTypeSales     InitiatorType = "sale"
+	InitiatorTypeSupplier  InitiatorType = "supplier"
 )
 
 type PaymentMethod string
@@ -46,33 +74,6 @@ type TransactionBase struct {
 	PaymentMethod PaymentMethod   `json:"payment_method" bson:"payment_method"`
 }
 
-type TransactionOutputSingle struct {
-	Data  Transaction `json:"data" bson:"data"`
-	Error []Error     `json:"error" bson:"error"`
-}
-
-type TransactionOutput struct {
-	Data  []Transaction `json:"data" bson:"data"`
-	Error []Error       `json:"error" bson:"error"`
-}
-
-func NewTransactionBase(amount uint32, description string, typeOfTransaction TransactionType) *TransactionBase {
-	return &TransactionBase{
-		Amount:      amount,
-		Description: description,
-		Type:        typeOfTransaction,
-	}
-}
-
-const (
-	InitiatorTypeSalary    InitiatorType = "salary"
-	InitiatorTypeRent      InitiatorType = "rent"
-	InitiatorTypeUtilities InitiatorType = "utilities"
-	InitiatorTypeOther     InitiatorType = "other"
-	InitiatorTypeSales     InitiatorType = "sale"
-	InitiatorTypeSupplier  InitiatorType = "supplier"
-)
-
 type Transaction struct {
 	TransactionBase
 	Type      InitiatorType `json:"type" bson:"type"`
@@ -83,12 +84,13 @@ type Transaction struct {
 }
 
 func NewTransaction(transactionBase *TransactionBase, typeOfTransaction InitiatorType, branchID string) *Transaction {
+	loc := utils.GetTimeZone()
 	return &Transaction{
 		TransactionBase: *transactionBase,
 		Type:            typeOfTransaction,
 		ID:              uuid.New().String(),
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		CreatedAt:       time.Now().In(loc),
+		UpdatedAt:       time.Now().In(loc),
 		BranchID:        branchID,
 	}
 }

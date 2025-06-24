@@ -2,6 +2,7 @@ package routes
 
 import (
 	"aslon1213/magazin_pos/pkg/app/controllers/finance"
+	journal_handlers "aslon1213/magazin_pos/pkg/app/controllers/journals"
 	"aslon1213/magazin_pos/pkg/app/controllers/sales"
 	"aslon1213/magazin_pos/pkg/app/controllers/suppliers"
 	"aslon1213/magazin_pos/pkg/app/controllers/transactions"
@@ -10,7 +11,7 @@ import (
 )
 
 func SuppliersRoutes(router *fiber.App, suppliersController *suppliers.SuppliersController) {
-	router.Get("/suppliers", suppliersController.GetSuppliers)
+	router.Get("/suppliers", suppliersController.GetSuppliers) // get all suppliers
 	router.Get("/suppliers/:id", suppliersController.GetSupplierByID)
 	router.Post("/suppliers", suppliersController.CreateSupplier)
 	router.Put("/suppliers/:id", suppliersController.UpdateSupplier)
@@ -22,15 +23,31 @@ func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsCont
 	router.Post("/sales/:branch_id", salesController.CreateSalesTransaction)
 }
 
+func JournalsRoutes(router *fiber.App, journalsController *journal_handlers.JournalHandlers, operationsController *journal_handlers.OperationHandlers) {
+	router.Get("/journals/:id", journalsController.GetJournalEntryByID)
+	router.Get("/journals/branch/:branch_id", journalsController.QueryJournalEntries)
+	router.Post("/journals", journalsController.NewJournalEntry)
+	router.Post("/journals/:id/close", journalsController.CloseJournalEntry)
+	router.Post("/journals/:id/reopen", journalsController.ReOpenJournalEntry)
+
+	// operations
+	router.Post("/journals/:id/operations", operationsController.NewOperationTransaction)
+	router.Put("/journals/:id/operations/:operation_id", operationsController.UpdateOperationTransactionByID)
+	router.Delete("/journals/:id/operations/:operation_id", operationsController.DeleteOperationTransactionByID)
+	router.Get("/journals/:id/operations/:operation_id", operationsController.GetOperationTransactionByID)
+
+}
+
 func InternalExpensesRoutes(router *fiber.App) {
 
 }
 
 func FinanceRoutes(router *fiber.App, financeController *finance.FinanceController) {
-	router.Get("/finance", financeController.GetBranches)
-	router.Get("/finance/id/:id", financeController.GetBranchByBranchID)
-	router.Get("/finance/name/:branch_name", financeController.GetFinanceByBranchName)
-	router.Post("/finance", financeController.NewFinanceOfBranch)
+	router.Get("/finance/branches", financeController.GetBranches)                            // get all branches
+	router.Get("/finance/branch/id/:id", financeController.GetBranchByBranchID)               // get branch by id
+	router.Get("/finance/branch/name/:branch_name", financeController.GetFinanceByBranchName) // get branch by name
+	router.Get("/finance/id/:id", financeController.GetFinanceByID)                           // get finance by id
+	router.Post("/finance", financeController.NewFinanceOfBranch)                             // create new finance of branch
 
 }
 
@@ -43,5 +60,4 @@ func TransactionsRoutes(router *fiber.App, transactionsController *transactions.
 	router.Get("/transactions/docs/initiator_type", transactionsController.GetInitiatorType)
 	router.Get("/transactions/docs/type", transactionsController.GetTransactionType)
 	router.Get("/transactions/docs/payment_method", transactionsController.GetPaymentMethod)
-
 }
