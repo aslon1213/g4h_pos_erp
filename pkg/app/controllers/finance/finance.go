@@ -39,7 +39,7 @@ func New(db *mongo.Database) *FinanceController {
 // GetBranches godoc
 // @Summary Fetch all branches
 // @Description Retrieve all branches from the finance collection
-// @Tags finance, branches
+// @Tags finance
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
@@ -73,12 +73,12 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 // GetBranchByBranchID godoc
 // @Summary Fetch branch by ID
 // @Description Retrieve a branch using its ID
-// @Tags finance, branches
+// @Tags finance
 // @Param id path string true "Branch ID"
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /finance/branches/{id} [get]
+// @Router /finance/branch/id/{id} [get]
 func (f *FinanceController) GetBranchByBranchID(c *fiber.Ctx) error {
 	branchID := c.Params("id")
 	log.Debug().Str("branch_id", branchID).Msg("Fetching branch by ID")
@@ -98,12 +98,12 @@ func (f *FinanceController) GetBranchByBranchID(c *fiber.Ctx) error {
 // GetFinanceByBranchName godoc
 // @Summary Fetch finance by branch name
 // @Description Retrieve finance details using the branch name
-// @Tags finance, branches
+// @Tags finance
 // @Param branch_name path string true "Branch Name"
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /finance/branches/name/{branch_name} [get]
+// @Router /finance/branch/name/{branch_name} [get]
 func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 	branchName := c.Params("branch_name")
 	log.Debug().Str("branch_name", branchName).Msg("Fetching finance by branch name")
@@ -111,7 +111,7 @@ func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 	normalizedBranchName, _ := url.QueryUnescape(branchName)
 	branchName = normalizedBranchName
 	log.Info().Str("branch_name", branchName).Msg("Normalized branch name")
-	filter := bson.M{"branch_name": normalizedBranchName}
+	filter := bson.M{"branch_name": bson.M{"$regex": "^" + normalizedBranchName + "$", "$options": "i"}}
 
 	var branch models.BranchFinance
 	err := f.collection.FindOne(context.Background(), filter).Decode(&branch)
@@ -127,14 +127,14 @@ func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 // NewFinanceOfBranch godoc
 // @Summary Create new finance for a branch
 // @Description Add new financial records for a branch
-// @Tags finance, branches
+// @Tags finance
 // @Accept json
 // @Produce json
 // @Param branch body models.NewBranchFinanceInput true "Branch finance input"
 // @Success 201 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /finance/branches [post]
+// @Router /finance [post]
 func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 	log.Debug().Msg("Creating new finance for branch")
 	var Input models.NewBranchFinanceInput
@@ -175,20 +175,27 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 // GetFinanceByID godoc
 // @Summary Fetch finance by ID
 // @Description Retrieve finance details using its ID
-// @Tags finance, branches
+// @Tags finance
 // @Param id path string true "Finance ID"
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /finance/branches/finance/{id} [get]
+// @Router /finance/id/{id} [get]
 func (f *FinanceController) GetFinanceByID(c *fiber.Ctx) error {
 	financeID := c.Params("id")
 	log.Debug().Str("finance_id", financeID).Msg("Fetching finance by ID")
 
-	filter := bson.M{"_id": financeID}
+	// convert to objectsid
+	financeIDBson, err := bson.ObjectIDFromHex(financeID)
+	if err != nil {
+		log.Error().Err(err).Str("finance_id", financeID).Msg("Invalid finance ID")
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.NewError("Invalid finance ID", fiber.StatusBadRequest)))
+	}
+
+	filter := bson.M{"_id": financeIDBson}
 
 	var finance models.BranchFinance
-	err := f.collection.FindOne(context.Background(), filter).Decode(&finance)
+	err = f.collection.FindOne(context.Background(), filter).Decode(&finance)
 	if err != nil {
 		log.Error().Err(err).Str("finance_id", financeID).Msg("Finance not found")
 		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.NewError("Finance not found", fiber.StatusNotFound)))

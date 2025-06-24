@@ -7,7 +7,8 @@ import (
 	"aslon1213/magazin_pos/platform/logger"
 	"log"
 
-	"github.com/go-redis/redis"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	fiberSwagger "github.com/swaggo/fiber-swagger"
@@ -19,7 +20,7 @@ import (
 
 type App struct {
 	Logger *zerolog.Logger
-	Redis  *redis.Client
+	Cache  *cache.Cache
 	DB     *mongo.Client
 	Config *configs.Config
 	Router *fiber.App
@@ -28,8 +29,12 @@ type App struct {
 func NewFiberApp() *fiber.App {
 	app := fiber.New()
 
+	app.Use(cors.New())
 	app.Use(logger.CustomZerologMiddleware)
-	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+	app.Get("/docs/*", fiberSwagger.WrapHandler)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/docs/index.html")
+	})
 	return app
 }
 
@@ -41,7 +46,7 @@ func NewApp() *App {
 
 	return &App{
 		Logger: logger.SetupLogger(),
-		Redis:  cache.NewCache(),
+		Cache:  cache.New(),
 		DB:     database.NewDB(),
 		Router: NewFiberApp(),
 		Config: config,
@@ -49,9 +54,7 @@ func NewApp() *App {
 }
 
 func (a *App) Run() {
-	controllers := NewControllers(a.DB.Database(a.Config.DB.Database))
-
+	controllers := NewControllers(a.DB.Database(a.Config.DB.Database), a.Cache)
 	SetupRoutes(a.Router, controllers)
-
 	a.Router.Listen(a.Config.Server.Port)
 }

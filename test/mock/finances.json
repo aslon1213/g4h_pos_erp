@@ -1,0 +1,50 @@
+[{
+  "_id": {
+    "$oid": "685a3b7b6f2b611d36f74252"
+  },
+  "finance": {
+    "balance": {
+      "cash": 0,
+      "bank": 0,
+      "terminal": 0,
+      "mobile_apps": 0
+    },
+    "total_income": 0,
+    "total_expenses": 0,
+    "debt": 2000000
+  },
+  "suppliers": [
+    "c6080810-2517-4189-84a0-9d8315254e7f",
+    "9f917635-b8cc-491f-9cea-2b63aba39145",
+    "7857d512-bd0b-4d1c-aaa9-5eab3b64e514",
+    "32db7c47-e24e-4288-9336-b1c3d34bcca4",
+    "eacd11ef-cfa2-4f90-8443-63c02216275d",
+    "d002b8bb-274c-45b3-80be-44fe1d3d7f09",
+    "87834355-8119-4a3b-8a63-4e2232b1d058",
+    "d0d30946-fccf-462f-9de9-429f044d16b7",
+    "02ab1359-df6d-4e8b-96d2-843b3b2df971"
+  ],
+  "branch_id": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "branch_name": "Xonobod",
+  "details": "Xonobod branch"
+},
+{
+  "_id": {
+    "$oid": "685a3b936f2b611d36f74253"
+  },
+  "finance": {
+    "balance": {
+      "cash": 0,
+      "bank": 0,
+      "terminal": 0,
+      "mobile_apps": 0
+    },
+    "total_income": 0,
+    "total_expenses": 0,
+    "debt": 0
+  },
+  "suppliers": [],
+  "branch_id": "54b2aada-0fdf-44da-9d4c-aacc754fef0c",
+  "branch_name": "Polevoy",
+  "details": "Polevoy branch"
+}]
