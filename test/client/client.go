@@ -85,10 +85,15 @@ func (c *Client) EncodeBody(body interface{}) ([]byte, error) {
 
 // Get all branches
 func (c *Client) GetAllBranches() (resp *http.Response, output models.BranchFinanceOutput, err error) {
-	resp, err = c.MakeRequest("GET", "/finance", nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", "/finance/branches", nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutput{}, err
 	}
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	return nil, models.BranchFinanceOutput{}, err
+	// }
+	// log.Info().Str("resp", string(body)).Msg("Getting all branches")
 	output, err = c.DecodeResponseMultiple(resp, nil)
 	return resp, output, err
 }

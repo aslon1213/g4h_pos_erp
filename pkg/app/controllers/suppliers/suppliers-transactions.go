@@ -2,11 +2,14 @@ package suppliers
 
 import (
 	models "aslon1213/magazin_pos/pkg/repository"
+	"aslon1213/magazin_pos/platform/database"
 	"context"
+	"errors"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 // NewTransaction godoc
@@ -31,7 +34,6 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	branch_id := c.Params("branch_id")
 
 	supplier_id := c.Params("supplier_id")
-	log.Info().Str("branch_id", branch_id).Str("supplier_id", supplier_id).Msg("Starting new transaction")
 
 	// Parse transaction data from request body
 	var transactionBase models.TransactionBase
@@ -42,24 +44,19 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 			Code:    fiber.StatusBadRequest,
 		}))
 	}
+	log.Info().Str("branch_id", branch_id).Str("supplier_id", supplier_id).Str("TransactionType", string(transactionBase.Type)).Msg("Starting new transaction")
 
-	// Create new transaction
-	transaction := models.NewTransaction(&transactionBase, models.InitiatorTypeSupplier, branch_id)
-	log.Info().Interface("transaction", transaction).Msg("Created new transaction")
-
-	// Start a session
-	session, err := s.DB.Client().StartSession()
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to start session")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+	// validate the transaction base
+	if err := models.ValidateTransactionType(transactionBase.Type); err != nil {
+		log.Error().Err(err).Msg("Failed to validate transaction data")
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
+			Code:    fiber.StatusBadRequest,
 		}))
 	}
-	defer session.EndSession(context.Background())
 
-	// Start transaction
-	err = session.StartTransaction()
+	// Start a session
+	sess, ctx, err := database.StartTransaction(c, s.transactionsCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -67,18 +64,43 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
+	defer sess.EndSession(ctx)
 
-	// Insert transaction
-	_, err = s.transactionsCollection.InsertOne(context.Background(), transaction)
+	transaction, err := NewSupplierTransaction(ctx, transactionBase, supplier_id, branch_id, s.transactionsCollection, s.financeCollection, s.suppliersCollection)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to insert transaction")
-		session.AbortTransaction(context.Background())
+		sess.AbortTransaction(ctx)
+		log.Error().Err(err).Msg("Failed to create new supplier transaction --- aborting")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
-	log.Info().Msg("Transaction inserted successfully")
+	// Commit transaction
+	err = sess.CommitTransaction(ctx)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to commit transaction")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			Message: err.Error(),
+			Code:    fiber.StatusInternalServerError,
+		}))
+	}
+	log.Info().Msg("Transaction committed successfully")
+
+	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(transaction))
+}
+
+func NewSupplierTransaction(ctx context.Context, transactionBase models.TransactionBase, supplier_id string, branch_id string, transactionsCollection *mongo.Collection, financeCollection *mongo.Collection, suppliersCollection *mongo.Collection) (*models.Transaction, error) {
+	// Create new transaction
+	transaction := models.NewTransaction(&transactionBase, models.InitiatorTypeSupplier, branch_id)
+	log.Info().Interface("transaction", transaction).Str("TransactionType", string(transaction.TransactionBase.Type)).Msg("Created new transaction")
+
+	// Insert transaction
+	res, err := transactionsCollection.InsertOne(ctx, transaction)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to insert transaction")
+		return &models.Transaction{}, err
+	}
+	log.Info().Interface("res", res).Msg("Transaction inserted successfully")
 
 	// Update supplier financial data
 	update := bson.M{
@@ -107,15 +129,16 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 		},
 	}
 
-	_, err = s.suppliersCollection.UpdateOne(context.Background(), bson.M{"_id": supplier_id}, update)
+	supplier_res, err := suppliersCollection.UpdateOne(ctx, bson.M{"_id": supplier_id}, update)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update supplier financial data")
-		session.AbortTransaction(context.Background())
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
-			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
-		}))
+		return &models.Transaction{}, err
 	}
+	if supplier_res.MatchedCount == 0 {
+		log.Error().Msg("Supplier not found")
+		return &models.Transaction{}, errors.New("supplier not found")
+	}
+
 	log.Info().Msg("Supplier financial data updated successfully")
 
 	// change finance of branch
@@ -164,26 +187,12 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 		"$inc": update_bson,
 	}
 
-	res, err := s.financeCollection.UpdateOne(context.Background(), filter, update)
+	res_2, err := financeCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update branch finance")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
-			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
-		}))
+		return &models.Transaction{}, err
 	}
-	log.Info().Interface("res", res).Msg("Branch finance updated successfully")
+	log.Info().Interface("res", res_2).Msg("Branch finance updated successfully")
 
-	// Commit transaction
-	err = session.CommitTransaction(context.Background())
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to commit transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
-			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
-		}))
-	}
-	log.Info().Msg("Transaction committed successfully")
-
-	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(transaction))
+	return transaction, nil
 }
