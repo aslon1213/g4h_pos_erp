@@ -20,6 +20,7 @@ type DBConfig struct {
 	MinPoolSize    uint64 `mapstructure:"min_pool_size"`
 	Auth           bool   `mapstructure:"auth"`
 	ReplicaSet     string `mapstructure:"replica_set"`
+	URL            string `mapstructure:"url"`
 }
 
 type RedisConfig struct {

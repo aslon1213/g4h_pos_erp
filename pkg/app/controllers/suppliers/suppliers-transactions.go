@@ -48,7 +48,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 
 	// validate the transaction base
 	if err := models.ValidateTransactionType(transactionBase.Type); err != nil {
-		log.Error().Err(err).Msg("Failed to validate transaction data")
+		log.Error().Err(err).Str("transaction_type", string(transactionBase.Type)).Msg("Failed to validate transaction data")
 		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
