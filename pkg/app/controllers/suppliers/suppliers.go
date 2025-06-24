@@ -2,6 +2,7 @@ package suppliers
 
 import (
 	models "aslon1213/magazin_pos/pkg/repository"
+	"aslon1213/magazin_pos/pkg/utils"
 	"context"
 	"time"
 
@@ -31,20 +32,89 @@ func New(db *mongo.Database) *SuppliersController {
 	}
 }
 
+type SupplierQuery struct {
+	Name    string `query:"name"`
+	INN     string `query:"inn"`
+	Branch  string `query:"branch"`
+	Email   string `query:"email"`
+	Phone   string `query:"phone"`
+	Address string `query:"address"`
+	Notes   string `query:"notes"`
+}
+
 // GetSuppliers godoc
 // @Summary Get all suppliers
 // @Description Get all suppliers from the database
 // @Tags suppliers
 // @Accept json
 // @Produce json
+// @Param name query string false "Supplier name"
+// @Param inn query string false "Supplier INN"
+// @Param branch query string false "Supplier branch"
+// @Param email query string false "Supplier email"
+// @Param phone query string false "Supplier phone"
+// @Param address query string false "Supplier address"
+// @Param notes query string false "Supplier notes"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
 // @Router /suppliers [get]
 func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
+
+	var query SupplierQuery
+	if err := c.QueryParser(&query); err != nil {
+		log.Error().Err(err).Msg("Failed to parse supplier query")
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+			Message: err.Error(),
+			Code:    fiber.StatusBadRequest,
+		}))
+	}
+	name := query.Name
+	inn := query.INN
+	branch := query.Branch
+	email := query.Email
+	phone := query.Phone
+	address := query.Address
+	notes := query.Notes
+	filter := bson.M{}
+
+	log.Debug().Str("name", name).Str("inn", inn).Str("branch", branch).Str("email", email).Str("phone", phone).Str("address", address).Str("notes", notes).Msg("Getting all suppliers")
+
+	if name != "" {
+		filter["name"] = name
+	}
+	if inn != "" {
+		filter["inn"] = inn
+	}
+	if branch != "" {
+		// get branch by name or id
+		branch_data := models.BranchFinance{}
+
+		err := s.financeCollection.FindOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": branch}, {"branch_name": branch}}}).Decode(&branch_data)
+		if err != nil {
+			log.Error().Err(err).Str("id or name", branch).Msg("Branch not found")
+			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+				Message: "Branch not found",
+				Code:    fiber.StatusNotFound,
+			}))
+		}
+		filter["branch"] = branch_data.BranchID
+	}
+	if email != "" {
+		filter["email"] = email
+	}
+	if phone != "" {
+		filter["phone"] = phone
+	}
+	if address != "" {
+		filter["address"] = address
+	}
+	if notes != "" {
+		filter["notes"] = notes
+	}
 	log.Debug().Msg("Getting all suppliers")
 
 	var suppliers []models.Supplier
-	cursor, err := s.suppliersCollection.Find(context.Background(), bson.M{})
+	cursor, err := s.suppliersCollection.Find(context.Background(), filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find suppliers")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -62,6 +132,9 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 	}
 
 	log.Debug().Int("count", len(suppliers)).Msg("Successfully retrieved suppliers")
+	if len(suppliers) == 0 {
+		return c.JSON(models.NewOutput([]string{}))
+	}
 	return c.JSON(models.NewOutput(suppliers))
 }
 
@@ -124,8 +197,8 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 			Code:    fiber.StatusBadRequest,
 		}))
 	}
-
-	now := time.Now()
+	loc := utils.GetTimeZone()
+	now := time.Now().In(loc)
 	supplier := models.Supplier{
 		SupplierBase: supplierBase,
 		ID:           uuid.New().String(),
@@ -143,7 +216,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	branch := models.BranchFinance{}
 	err := s.financeCollection.FindOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": supplierBase.Branch}, {"branch_name": supplierBase.Branch}}}).Decode(&branch)
 	if err != nil {
-		log.Error().Err(err).Str("id", supplierBase.Branch).Msg("Branch not found")
+		log.Error().Err(err).Str("id or name", supplierBase.Branch).Msg("Branch not found")
 		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
 			Message: "Branch not found",
 			Code:    fiber.StatusNotFound,
@@ -202,9 +275,11 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 		}))
 	}
 
+	loc := utils.GetTimeZone()
+	now := time.Now().In(loc)
 	update := bson.M{
 		"$set": bson.M{
-			"updated_at": time.Now(),
+			"updated_at": now,
 		},
 	}
 	if supplierBase.Email != "" {

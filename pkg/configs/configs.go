@@ -18,6 +18,8 @@ type DBConfig struct {
 	Database       string `mapstructure:"database"`
 	MaxConnections uint64 `mapstructure:"max_connections"`
 	MinPoolSize    uint64 `mapstructure:"min_pool_size"`
+	Auth           bool   `mapstructure:"auth"`
+	ReplicaSet     string `mapstructure:"replica_set"`
 }
 
 type RedisConfig struct {

@@ -1,0 +1,237 @@
+[{
+  "_id": "c6080810-2517-4189-84a0-9d8315254e7f",
+  "name": "Pepsi",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:00:46.928Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:00:46.928Z"
+  }
+},
+{
+  "_id": "9f917635-b8cc-491f-9cea-2b63aba39145",
+  "name": "cola",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:00:54.281Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:00:54.281Z"
+  }
+},
+{
+  "_id": "7857d512-bd0b-4d1c-aaa9-5eab3b64e514",
+  "name": "Ferro",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": -2000000,
+    "transactions": [
+      {
+        "transactionbase": {
+          "amount": {
+            "$numberLong": "1000000"
+          },
+          "description": "string",
+          "type": "debit",
+          "payment_method": "cash"
+        },
+        "type": "supplier",
+        "_id": "698e2191-d6b9-4a88-865f-a81312d6410d",
+        "created_at": {
+          "$date": "2025-06-24T06:05:16.176Z"
+        },
+        "updated_at": {
+          "$date": "2025-06-24T06:05:16.176Z"
+        },
+        "branch_id": "e612ba95-28cb-4294-a745-07943a1f9809"
+      },
+      {
+        "transactionbase": {
+          "amount": {
+            "$numberLong": "1000000"
+          },
+          "description": "string",
+          "type": "debit",
+          "payment_method": "cash"
+        },
+        "type": "supplier",
+        "_id": "8e35d997-70ff-4c29-a688-9ae44980d272",
+        "created_at": {
+          "$date": "2025-06-24T06:07:19.817Z"
+        },
+        "updated_at": {
+          "$date": "2025-06-24T06:07:19.817Z"
+        },
+        "branch_id": "e612ba95-28cb-4294-a745-07943a1f9809"
+      }
+    ],
+    "total_income": 0,
+    "total_expenses": 2000000
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:01:07.147Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:01:07.147Z"
+  }
+},
+{
+  "_id": "32db7c47-e24e-4288-9336-b1c3d34bcca4",
+  "name": "Asia",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:01:12.863Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:01:12.863Z"
+  }
+},
+{
+  "_id": "eacd11ef-cfa2-4f90-8443-63c02216275d",
+  "name": "Weber",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:01:16.022Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:01:16.022Z"
+  }
+},
+{
+  "_id": "d002b8bb-274c-45b3-80be-44fe1d3d7f09",
+  "name": "Hayat",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:01:19.548Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:01:19.548Z"
+  }
+},
+{
+  "_id": "87834355-8119-4a3b-8a63-4e2232b1d058",
+  "name": "O'rikzor 1",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:01:43.155Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:01:43.155Z"
+  }
+},
+{
+  "_id": "d0d30946-fccf-462f-9de9-429f044d16b7",
+  "name": "Chinnibozor 1",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:01:55.490Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:01:55.490Z"
+  }
+},
+{
+  "_id": "02ab1359-df6d-4e8b-96d2-843b3b2df971",
+  "name": "Sami aka",
+  "address": "xonobod",
+  "phone": "string",
+  "email": "hhh@gmail.com",
+  "inn": "111000",
+  "notes": "string",
+  "branch": "e612ba95-28cb-4294-a745-07943a1f9809",
+  "financial_data": {
+    "balance": 0,
+    "transactions": [],
+    "total_income": 0,
+    "total_expenses": 0
+  },
+  "created_at": {
+    "$date": "2025-06-24T06:02:00.303Z"
+  },
+  "updated_at": {
+    "$date": "2025-06-24T06:02:00.303Z"
+  }
+}]

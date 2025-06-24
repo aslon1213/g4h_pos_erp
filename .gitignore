@@ -37,3 +37,4 @@ dist/
 env*
 config.yaml
 bin/main
+*.log

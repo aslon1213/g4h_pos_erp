@@ -7,7 +7,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewCache() *redis.Client {
+type Cache struct {
+	RedisClient *redis.Client
+}
+
+func New() *Cache {
 	log.Debug().Msg("Initializing Redis connection")
 
 	config, err := configs.LoadConfig(".")
@@ -22,5 +26,7 @@ func NewCache() *redis.Client {
 	})
 
 	log.Info().Msg("Successfully connected to Redis")
-	return client
+	return &Cache{
+		RedisClient: client,
+	}
 }
