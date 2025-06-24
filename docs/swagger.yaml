@@ -69,9 +69,9 @@ definitions:
         type: string
       payment_method:
         $ref: '#/definitions/models.PaymentMethod'
-      supplierID:
+      supplier_id:
         type: string
-      supplierTransaction:
+      supplier_transaction:
         type: boolean
       type:
         $ref: '#/definitions/models.TransactionType'
@@ -476,6 +476,14 @@ paths:
         name: branch_id
         required: true
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
       produces:
       - application/json
       responses:

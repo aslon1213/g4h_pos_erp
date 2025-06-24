@@ -46,8 +46,8 @@ func Read_finance() []models.BranchFinance {
 	return finances
 }
 
-func ReadSuppliers() []map[string]interface{} {
-	suppliers := []map[string]interface{}{}
+func ReadSuppliers() []models.Supplier {
+	suppliers := []models.Supplier{}
 	file, err := os.ReadFile("suppliers.json")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to read suppliers.json")
