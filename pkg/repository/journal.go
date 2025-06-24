@@ -68,8 +68,8 @@ type JournalQueryParams struct {
 
 type JournalOperationInput struct {
 	TransactionBase
-	SupplierTransaction bool
-	SupplierID          string
+	SupplierTransaction bool   `json:"supplier_transaction" bson:"supplier_transaction"`
+	SupplierID          string `json:"supplier_id" bson:"supplier_id"`
 }
 
 type CloseJournalEntryInput struct {

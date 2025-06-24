@@ -258,6 +258,18 @@ const docTemplate = `{
                         "name": "branch_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1324,10 +1336,10 @@ const docTemplate = `{
                 "payment_method": {
                     "$ref": "#/definitions/models.PaymentMethod"
                 },
-                "supplierID": {
+                "supplier_id": {
                     "type": "string"
                 },
-                "supplierTransaction": {
+                "supplier_transaction": {
                     "type": "boolean"
                 },
                 "type": {

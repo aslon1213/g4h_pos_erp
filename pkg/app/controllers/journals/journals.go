@@ -64,7 +64,7 @@ func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
 // @Failure 500 {object} models.Error
 // @Router /journals/{journal_id} [get]
 func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
-	log.Info().Msg("Fetching journal entry by ID")
+	// log.Info().Msg("Fetching journal entry by ID")
 	journal, err := j.FetchJournalByID(j.ctx, c, true)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal entry by ID")
@@ -84,6 +84,8 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param branch_id path string true "Branch ID"
+// @Param page query int false "Page number"
+// @Param page_size query int false "Page size"
 // @Success 200 {array} models.Journal
 // @Failure 500 {object} models.Error
 // @Router /journals/branch/{branch_id} [get]
@@ -97,6 +99,12 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 		}))
 	}
 	log.Info().Interface("queryParams", queryParams).Str("branch_id", c.Params("branch_id")).Msg("Querying journal entries")
+	if queryParams.Page == 0 {
+		queryParams.Page = 1
+	}
+	if queryParams.PageSize == 0 {
+		queryParams.PageSize = 10
+	}
 
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{{Key: "branch._id", Value: c.Params("branch_id")}}}},
@@ -462,7 +470,7 @@ func (j *JournalHandlers) GetReport(c *fiber.Ctx) error {
 }
 
 func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool, journalsCollection *mongo.Collection) (*models.Journal, error) {
-	log.Info().Msg("Fetching journal by ID")
+	// log.Info().Msg("Fetching journal by ID")
 	journalID, err := ParseJournalID(c)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to parse journal ID")
@@ -501,7 +509,7 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 		}
 	}
 
-	log.Info().Interface("pipeline", pipeline).Msg("Pipeline")
+	// log.Info().Interface("pipeline", pipeline).Msg("Pipeline")
 
 	cursor, err := journalsCollection.Aggregate(ctx, pipeline)
 	if err != nil {
@@ -524,7 +532,7 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 		}
 	}
 
-	log.Debug().Interface("results", results).Msg("Successfully fetched journal by ID")
+	// log.Debug().Interface("results", results).Msg("Successfully fetched journal by ID")
 
 	return &results, nil
 }

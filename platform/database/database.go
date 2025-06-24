@@ -3,7 +3,6 @@ package database
 import (
 	"aslon1213/magazin_pos/pkg/configs"
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,9 +20,9 @@ func NewDB() *mongo.Client {
 	}
 	uri := ""
 	if config.DB.Auth {
-		uri = fmt.Sprintf("mongodb://%s:%s@%s:%s/?replicaSet=%s", config.DB.Username, config.DB.Password, config.DB.Host, config.DB.Port, config.DB.ReplicaSet)
+		uri = config.DB.URL
 	} else {
-		uri = fmt.Sprintf("mongodb://%s:%s/?replicaSet=%s", config.DB.Host, config.DB.Port, config.DB.ReplicaSet)
+		uri = config.DB.URL
 	}
 
 	// uri := "mongodb://localhost:27017/?replicaSet=myReplicaSet"
