@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  # mongodb:
+  #   image: mongo:5
+  #   container_name: mongo
+  #   ports:
+  #     - "27017:27017"
+  #   networks:
+  #     - mongoCluster2
+  #   command: mongod --replSet myReplicaSet --bind_ip localhost,mongodb
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "mongosh",
+  #         "--eval",
+  #         "rs.initiate({_id: 'myReplicaSet', members: [{_id: 0, host: 'mongodb:27017'}]})",
+  #       ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 10s
+
+  backend:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    ports:
+      - "12000:12000"
+    # depends_on:
+    #   mongodb:
+    #     condition: service_healthy
+    networks:
+      - mongoCluster
+    volumes:
+      - ../config.yaml:/app/config.yaml
+      - ../tmp:/app/tmp
+      # - ../docs:/app/docs
+    environment:
+      - ENVIRONMENT=PRODUCTION
+
+networks:
+  mongoCluster:
+    name: mongoCluster
+    external: true

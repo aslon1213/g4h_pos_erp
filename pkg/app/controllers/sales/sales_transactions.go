@@ -218,15 +218,15 @@ func DecrementBalance(ctx context.Context, finance *mongo.Collection, branch_id 
 	}
 	switch transaction.PaymentMethod {
 	case models.PaymentMethodCash:
-		update["$inc"].(bson.M)["finance.balance.cash"] = -transaction.Amount
+		update["$inc"].(bson.M)["finance.balance.cash"] = -int32(transaction.Amount)
 	case models.PaymentMethodBank:
-		update["$inc"].(bson.M)["finance.balance.bank"] = -transaction.Amount
+		update["$inc"].(bson.M)["finance.balance.bank"] = -int32(transaction.Amount)
 	case models.PaymentMethodTerminal:
-		update["$inc"].(bson.M)["finance.balance.terminal"] = -transaction.Amount
+		update["$inc"].(bson.M)["finance.balance.terminal"] = -int32(transaction.Amount)
 	case models.OnlineMobileAppPayment:
-		update["$inc"].(bson.M)["finance.balance.mobile_apps"] = -transaction.Amount
+		update["$inc"].(bson.M)["finance.balance.mobile_apps"] = -int32(transaction.Amount)
 	case models.OnlineTransfer:
-		update["$inc"].(bson.M)["finance.balance.mobile_apps"] = -transaction.Amount
+		update["$inc"].(bson.M)["finance.balance.mobile_apps"] = -int32(transaction.Amount)
 	}
 	result, err := finance.UpdateOne(ctx, filter, update)
 	if err != nil {
