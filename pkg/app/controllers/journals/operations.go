@@ -65,6 +65,8 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		}))
 	}
 
+	log.Info().Interface("transaction", transaction).Msg("Transaction data")
+
 	// transaction_created := &models.Transaction{}
 	// start a new session and transaction
 	ses, ctx, err := database.StartTransaction(c, o.JournalsCollection.Database().Client())

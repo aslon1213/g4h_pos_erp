@@ -211,7 +211,7 @@ func SetupLogger() *zerolog.Logger {
 	logFile, err := os.OpenFile("./tmp/application.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		if err == os.ErrNotExist {
-			logfile, err := os.Create("/application.log")
+			logfile, err := os.Create("./tmp/application.log")
 			if err != nil {
 				log.Fatal().Err(err).Msg("Failed to create log file")
 			}
