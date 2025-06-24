@@ -1,4 +1,22 @@
 definitions:
+  models.Branch:
+    properties:
+      id:
+        type: string
+      location:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.CloseJournalEntryInput:
+    properties:
+      cash_left:
+        type: integer
+      terminal_income:
+        type: integer
+    type: object
   models.Error:
     properties:
       code:
@@ -22,11 +40,54 @@ definitions:
     - InitiatorTypeOther
     - InitiatorTypeSales
     - InitiatorTypeSupplier
+  models.Journal:
+    properties:
+      branch:
+        $ref: '#/definitions/models.Branch'
+      cash_left:
+        type: integer
+      date:
+        type: string
+      id:
+        type: string
+      operations:
+        items:
+          $ref: '#/definitions/models.Transaction'
+        type: array
+      shift_is_closed:
+        type: boolean
+      terminal_income:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.JournalOperationInput:
+    properties:
+      amount:
+        type: integer
+      description:
+        type: string
+      payment_method:
+        $ref: '#/definitions/models.PaymentMethod'
+      supplierID:
+        type: string
+      supplierTransaction:
+        type: boolean
+      type:
+        $ref: '#/definitions/models.TransactionType'
+    type: object
   models.NewBranchFinanceInput:
     properties:
       branch_name:
         type: string
       details: {}
+    type: object
+  models.NewJournalEntryInput:
+    properties:
+      branch_name_or_id:
+        type: string
+      date:
+        type: string
     type: object
   models.Output:
     properties:
@@ -133,24 +194,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /finance/branches:
-    get:
-      description: Retrieve all branches from the finance collection
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Output'
-      summary: Fetch all branches
-      tags:
-      - finance
-      - branches
+  /finance:
     post:
       consumes:
       - application/json
@@ -180,8 +224,7 @@ paths:
       summary: Create new finance for a branch
       tags:
       - finance
-      - branches
-  /finance/branches/{id}:
+  /finance/branch/id/{id}:
     get:
       description: Retrieve a branch using its ID
       parameters:
@@ -204,32 +247,7 @@ paths:
       summary: Fetch branch by ID
       tags:
       - finance
-      - branches
-  /finance/branches/finance/{id}:
-    get:
-      description: Retrieve finance details using its ID
-      parameters:
-      - description: Finance ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Output'
-      summary: Fetch finance by ID
-      tags:
-      - finance
-      - branches
-  /finance/branches/name/{branch_name}:
+  /finance/branch/name/{branch_name}:
     get:
       description: Retrieve finance details using the branch name
       parameters:
@@ -252,7 +270,239 @@ paths:
       summary: Fetch finance by branch name
       tags:
       - finance
-      - branches
+  /finance/branches:
+    get:
+      description: Retrieve all branches from the finance collection
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      summary: Fetch all branches
+      tags:
+      - finance
+  /finance/id/{id}:
+    get:
+      description: Retrieve finance details using its ID
+      parameters:
+      - description: Finance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Output'
+      summary: Fetch finance by ID
+      tags:
+      - finance
+  /journals:
+    post:
+      consumes:
+      - application/json
+      description: Create a new journal entry for a branch
+      parameters:
+      - description: New Journal Entry Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewJournalEntryInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Journal'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Create a new journal entry
+      tags:
+      - journals
+  /journals/{journal_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a journal entry by its ID
+      parameters:
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Journal'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get a journal entry by ID
+      tags:
+      - journals
+  /journals/{journal_id}/close:
+    post:
+      consumes:
+      - application/json
+      description: Close a journal entry by updating its transactions
+      parameters:
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      - description: Close Journal Entry Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CloseJournalEntryInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Close a journal entry
+      tags:
+      - journals
+  /journals/{journal_id}/operations:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction and update the journal
+      parameters:
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.JournalOperationInput'
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      summary: Create a new operation transaction
+      tags:
+      - operations
+      - transactions
+  /journals/{journal_id}/reopen:
+    post:
+      consumes:
+      - application/json
+      description: Reopen a journal entry by removing its closing transactions
+      parameters:
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Reopen a closed journal entry
+      tags:
+      - journals
+  /journals/branch/{branch_id}:
+    get:
+      consumes:
+      - application/json
+      description: Query journal entries by branch ID
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Journal'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Query journal entries
+      tags:
+      - journals
+  /journals/report:
+    get:
+      consumes:
+      - application/json
+      description: Get a report of journal entries
+      produces:
+      - application/json
+      responses: {}
+      summary: Get a report
+      tags:
+      - journals
   /sales/{branch_id}:
     post:
       consumes:
@@ -318,6 +568,35 @@ paths:
       consumes:
       - application/json
       description: Get all suppliers from the database
+      parameters:
+      - description: Supplier name
+        in: query
+        name: name
+        type: string
+      - description: Supplier INN
+        in: query
+        name: inn
+        type: string
+      - description: Supplier branch
+        in: query
+        name: branch
+        type: string
+      - description: Supplier email
+        in: query
+        name: email
+        type: string
+      - description: Supplier phone
+        in: query
+        name: phone
+        type: string
+      - description: Supplier address
+        in: query
+        name: address
+        type: string
+      - description: Supplier notes
+        in: query
+        name: notes
+        type: string
       produces:
       - application/json
       responses:

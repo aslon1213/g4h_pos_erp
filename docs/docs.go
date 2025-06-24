@@ -15,32 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/finance/branches": {
-            "get": {
-                "description": "Retrieve all branches from the finance collection",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "finance",
-                    "branches"
-                ],
-                "summary": "Fetch all branches",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Output"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Output"
-                        }
-                    }
-                }
-            },
+        "/finance": {
             "post": {
                 "description": "Add new financial records for a branch",
                 "consumes": [
@@ -50,8 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "finance",
-                    "branches"
+                    "finance"
                 ],
                 "summary": "Create new finance for a branch",
                 "parameters": [
@@ -87,21 +61,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/branches/finance/{id}": {
+        "/finance/branch/id/{id}": {
             "get": {
-                "description": "Retrieve finance details using its ID",
+                "description": "Retrieve a branch using its ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "finance",
-                    "branches"
+                    "finance"
                 ],
-                "summary": "Fetch finance by ID",
+                "summary": "Fetch branch by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Finance ID",
+                        "description": "Branch ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -123,15 +96,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/branches/name/{branch_name}": {
+        "/finance/branch/name/{branch_name}": {
             "get": {
                 "description": "Retrieve finance details using the branch name",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "finance",
-                    "branches"
+                    "finance"
                 ],
                 "summary": "Fetch finance by branch name",
                 "parameters": [
@@ -159,21 +131,46 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/branches/{id}": {
+        "/finance/branches": {
             "get": {
-                "description": "Retrieve a branch using its ID",
+                "description": "Retrieve all branches from the finance collection",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "finance",
-                    "branches"
+                    "finance"
                 ],
-                "summary": "Fetch branch by ID",
+                "summary": "Fetch all branches",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/finance/id/{id}": {
+            "get": {
+                "description": "Retrieve finance details using its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "finance"
+                ],
+                "summary": "Fetch finance by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Branch ID",
+                        "description": "Finance ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -190,6 +187,298 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals": {
+            "post": {
+                "description": "Create a new journal entry for a branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals"
+                ],
+                "summary": "Create a new journal entry",
+                "parameters": [
+                    {
+                        "description": "New Journal Entry Input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.NewJournalEntryInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Journal"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals/branch/{branch_id}": {
+            "get": {
+                "description": "Query journal entries by branch ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals"
+                ],
+                "summary": "Query journal entries",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branch_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Journal"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals/report": {
+            "get": {
+                "description": "Get a report of journal entries",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals"
+                ],
+                "summary": "Get a report",
+                "responses": {}
+            }
+        },
+        "/journals/{journal_id}": {
+            "get": {
+                "description": "Get a journal entry by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals"
+                ],
+                "summary": "Get a journal entry by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Journal"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals/{journal_id}/close": {
+            "post": {
+                "description": "Close a journal entry by updating its transactions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals"
+                ],
+                "summary": "Close a journal entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Close Journal Entry Input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CloseJournalEntryInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals/{journal_id}/operations": {
+            "post": {
+                "description": "Create a new transaction and update the journal",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "operations",
+                    "transactions"
+                ],
+                "summary": "Create a new operation transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction data",
+                        "name": "transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.JournalOperationInput"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals/{journal_id}/reopen": {
+            "post": {
+                "description": "Reopen a journal entry by removing its closing transactions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals"
+                ],
+                "summary": "Reopen a closed journal entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -299,6 +588,50 @@ const docTemplate = `{
                     "suppliers"
                 ],
                 "summary": "Get all suppliers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Supplier name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Supplier INN",
+                        "name": "inn",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Supplier branch",
+                        "name": "branch",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Supplier email",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Supplier phone",
+                        "name": "phone",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Supplier address",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Supplier notes",
+                        "name": "notes",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -889,6 +1222,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Branch": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CloseJournalEntryInput": {
+            "type": "object",
+            "properties": {
+                "cash_left": {
+                    "type": "integer"
+                },
+                "terminal_income": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Error": {
             "type": "object",
             "properties": {
@@ -919,6 +1280,61 @@ const docTemplate = `{
                 "InitiatorTypeSupplier"
             ]
         },
+        "models.Journal": {
+            "type": "object",
+            "properties": {
+                "branch": {
+                    "$ref": "#/definitions/models.Branch"
+                },
+                "cash_left": {
+                    "type": "integer"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "operations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Transaction"
+                    }
+                },
+                "shift_is_closed": {
+                    "type": "boolean"
+                },
+                "terminal_income": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.JournalOperationInput": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "$ref": "#/definitions/models.PaymentMethod"
+                },
+                "supplierID": {
+                    "type": "string"
+                },
+                "supplierTransaction": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "$ref": "#/definitions/models.TransactionType"
+                }
+            }
+        },
         "models.NewBranchFinanceInput": {
             "type": "object",
             "properties": {
@@ -926,6 +1342,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "details": {}
+            }
+        },
+        "models.NewJournalEntryInput": {
+            "type": "object",
+            "properties": {
+                "branch_name_or_id": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                }
             }
         },
         "models.Output": {
