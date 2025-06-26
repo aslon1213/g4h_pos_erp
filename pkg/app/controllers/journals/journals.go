@@ -7,6 +7,7 @@ import (
 	"aslon1213/magazin_pos/platform/cache"
 	"aslon1213/magazin_pos/platform/database"
 	"context"
+	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -74,6 +75,7 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 		}))
 	}
 	log.Info().Msg("Successfully fetched journal entry by ID")
+	log.Info().Interface("journal", journal).Msg("Journal")
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(journal))
 }
 
@@ -108,7 +110,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{{Key: "branch._id", Value: c.Params("branch_id")}}}},
-		{{Key: "$sort", Value: bson.D{{Key: "date", Value: 1}}}},               // Sort by date in ascending order
+		{{Key: "$sort", Value: bson.D{{Key: "date", Value: -1}}}},              // Sort by date in ascending order
 		{{Key: "$skip", Value: (queryParams.Page - 1) * queryParams.PageSize}}, // Skip the first N documents = page_size * page_number
 		{{Key: "$limit", Value: queryParams.PageSize}},                         // Limit the number of documents returned = page_size
 		{
@@ -150,6 +152,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 		}))
 	}
 	log.Info().Msg("Successfully queried journal entries")
+	// log.Info().Interface("results", results).Msg("Results")
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(results))
 }
 
@@ -176,7 +179,7 @@ func (j *JournalHandlers) NewJournalEntry(c *fiber.Ctx) error {
 
 	// get the branch from the database
 	financeBranch := models.BranchFinance{}
-	err := j.FinanceCollection.FindOne(j.ctx, bson.M{"$or": []bson.M{{"branch_name": input.BranchNameOrID}, {"branch_id": input.BranchNameOrID}}}).Decode(&financeBranch)
+	err := j.FinanceCollection.FindOne(j.ctx, bson.M{"$or": []bson.M{{"branch_name": bson.M{"$regex": input.BranchNameOrID, "$options": "i"}}, {"branch_id": input.BranchNameOrID}}}).Decode(&financeBranch)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find branch in finance collection")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -351,7 +354,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 }
 
 func (j *JournalHandlers) FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool) (*models.Journal, error) {
-	log.Info().Msg("Fetching journal by ID")
+	log.Info().Str("journal_id", c.Params("id")).Msg("Fetching journal by ID")
 	return FetchJournalByID(ctx, c, fetchTransactions, j.JournalCollection)
 }
 
@@ -447,13 +450,13 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 }
 
 func ParseJournalID(c *fiber.Ctx) (bson.ObjectID, error) {
-	log.Info().Msg("Parsing journal ID")
+	// log.Info().Msg("Parsing journal ID")
 	journalID, err := bson.ObjectIDFromHex(c.Params("id"))
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to parse journal ID")
 		return bson.NilObjectID, err
 	}
-	log.Info().Msg("Successfully parsed journal ID")
+	// log.Info().Msg("Successfully parsed journal ID")
 	return journalID, nil
 }
 
@@ -480,7 +483,7 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 	// Fetch transactions related to this journal using a MongoDB pipeline
 	pipeline := mongo.Pipeline{}
 	if fetchTransactions {
-		log.Info().Msg("Fetching transactions with lookup")
+		log.Info().Str("journal_id", journalID.Hex()).Msg("Fetching transactions with lookup")
 		pipeline = mongo.Pipeline{
 			{{Key: "$match", Value: bson.D{{Key: "_id", Value: journalID}}}},
 			{
@@ -504,8 +507,9 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 			},
 		}
 	} else {
+		log.Info().Str("journal_id", journalID.Hex()).Msg("Fetching journal by ID without transactions")
 		pipeline = mongo.Pipeline{
-			{{Key: "$match", Value: bson.D{{Key: "journal_id", Value: journalID}}}},
+			{{Key: "$match", Value: bson.D{{Key: "_id", Value: journalID}}}},
 		}
 	}
 
@@ -518,21 +522,16 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 	}
 	defer cursor.Close(ctx)
 
-	var results models.Journal
-	for cursor.Next(ctx) {
-		if err := cursor.Decode(&results); err != nil {
-			res_temp := map[string]interface{}{}
-			if err := cursor.Decode(&res_temp); err != nil {
-				log.Error().Err(err).Msg("Failed to decode journal entry")
-				return nil, err
-			}
-			log.Info().Interface("res_temp", res_temp).Msg("Decoded journal entry")
-			log.Error().Err(err).Msg("Failed to decode journal entry")
-			return nil, err
-		}
+	var results []models.Journal
+	if err := cursor.All(ctx, &results); err != nil {
+		log.Error().Err(err).Msg("Failed to decode journal entries")
+		return nil, err
 	}
 
-	// log.Debug().Interface("results", results).Msg("Successfully fetched journal by ID")
-
-	return &results, nil
+	log.Debug().Interface("results", results).Msg("Successfully fetched journal by ID")
+	if len(results) == 0 {
+		log.Error().Msg("No journal found")
+		return nil, errors.New("no journal found")
+	}
+	return &results[0], nil
 }
