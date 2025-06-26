@@ -18,16 +18,18 @@ import time
 async def fetch_data(session, url):
     start_time = time.time()
     async with session.get(url) as response:
-        await response.json()
+        result = await response.json()
+        # print(result)
+
     return time.time() - start_time
 
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        for _ in range(10):  # Run 10 batches
+        for _ in range(3):  # Run 10 batches
             tasks = []
-            for _ in range(1000):  # 1000 requests per batch
-                url = f"http://localhost:9999/journals/685a2d2f5a8e3be7b026debd"
+            for _ in range(100):  # 1000 requests per batch
+                url = f"http://api.g4h.uz/journals/685ab4cffad6033ab220b2de"
                 tasks.append(fetch_data(session, url))
             results = await asyncio.gather(*tasks)
             # calculate the average time
