@@ -1,6 +1,6 @@
 package main
 
-import "aslon1213/magazin_pos/pkg/app"
+import "github.com/aslon1213/go-pos-erp/pkg/app"
 
 // @title Swagger Example API
 // @version 1.0
@@ -18,7 +18,7 @@ import "aslon1213/magazin_pos/pkg/app"
 // @BasePath /v2
 func main() {
 
-	app := app.NewApp()
+	app := app.New()
 
 	app.Logger.Info().Msg("Starting server...")
 
