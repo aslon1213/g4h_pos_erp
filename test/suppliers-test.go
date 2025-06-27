@@ -1,23 +1,24 @@
 package test
 
 import (
-	"aslon1213/magazin_pos/pkg/app"
 	"encoding/json"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/aslon1213/go-pos-erp/pkg/app"
 )
 
 func StartTest(m *testing.M) {
-	app := app.NewApp()
+	app := app.New()
 	app.Run()
 	os.Exit(m.Run())
 }
 
 func TestCreateSuppliers(t *testing.T) {
 
-	app := app.NewApp()
+	app := app.New()
 	go app.Run()
 	// Create test HTTP client
 	client := &http.Client{}

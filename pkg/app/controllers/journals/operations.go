@@ -1,12 +1,13 @@
 package journal_handlers
 
 import (
-	"aslon1213/magazin_pos/pkg/app/controllers/sales"
-	"aslon1213/magazin_pos/pkg/app/controllers/suppliers"
-	models "aslon1213/magazin_pos/pkg/repository"
-	"aslon1213/magazin_pos/platform/cache"
-	"aslon1213/magazin_pos/platform/database"
 	"context"
+
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/sales"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/suppliers"
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	"github.com/aslon1213/go-pos-erp/platform/cache"
+	"github.com/aslon1213/go-pos-erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -46,7 +47,7 @@ func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHand
 // NewOperationTransaction godoc
 // @Summary Create a new operation transaction
 // @Description Create a new transaction and update the journal
-// @Tags operations, transactions
+// @Tags journals/operations
 // @Accept json
 // @Produce json
 // @Param transaction body models.JournalOperationInput true "Transaction data"
@@ -159,14 +160,50 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(journal))
 }
 
+// UpdateOperationTransactionByID godoc
+// @Summary Update an operation transaction
+// @Description Update an operation transaction by ID
+// @Tags journals/operations
+// @Accept json
+// @Produce json
+// @Param id path string true "Operation ID"
+// @Param journal_id path string true "Journal ID"
+// @Success 200 {object} models.Output
+// @Failure 400 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /journals/{journal_id}/operations/{id} [put]
 func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
 	panic("Not implemented")
 }
 
+// DeleteOperationTransactionByID godoc
+// @Summary Delete an operation transaction
+// @Description Delete an operation transaction by ID
+// @Tags journals/operations
+// @Accept json
+// @Produce json
+// @Param id path string true "Operation ID"
+// @Param journal_id path string true "Journal ID"
+// @Success 200 {object} models.Output
+// @Failure 400 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /journals/{journal_id}/operations/{id} [delete]
 func (o *OperationHandlers) DeleteOperationTransactionByID(c *fiber.Ctx) error {
 	panic("Not implemented")
 }
 
+// GetOperationTransactionByID godoc
+// @Summary Get an operation transaction by ID
+// @Description Get an operation transaction by ID
+// @Tags journals/operations
+// @Accept json
+// @Produce json
+// @Param id path string true "Operation ID"
+// @Param journal_id path string true "Journal ID"
+// @Success 200 {object} models.Output
+// @Failure 400 {object} models.Output
+// @Failure 500 {object} models.Output
+// @Router /journals/{journal_id}/operations/{id} [get]
 func (o *OperationHandlers) GetOperationTransactionByID(c *fiber.Ctx) error {
 	panic("Not implemented")
 }

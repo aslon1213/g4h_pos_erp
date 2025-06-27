@@ -1,40 +1,62 @@
 package routes
 
 import (
-	"aslon1213/magazin_pos/pkg/app/controllers/finance"
-	journal_handlers "aslon1213/magazin_pos/pkg/app/controllers/journals"
-	"aslon1213/magazin_pos/pkg/app/controllers/sales"
-	"aslon1213/magazin_pos/pkg/app/controllers/suppliers"
-	"aslon1213/magazin_pos/pkg/app/controllers/transactions"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/finance"
+	journal_handlers "github.com/aslon1213/go-pos-erp/pkg/app/controllers/journals"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/products"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/sales"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/suppliers"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/transactions"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func SuppliersRoutes(router *fiber.App, suppliersController *suppliers.SuppliersController) {
-	router.Get("/suppliers", suppliersController.GetSuppliers) // get all suppliers
-	router.Get("/suppliers/:id", suppliersController.GetSupplierByID)
-	router.Post("/suppliers", suppliersController.CreateSupplier)
-	router.Put("/suppliers/:id", suppliersController.UpdateSupplier)
-	router.Delete("/suppliers/:id", suppliersController.DeleteSupplier)
-	router.Post("/suppliers/:branch_id/:supplier_id/transactions", suppliersController.NewTransaction)
+	router.Get("/suppliers", suppliersController.GetSuppliers)                                         // get all suppliers
+	router.Get("/suppliers/:id", suppliersController.GetSupplierByID)                                  // get supplier by id
+	router.Post("/suppliers", suppliersController.CreateSupplier)                                      // create supplier
+	router.Put("/suppliers/:id", suppliersController.UpdateSupplier)                                   // update supplier
+	router.Delete("/suppliers/:id", suppliersController.DeleteSupplier)                                // delete supplier
+	router.Post("/suppliers/:branch_id/:supplier_id/transactions", suppliersController.NewTransaction) // create transaction
 }
 
 func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsController) {
-	router.Post("/sales/:branch_id", salesController.CreateSalesTransaction)
+	router.Post("/sales/transactions/:branch_id", salesController.CreateSalesTransaction)        // create sales transaction
+	router.Delete("/sales/transactions/:transaction_id", salesController.DeleteSalesTransaction) // delete sales transaction
+	// sales session routes
+	router.Post("/sales/session/branch/:branch_id", salesController.OpenSalesSession)          // open sales session
+	router.Post("/sales/session/:session_id/product", salesController.AddProductItemToSession) // add product to session
+	router.Post("/sales/session/:session_id/close", salesController.CloseSalesSession)         // close sales session
+	router.Get("/sales/session/:session_id", salesController.GetSalesSession)                  // get sales session
+	router.Delete("/sales/session/:session_id", salesController.DeleteSalesSession)            // delete sales session
+	router.Get("/sales/session/branch/:branch_id", salesController.GetSalesSessionsOfBranch)   // get sales of session
+	// router.Get("/sales/branch/:branch_id/sessions", salesController.GetSalesOfSession)
+
+}
+
+func ProductsRoutes(router *fiber.App, productsController *products.ProductsController) {
+
+	router.Post("/products", productsController.CreateProduct)        // create product
+	router.Put("/products/:id", productsController.EditProduct)       // edit product
+	router.Delete("/products/:id", productsController.DeleteProduct)  // delete product
+	router.Get("/products/:id", productsController.GetProductByID)    // get product by id
+	router.Get("/products", productsController.QueryProducts)         // query products
+	router.Post("/products/:id/income", productsController.NewIncome) // create income
+	router.Post("/products/transfer", productsController.NewTransfer) // create transfer
 }
 
 func JournalsRoutes(router *fiber.App, journalsController *journal_handlers.JournalHandlers, operationsController *journal_handlers.OperationHandlers) {
-	router.Get("/journals/:id", journalsController.GetJournalEntryByID)
-	router.Get("/journals/branch/:branch_id", journalsController.QueryJournalEntries)
-	router.Post("/journals", journalsController.NewJournalEntry)
-	router.Post("/journals/:id/close", journalsController.CloseJournalEntry)
-	router.Post("/journals/:id/reopen", journalsController.ReOpenJournalEntry)
+	router.Get("/journals/:id", journalsController.GetJournalEntryByID)               // get journal entry by id
+	router.Get("/journals/branch/:branch_id", journalsController.QueryJournalEntries) // query journal entries
+	router.Post("/journals", journalsController.NewJournalEntry)                      // create journal entry
+	router.Post("/journals/:id/close", journalsController.CloseJournalEntry)          // close journal entry
+	router.Post("/journals/:id/reopen", journalsController.ReOpenJournalEntry)        // reopen journal entry
 
 	// operations
-	router.Post("/journals/:id/operations", operationsController.NewOperationTransaction)
-	router.Put("/journals/:id/operations/:operation_id", operationsController.UpdateOperationTransactionByID)
-	router.Delete("/journals/:id/operations/:operation_id", operationsController.DeleteOperationTransactionByID)
-	router.Get("/journals/:id/operations/:operation_id", operationsController.GetOperationTransactionByID)
+	router.Post("/journals/:id/operations", operationsController.NewOperationTransaction)                        // create operation transaction
+	router.Put("/journals/:id/operations/:operation_id", operationsController.UpdateOperationTransactionByID)    // update operation transaction by id
+	router.Delete("/journals/:id/operations/:operation_id", operationsController.DeleteOperationTransactionByID) // delete operation transaction by id
+	router.Get("/journals/:id/operations/:operation_id", operationsController.GetOperationTransactionByID)       // get operation transaction by id
 
 }
 
@@ -52,12 +74,12 @@ func FinanceRoutes(router *fiber.App, financeController *finance.FinanceControll
 }
 
 func TransactionsRoutes(router *fiber.App, transactionsController *transactions.TransactionsController) {
-	router.Get("/transactions/branch/:branch_id", transactionsController.GetTransactionsByQueryParams)
-	router.Get("/transactions/:id", transactionsController.GetTransactionByID)
+	router.Get("/transactions/branch/:branch_id", transactionsController.GetTransactionsByQueryParams) // get transactions by query params
+	router.Get("/transactions/:id", transactionsController.GetTransactionByID)                         // get transaction by id
 	// router.Post("/transactions/:branch_id", transactionsController.Tra)
-	router.Put("/transactions/:id", transactionsController.UpdateTransactionByID)
-	router.Delete("/transactions/:id", transactionsController.DeleteTransactionByID)
-	router.Get("/transactions/docs/initiator_type", transactionsController.GetInitiatorType)
-	router.Get("/transactions/docs/type", transactionsController.GetTransactionType)
-	router.Get("/transactions/docs/payment_method", transactionsController.GetPaymentMethod)
+	router.Put("/transactions/:id", transactionsController.UpdateTransactionByID)            // update transaction by id
+	router.Delete("/transactions/:id", transactionsController.DeleteTransactionByID)         // delete transaction by id
+	router.Get("/transactions/docs/initiator_type", transactionsController.GetInitiatorType) // get initiator type
+	router.Get("/transactions/docs/type", transactionsController.GetTransactionType)         // get transaction type
+	router.Get("/transactions/docs/payment_method", transactionsController.GetPaymentMethod) // get payment method
 }
