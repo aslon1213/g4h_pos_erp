@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/sales"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/sales"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/pkg/utils"
 	"github.com/aslon1213/go-pos-erp/platform/cache"
