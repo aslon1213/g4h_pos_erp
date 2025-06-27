@@ -183,7 +183,7 @@ func CustomZerologMiddleware(c *fiber.Ctx) error {
 }
 
 func SetupLogger() *zerolog.Logger {
-	log.Debug().Msg("Setting up logger")
+	// log.Debug().Msg("Setting up logger")
 	// lokiClient = LokiClient{
 	// 	PushIntveralSeconds: 5,
 	// 	MaxBatchSize:        10,

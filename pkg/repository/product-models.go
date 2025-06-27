@@ -1,10 +1,14 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // ProductQuantityInfo represents the quantity and unit of measurement for a product
 type ProductQuantityInfo struct {
-	Quantity int    `json:"quantity" bson:"quantity"` // Amount of product
+	Quantity int32  `json:"quantity" bson:"quantity"` // Quantity of the product
 	Unit     string `json:"unit" bson:"unit"`         // Unit of measurement (e.g. kg, pieces, etc)
 }
 
@@ -19,14 +23,16 @@ const (
 
 // ProductPlace represents a physical location where products are stored
 type ProductPlace struct {
-	ID        string           `json:"id" bson:"_id"`                // Unique identifier for the place
+	ID        string           `json:"id" bson:"id"`                 // Unique identifier for the place
 	PlaceType ProductPlaceType `json:"place_type" bson:"place_type"` // Type of storage location
 }
+type ProductItemID string
 
 // ProductQuantityDistribution tracks how much of a product is stored in each location
-type ProductQuantityDistribution struct {
+type ProductDistribution struct {
 	ProductQuantityInfo              // Embedded quantity info
 	Place               ProductPlace `json:"place" bson:"place"` // Location details
+	Price               int32        `json:"price" bson:"price"` // Price of the product
 }
 
 type PriceDistribution struct {
@@ -53,38 +59,55 @@ type IncomeHistory struct {
 
 // this is used to track every item of this product type.
 type ProductItem struct {
-	ID     string    `json:"id" bson:"id"`         // Unique identifier for the product item
 	Expire time.Time `json:"expire" bson:"expire"` // Expire date of the product item
+	Price  int32     `json:"price" bson:"price"`   // Price of the product item
+}
+
+type ProductBase struct {
+	Name              string           `json:"name" bson:"name"`                               // Product name
+	Description       string           `json:"description" bson:"description"`                 // Product description
+	Manufacturer      ManufacturerInfo `json:"manufacturer" bson:"manufacturer"`               // Manufacturer details
+	Category          []string         `json:"category" bson:"category"`                       // Product categories
+	SKU               string           `json:"sku" bson:"sku"`                                 // Stock Keeping Unit
+	MinimumStockAlert int32            `json:"minimum_stock_alert" bson:"minimum_stock_alert"` // Minimum stock alert
 }
 
 // Product represents a complete product entity with all its details
 type Product struct {
-	ID                   string                        `json:"id" bson:"_id"`                                      // Unique product identifier
-	Images               []string                      `json:"images" bson:"images"`                               // Product images (lins) saved to some S3
-	Name                 string                        `json:"name" bson:"name"`                                   // Product name
-	Description          string                        `json:"description" bson:"description"`                     // Product description
-	Manufacturer         ManufacturerInfo              `json:"manufacturer" bson:"manufacturer"`                   // Manufacturer details
-	PriceDistribution    []PriceDistribution           `json:"price_distribution" bson:"price_distribution"`       // Pricing information
-	Category             []string                      `json:"category" bson:"category"`                           // Product categories
-	SKU                  string                        `json:"sku" bson:"sku"`                                     // Stock Keeping Unit
-	CreatedAt            string                        `json:"created_at" bson:"created_at"`                       // Creation timestamp
-	UpdatedAt            string                        `json:"updated_at" bson:"updated_at"`                       // Last update timestamp
-	QuantityDistribution []ProductQuantityDistribution `json:"quantity_distribution" bson:"quantity_distribution"` // Stock levels by location
-	IncomeHistory        []IncomeHistory               `json:"income_history" bson:"income_history"`               // Income history
-	ProductItems         []ProductItem                 `json:"product_items" bson:"product_items"`                 // Product items
-	MinimumStockAlert    int32                         `json:"minimum_stock_alert" bson:"minimum_stock_alert"`     // Minimum stock alert
+	ID                   string                `json:"id" bson:"_id"` // Unique product identifier
+	ProductBase          `bson:",inline"`      // Unique product identifier
+	CreatedAt            time.Time             `json:"created_at" bson:"created_at"`                       // Creation timestamp
+	UpdatedAt            time.Time             `json:"updated_at" bson:"updated_at"`                       // Last update timestamp
+	QuantityDistribution []ProductDistribution `json:"quantity_distribution" bson:"quantity_distribution"` // Stock levels by location
+	Images               []string              `json:"images" bson:"images"`                               // Product images (lins) saved to some S3
+	IncomeHistory        []IncomeHistory       `json:"income_history" bson:"income_history"`               // Income history
+}
+
+func NewProduct(productBase *ProductBase) *Product {
+	return &Product{
+		ID:                   uuid.New().String(),
+		ProductBase:          *productBase,
+		CreatedAt:            time.Now(),
+		UpdatedAt:            time.Now(),
+		QuantityDistribution: []ProductDistribution{},
+		Images:               []string{},
+		IncomeHistory:        []IncomeHistory{},
+	}
+}
+
+type ProductOutput struct {
+	Data  []Product `json:"data"`
+	Error []Error   `json:"error"`
 }
 
 // ProductQueryParams defines the available search parameters for products
 type ProductQueryParams struct {
-	BranchID             string                        `query:"branch_id"`             // Filter by branch
-	Category             string                        `query:"category"`              // Filter by category
-	SKU                  string                        `query:"sku"`                   // Filter by SKU
-	PriceMin             float64                       `query:"price_min"`             // Minimum selling price
-	PriceMax             float64                       `query:"price_max"`             // Maximum selling price
-	CostMin              float64                       `query:"cost_min"`              // Minimum cost price
-	CostMax              float64                       `query:"cost_max"`              // Maximum cost price
-	QuantityDistribution []ProductQuantityDistribution `query:"quantity_distribution"` // Filter by stock levels
+	BranchID string  `query:"branch_id"` // Filter by branch
+	Category string  `query:"category"`  // Filter by category
+	SKU      string  `query:"sku"`       // Filter by SKU
+	PriceMin float64 `query:"price_min"` // Minimum selling price
+	PriceMax float64 `query:"price_max"` // Maximum selling price
+
 }
 
 // Logic for handling products
