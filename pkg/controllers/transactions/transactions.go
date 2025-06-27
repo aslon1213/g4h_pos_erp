@@ -1,8 +1,9 @@
 package transactions
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
 	"context"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"

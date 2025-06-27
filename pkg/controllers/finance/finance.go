@@ -1,9 +1,10 @@
 package finance
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
 	"context"
 	"net/url"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"

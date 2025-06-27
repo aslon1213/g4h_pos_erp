@@ -9,7 +9,11 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "API Support",
+            "url": "https://github.com/github.com/aslon1213/go-pos-erp",
+            "email": "hamidovaslon13@gmail.com"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -411,8 +415,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "operations",
-                    "transactions"
+                    "journals/operations"
                 ],
                 "summary": "Create a new operation transaction",
                 "parameters": [
@@ -424,6 +427,155 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.JournalOperationInput"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/journals/{journal_id}/operations/{id}": {
+            "get": {
+                "description": "Get an operation transaction by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals/operations"
+                ],
+                "summary": "Get an operation transaction by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Operation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an operation transaction by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals/operations"
+                ],
+                "summary": "Update an operation transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Operation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Journal ID",
+                        "name": "journal_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an operation transaction by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "journals/operations"
+                ],
+                "summary": "Delete an operation transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Operation ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     },
                     {
                         "type": "string",
@@ -496,7 +648,581 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/{branch_id}": {
+        "/products": {
+            "get": {
+                "description": "Query products based on various parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Query products",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branch_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "SKU",
+                        "name": "sku",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Minimum price",
+                        "name": "price_min",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Maximum price",
+                        "name": "price_max",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new product with the given details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Create a new product",
+                "parameters": [
+                    {
+                        "description": "Product details",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProductBase"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/transfer": {
+            "post": {
+                "description": "Transfers product quantity from one location to another",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Transfer product between locations",
+                "responses": {}
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "description": "Retrieves a product by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Get a product by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates an existing product with the given details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Edit a product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Product details to update",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProductBase"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a product and its related data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Delete a product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{id}/income": {
+            "post": {
+                "description": "Adds new income entry for a product with quantity and price updates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Add new income for a product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Income details",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/products.NewIncomeInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/sales/session/branch/{branch_id}": {
+            "get": {
+                "description": "Retrieves all sales sessions associated with a branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales/session"
+                ],
+                "summary": "Get all sales sessions for a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branch_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new sales session for a branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales/session"
+                ],
+                "summary": "Open a new sales session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branch_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/sales/session/{session_id}": {
+            "get": {
+                "description": "Retrieves details of a specific sales session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales/session"
+                ],
+                "summary": "Get a sales session by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session ID",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a sales session by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales/session"
+                ],
+                "summary": "Delete a sales session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session ID",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/sales/session/{session_id}/close": {
+            "post": {
+                "description": "Closes an existing sales session and processes the transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales/session"
+                ],
+                "summary": "Close a sales session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session ID",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/sales/session/{session_id}/product": {
+            "post": {
+                "description": "Adds a product item to an existing sales session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sales/session"
+                ],
+                "summary": "Add product to sales session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Session ID",
+                        "name": "session_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Product details",
+                        "name": "product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sales.AddProductItemToSessionInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Output"
+                        }
+                    }
+                }
+            }
+        },
+        "/sales/transactions/{branch_id}": {
             "post": {
                 "description": "Create a new sales transaction for a branch",
                 "consumes": [
@@ -506,7 +1232,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sales"
+                    "sales/transactions"
                 ],
                 "summary": "Create a new sales transaction",
                 "parameters": [
@@ -549,7 +1275,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/{transaction_id}": {
+        "/sales/transactions/{transaction_id}": {
             "delete": {
                 "description": "Delete a sales transaction by ID",
                 "consumes": [
@@ -559,7 +1285,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sales"
+                    "sales/transactions"
                 ],
                 "summary": "Delete a sales transaction",
                 "parameters": [
@@ -1347,6 +2073,31 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ManufacturerInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "Manufacturer address",
+                    "type": "string"
+                },
+                "country": {
+                    "description": "Country of manufacture",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Contact email",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Manufacturer name",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "Contact phone number",
+                    "type": "string"
+                }
+            }
+        },
         "models.NewBranchFinanceInput": {
             "type": "object",
             "properties": {
@@ -1387,7 +2138,8 @@ const docTemplate = `{
                 "terminal",
                 "online_payment",
                 "cheque",
-                "online_transfer"
+                "online_transfer",
+                "undefined"
             ],
             "x-enum-varnames": [
                 "PaymentMethodCash",
@@ -1395,7 +2147,76 @@ const docTemplate = `{
                 "PaymentMethodTerminal",
                 "OnlineMobileAppPayment",
                 "Cheque",
-                "OnlineTransfer"
+                "OnlineTransfer",
+                "PaymentMethodUndefined"
+            ]
+        },
+        "models.ProductBase": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "description": "Product categories",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
+                    "description": "Product description",
+                    "type": "string"
+                },
+                "manufacturer": {
+                    "description": "Manufacturer details",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ManufacturerInfo"
+                        }
+                    ]
+                },
+                "minimum_stock_alert": {
+                    "description": "Minimum stock alert",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "Product name",
+                    "type": "string"
+                },
+                "sku": {
+                    "description": "Stock Keeping Unit",
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProductPlace": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Unique identifier for the place",
+                    "type": "string"
+                },
+                "place_type": {
+                    "description": "Type of storage location",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProductPlaceType"
+                        }
+                    ]
+                }
+            }
+        },
+        "models.ProductPlaceType": {
+            "type": "string",
+            "enum": [
+                "branch",
+                "warehouse"
+            ],
+            "x-enum-comments": {
+                "ProductPlaceTypeBranch": "Store branch location",
+                "ProductPlaceTypeWarehouse": "Central warehouse location"
+            },
+            "x-enum-varnames": [
+                "ProductPlaceTypeBranch",
+                "ProductPlaceTypeWarehouse"
             ]
         },
         "models.SupplierBase": {
@@ -1512,18 +2333,61 @@ const docTemplate = `{
                 "TransactionTypeCredit",
                 "TransactionTypeDebit"
             ]
+        },
+        "products.NewIncomeInput": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "description": "Date of the income",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "Price of the product that was uploaded",
+                    "type": "integer"
+                },
+                "quantity": {
+                    "description": "Quantity of the product that was uploaded",
+                    "type": "integer"
+                },
+                "selling_price": {
+                    "type": "integer"
+                },
+                "supplier_id": {
+                    "description": "Supplier ID",
+                    "type": "string"
+                },
+                "uploaded_to": {
+                    "description": "Place where the product was uploaded to",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProductPlace"
+                        }
+                    ]
+                }
+            }
+        },
+        "sales.AddProductItemToSessionInput": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
+	Version:          "1.0",
+	Host:             "{config.host}:{config.port}",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Magazin ERP/POS API",
+	Description:      "This is a ERP/POS API for Magazin.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

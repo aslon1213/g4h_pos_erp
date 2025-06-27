@@ -164,6 +164,7 @@ func CustomZerologMiddleware(c *fiber.Ctx) error {
 	start := time.Now()
 	err := c.Next()
 	duration := time.Since(start)
+	durationMs := duration.Seconds() * 1000
 
 	// Skip logging for /favicon.ico
 	if c.Path() == "/favicon.ico" || c.Response().StatusCode() == 404 {
@@ -174,7 +175,7 @@ func CustomZerologMiddleware(c *fiber.Ctx) error {
 		Str("method", c.Method()).
 		Str("url", c.OriginalURL()).
 		Int("status", c.Response().StatusCode()).
-		Dur("latency", duration).
+		Float64("latency", durationMs).
 		Str("ip", c.IP()).
 		Msg("Handled request")
 
@@ -182,7 +183,7 @@ func CustomZerologMiddleware(c *fiber.Ctx) error {
 }
 
 func SetupLogger() *zerolog.Logger {
-	log.Debug().Msg("Setting up logger")
+	// log.Debug().Msg("Setting up logger")
 	// lokiClient = LokiClient{
 	// 	PushIntveralSeconds: 5,
 	// 	MaxBatchSize:        10,

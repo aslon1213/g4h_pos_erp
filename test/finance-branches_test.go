@@ -1,10 +1,6 @@
 package test
 
 import (
-	"aslon1213/magazin_pos/pkg/app"
-	"aslon1213/magazin_pos/pkg/configs"
-	"aslon1213/magazin_pos/pkg/utils"
-	"aslon1213/magazin_pos/test/client"
 	"context"
 	"io"
 	logging "log"
@@ -12,7 +8,12 @@ import (
 	"testing"
 	"time"
 
-	models "aslon1213/magazin_pos/pkg/repository"
+	"github.com/aslon1213/go-pos-erp/pkg/app"
+	"github.com/aslon1213/go-pos-erp/pkg/configs"
+	"github.com/aslon1213/go-pos-erp/pkg/utils"
+	"github.com/aslon1213/go-pos-erp/test/client"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,7 @@ import (
 
 func TestMain(m *testing.M) {
 	logging.SetOutput(io.Discard)
-	app := app.NewApp()
+	app := app.New()
 
 	app.DB.Database("magazin").Collection("finance").DeleteMany(context.Background(), bson.M{})
 	app.DB.Database("magazin").Collection("suppliers").DeleteMany(context.Background(), bson.M{})

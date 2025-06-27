@@ -1,13 +1,14 @@
 package app
 
 import (
-	"aslon1213/magazin_pos/pkg/app/controllers/finance"
-	journal_handlers "aslon1213/magazin_pos/pkg/app/controllers/journals"
-	"aslon1213/magazin_pos/pkg/app/controllers/sales"
-	"aslon1213/magazin_pos/pkg/app/controllers/suppliers"
-	"aslon1213/magazin_pos/pkg/app/controllers/transactions"
-	"aslon1213/magazin_pos/pkg/routes"
-	"aslon1213/magazin_pos/platform/cache"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/finance"
+	journal_handlers "github.com/aslon1213/go-pos-erp/pkg/app/controllers/journals"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/products"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/sales"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/suppliers"
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/transactions"
+	"github.com/aslon1213/go-pos-erp/pkg/routes"
+	"github.com/aslon1213/go-pos-erp/platform/cache"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -21,6 +22,7 @@ type Controllers struct {
 	Sales        *sales.SalesTransactionsController
 	Journals     *journal_handlers.JournalHandlers
 	Operations   *journal_handlers.OperationHandlers
+	Products     *products.ProductsController
 }
 
 func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
@@ -29,9 +31,10 @@ func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
 		Finance:      finance.New(db),
 		Suppliers:    suppliers.New(db),
 		Transactions: transactions.New(db),
-		Sales:        sales.New(db),
+		Sales:        sales.New(db, cache),
 		Journals:     journal_handlers.New(db, cache),
 		Operations:   journal_handlers.NewOperationsHandler(db, cache),
+		Products:     products.NewProductsController(db),
 	}
 	log.Debug().Msg("Controllers initialized successfully")
 	return controllers
@@ -49,5 +52,7 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	log.Debug().Msg("Sales routes set up successfully")
 	routes.JournalsRoutes(app, controllers.Journals, controllers.Operations)
 	log.Debug().Msg("Journals routes set up successfully")
+	routes.ProductsRoutes(app, controllers.Products)
+	log.Debug().Msg("Products routes set up successfully")
 	log.Debug().Msg("All routes set up successfully")
 }
