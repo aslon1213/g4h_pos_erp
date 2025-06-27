@@ -1,11 +1,12 @@
 package models
 
 import (
-	"aslon1213/magazin_pos/pkg/utils"
 	"context"
 	"fmt"
 	"slices"
 	"time"
+
+	"github.com/aslon1213/go-pos-erp/pkg/utils"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -65,6 +66,7 @@ const (
 	OnlineMobileAppPayment PaymentMethod = "online_payment"
 	Cheque                 PaymentMethod = "cheque"
 	OnlineTransfer         PaymentMethod = "online_transfer"
+	PaymentMethodUndefined PaymentMethod = "undefined"
 )
 
 type TransactionBase struct {
