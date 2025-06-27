@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/finance"
-	journal_handlers "github.com/aslon1213/go-pos-erp/pkg/app/controllers/journals"
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/products"
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/sales"
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/suppliers"
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/transactions"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/finance"
+	journal_handlers "github.com/aslon1213/go-pos-erp/pkg/controllers/journals"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/products"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/sales"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/suppliers"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/transactions"
 
 	"github.com/gofiber/fiber/v2"
 )
