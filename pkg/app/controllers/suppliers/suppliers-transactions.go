@@ -1,10 +1,11 @@
 package suppliers
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
-	"aslon1213/magazin_pos/platform/database"
 	"context"
 	"errors"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	"github.com/aslon1213/go-pos-erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"

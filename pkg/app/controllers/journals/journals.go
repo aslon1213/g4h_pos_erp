@@ -1,20 +1,25 @@
 package journal_handlers
 
 import (
-	"aslon1213/magazin_pos/pkg/app/controllers/sales"
-	models "aslon1213/magazin_pos/pkg/repository"
-	"aslon1213/magazin_pos/pkg/utils"
-	"aslon1213/magazin_pos/platform/cache"
-	"aslon1213/magazin_pos/platform/database"
 	"context"
 	"errors"
+	"fmt"
 	"time"
+
+	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/sales"
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	"github.com/aslon1213/go-pos-erp/pkg/utils"
+	"github.com/aslon1213/go-pos-erp/platform/cache"
+	"github.com/aslon1213/go-pos-erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type JournalHandlers struct {
@@ -23,6 +28,7 @@ type JournalHandlers struct {
 	FinanceCollection      *mongo.Collection
 	TransactionsCollection *mongo.Collection
 	RedisClient            *cache.Cache
+	Tracer                 trace.Tracer
 }
 
 func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
@@ -44,13 +50,14 @@ func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
 	}
 	financeCollection := db.Collection("finance")
 	transactionsCollection := db.Collection("transactions")
+	tracer := otel.Tracer("journals")
 	return &JournalHandlers{
 		ctx:                    ctx,
 		JournalCollection:      journalCollection,
 		FinanceCollection:      financeCollection,
 		TransactionsCollection: transactionsCollection,
-
-		RedisClient: cache,
+		Tracer:                 tracer,
+		RedisClient:            cache,
 	}
 }
 
@@ -92,6 +99,10 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 // @Failure 500 {object} models.Error
 // @Router /journals/branch/{branch_id} [get]
 func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
+	ctx, span := j.Tracer.Start(j.ctx, "query_journal_entries")
+	defer span.End()
+	log.Info().Msg("Querying journal entries --- using tracer")
+
 	queryParams := models.JournalQueryParams{}
 	if err := c.QueryParser(&queryParams); err != nil {
 		log.Error().Err(err).Msg("Failed to parse query parameters")
@@ -100,6 +111,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 			Code:    fiber.StatusBadRequest,
 		}))
 	}
+	span.AddEvent("query_params", trace.WithAttributes(attribute.String("query_params", fmt.Sprintf("%v", queryParams))))
 	log.Info().Interface("queryParams", queryParams).Str("branch_id", c.Params("branch_id")).Msg("Querying journal entries")
 	if queryParams.Page == 0 {
 		queryParams.Page = 1
@@ -133,7 +145,8 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 			}},
 		},
 	}
-	cursor, err := j.JournalCollection.Aggregate(j.ctx, pipeline)
+	span.AddEvent("Created pipeline")
+	cursor, err := j.JournalCollection.Aggregate(ctx, pipeline)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to aggregate journal entries")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -141,17 +154,18 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
-	defer cursor.Close(j.ctx)
-
+	defer cursor.Close(ctx)
+	span.AddEvent("Got cursor")
 	var results []models.Journal
-	if err := cursor.All(j.ctx, &results); err != nil {
+	if err := cursor.All(ctx, &results); err != nil {
 		log.Error().Err(err).Msg("Failed to decode journal entries")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
-	log.Info().Msg("Successfully queried journal entries")
+	span.AddEvent("Got results", trace.WithAttributes(attribute.Int("results_count", len(results))))
+	log.Info().Msgf("Successfully queried journal entries")
 	// log.Info().Interface("results", results).Msg("Results")
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(results))
 }
