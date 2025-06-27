@@ -1,11 +1,12 @@
 package client
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
 	"github.com/rs/zerolog/log"
 )

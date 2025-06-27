@@ -16,7 +16,7 @@ echo "Initializing replica set..."
 docker exec -it mongo1 mongosh --eval "rs.initiate({
  _id: \"myReplicaSet\",
  members: [
-   { _id: 0, host: \"mongo1:27017\" }
+   { _id: 0, host: \"localhost:27017\" }
  ]
 })"
 
