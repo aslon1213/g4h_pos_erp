@@ -1,5 +1,10 @@
 # Go POS ERP System
 
+[![Release](https://img.shields.io/github/v/release/aslon1213/go-pos-erp?style=flat-square)](https://github.com/aslon1213/go-pos-erp/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/go-pos-erp/release.yaml?style=flat-square)](https://github.com/aslon1213/go-pos-erp/actions/workflows/release.yaml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/go-pos-erp?style=flat-square)](https://golang.org/)
+[![License](https://img.shields.io/github/license/aslon1213/go-pos-erp?style=flat-square)](LICENSE)
+
 A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built with Go, designed for retail businesses and stores.
 
 ## 🚀 Features
@@ -188,16 +193,52 @@ docker-compose -f deployments/docker-compose.yml logs -f
 docker-compose -f deployments/docker-compose.yml down
 ```
 
-## 📦 Release
+## 📦 Releases & CI/CD
 
-This project uses [GoReleaser](https://goreleaser.com/) for automated releases. Releases are built for:
-- Linux (amd64, arm64)
-- macOS (amd64, arm64)
-- Windows (amd64)
+### Automated Releases
+
+This project uses GitHub Actions with [GoReleaser](https://goreleaser.com/) for automated releases:
+
+- **Trigger**: Releases are automatically triggered when you push a git tag starting with `v` (e.g., `v1.0.0`, `v2.1.3`)
+- **Build Matrix**: Cross-platform builds for Linux, macOS, and Windows (amd64, arm64)
+- **Artifacts**: Pre-built binaries, archives, and checksums
+- **Distribution**: Automatically published to GitHub Releases
+
+### Release Workflow
+
+1. **Create and push a tag**:
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+2. **GitHub Actions automatically**:
+   - Builds binaries for all supported platforms
+   - Runs tests and quality checks
+   - Creates GitHub release with artifacts
+   - Generates changelog
+
+### Build Platforms
+
+| OS | Architecture | Status |
+|---|---|---|
+| Linux | amd64, arm64 | ✅ Supported |
+| macOS | amd64, arm64 | ✅ Supported |
+| Windows | amd64 | ✅ Supported |
+
+### Local Development Build
 
 ```bash 
+# Build snapshot for testing (without releasing)
 goreleaser build --snapshot --clean
+
+# Build for current platform only
+go build -o bin/pos-erp cmd/main.go
 ```
+
+### Download Latest Release
+
+Visit the [Releases page](https://github.com/aslon1213/go-pos-erp/releases) to download pre-built binaries for your platform.
 
 
 ## 🤝 Contributing
