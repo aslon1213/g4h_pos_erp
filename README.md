@@ -22,7 +22,7 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 - **Database**: MongoDB
 - **Cache**: Redis
 - **Documentation**: Swagger/OpenAPI
-- **Authentication**: JWT/BasicAuth
+- **Authentication**: JWT/BasicAuthc
 - **Observability**: OpenTelemetry
 - **Logging**: Zerolog
 - **Configuration**: Viper (YAML-based)
