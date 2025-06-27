@@ -3,7 +3,7 @@ package products
 import (
 	"context"
 
-	"github.com/aslon1213/go-pos-erp/pkg/app/controllers/suppliers"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/suppliers"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/platform/database"
 
