@@ -1,18 +1,19 @@
 package main
 
 import (
-	"aslon1213/magazin_pos/pkg/app"
-	models "aslon1213/magazin_pos/pkg/repository"
 	"context"
 	"encoding/json"
 	"os"
+
+	"github.com/aslon1213/go-pos-erp/pkg/app"
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
 
-	app := app.NewApp()
+	app := app.New()
 	// app.Run()
 
 	db := app.DB
