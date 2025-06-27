@@ -1,9 +1,10 @@
 package database
 
 import (
-	"aslon1213/magazin_pos/pkg/configs"
 	"context"
 	"strconv"
+
+	"github.com/aslon1213/go-pos-erp/pkg/configs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"

@@ -1,10 +1,12 @@
 package sales
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
-	"aslon1213/magazin_pos/platform/database"
 	"context"
 	"errors"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	"github.com/aslon1213/go-pos-erp/platform/cache"
+	"github.com/aslon1213/go-pos-erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -15,19 +17,24 @@ import (
 type SalesTransactionsController struct {
 	transactions *mongo.Collection
 	finances     *mongo.Collection
+	products     *mongo.Collection
+	cache        *cache.Cache
 }
 
-func New(db *mongo.Database) *SalesTransactionsController {
+func New(db *mongo.Database, cache *cache.Cache) *SalesTransactionsController {
+	log.Info().Msg("Initializing SalesTransactionsController")
 	return &SalesTransactionsController{
 		transactions: db.Collection("transactions"),
 		finances:     db.Collection("finance"),
+		products:     db.Collection("products"),
+		cache:        cache,
 	}
 }
 
 // CreateSalesTransaction godoc
 // @Summary Create a new sales transaction
 // @Description Create a new sales transaction for a branch
-// @Tags sales
+// @Tags sales/transactions
 // @Accept json
 // @Produce json
 // @Param branch_id path string true "Branch ID"
@@ -35,7 +42,7 @@ func New(db *mongo.Database) *SalesTransactionsController {
 // @Success 201 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/{branch_id} [post]
+// @Router /sales/transactions/{branch_id} [post]
 func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error {
 	branch_id := c.Params("branch_id")
 	transaction_base := models.TransactionBase{}
@@ -46,7 +53,12 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 			Code:    fiber.StatusBadRequest,
 		}))
 	}
-	// start a transaction
+
+	log.Info().
+		Str("branch_id", branch_id).
+		Interface("transaction_base", transaction_base).
+		Msg("Creating new sales transaction")
+
 	ses, ctx, err := database.StartTransaction(c, s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
@@ -64,7 +76,6 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 		}))
 	}
 
-	// commit the transaction
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -72,55 +83,69 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
+
+	log.Info().
+		Str("transaction_id", transaction.ID).
+		Str("branch_id", branch_id).
+		Uint32("amount", transaction.Amount).
+		Msg("Sales transaction created successfully")
+
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(transaction))
 }
 
 func NewTransaction(ctx context.Context, transaction_base models.TransactionBase, branch_id string, transactionsCollection *mongo.Collection, financesCollection *mongo.Collection) (*models.Transaction, error) {
-	// sales transaction are always credits
 	transaction_base.Type = models.TransactionTypeCredit
-	log.Info().Str("Collection", transactionsCollection.Name()).Str("Branch ID", branch_id).Msgf("Creating Sales Transaction with Transaction base: %+v", transaction_base)
-	// accepted types of sales methods: cash, bank, terminal, online_payment, online_transfer, cheque
+	log.Info().
+		Str("Collection", transactionsCollection.Name()).
+		Str("Branch ID", branch_id).
+		Interface("Transaction Base", transaction_base).
+		Msg("Creating sales transaction")
+
 	if err := models.ValidatePaymentMethod(transaction_base.PaymentMethod); err != nil {
 		log.Error().Err(err).Msg("Invalid payment method")
 		return nil, err
 	}
 
-	// create a new transaction
 	transaction := models.NewTransaction(
 		&transaction_base,
 		models.InitiatorTypeSales,
 		branch_id,
 	)
-	// insert the transaction into the database
+
 	_, err := transactionsCollection.InsertOne(ctx, transaction)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to insert transaction")
 		return nil, err
 	}
-	// update the finance of the branch
+
 	if err := IncrementBalance(ctx, financesCollection, branch_id, transaction_base); err != nil {
 		log.Error().Err(err).Msg("Failed to increment balance")
 		return nil, err
 	}
 
-	log.Info().Msg("Transaction created successfully")
+	log.Info().
+		Str("transaction_id", transaction.ID).
+		Uint32("amount", transaction.Amount).
+		Str("payment_method", string(transaction.PaymentMethod)).
+		Msg("Transaction created successfully")
+
 	return transaction, nil
 }
 
 // DeleteSalesTransaction godoc
 // @Summary Delete a sales transaction
 // @Description Delete a sales transaction by ID
-// @Tags sales
+// @Tags sales/transactions
 // @Accept json
 // @Produce json
 // @Param transaction_id path string true "Transaction ID"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/{transaction_id} [delete]
+// @Router /sales/transactions/{transaction_id} [delete]
 func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error {
 	transaction_id := c.Params("transaction_id")
+	log.Info().Str("transaction_id", transaction_id).Msg("Deleting sales transaction")
 
-	// start a db transaction
 	ses, ctx, err := database.StartTransaction(c, s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
@@ -130,7 +155,7 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 		}))
 	}
 	defer ses.EndSession(ctx)
-	//
+
 	transaction, err := DeleteSalesTransaction(ctx, transaction_id, s.transactions, s.finances)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -139,7 +164,6 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 		}))
 	}
 
-	// commit the transaction
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -147,29 +171,33 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
-	log.Info().Msg("Transaction deleted successfully")
+
+	log.Info().
+		Str("transaction_id", transaction_id).
+		Msg("Transaction deleted successfully")
+
 	return c.JSON(models.NewOutput(transaction))
 }
 
 func DeleteSalesTransaction(ctx context.Context, transactionID string, transactionsCollection *mongo.Collection, financesCollection *mongo.Collection) (models.Transaction, error) {
-	// retrieve the transaction -> delete the transaction -> change the Balance Info of the branch
 	transaction := models.Transaction{}
 	err := transactionsCollection.FindOne(ctx, bson.M{"_id": transactionID}).Decode(&transaction)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to find transaction")
+		log.Error().Err(err).Str("transaction_id", transactionID).Msg("Failed to find transaction")
 		return models.Transaction{}, err
 	}
-	// delete the transaction
+
 	_, err = transactionsCollection.DeleteOne(ctx, bson.M{"_id": transactionID})
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to delete transaction")
+		log.Error().Err(err).Str("transaction_id", transactionID).Msg("Failed to delete transaction")
 		return models.Transaction{}, err
 	}
-	// change the Balance Info of the branch
+
 	if err := DecrementBalance(ctx, financesCollection, transaction.BranchID, transaction); err != nil {
-		log.Error().Err(err).Msg("Failed to decrement balance")
+		log.Error().Err(err).Str("branch_id", transaction.BranchID).Msg("Failed to decrement balance")
 		return models.Transaction{}, err
 	}
+
 	return transaction, nil
 }
 
@@ -192,18 +220,20 @@ func IncrementBalance(ctx context.Context, finance *mongo.Collection, branch_id 
 	case models.OnlineTransfer:
 		update["$inc"].(bson.M)["finance.balance.mobile_apps"] = int(transaction_base.Amount)
 	}
-	log.Info().Interface("update", update).Interface("filter", filter).Str("Collection", finance.Name()).Msg("Updating finance of the branch")
-	result, err := finance.UpdateOne(
-		ctx,
-		filter,
-		update,
-	)
+
+	log.Info().
+		Interface("update", update).
+		Interface("filter", filter).
+		Str("Collection", finance.Name()).
+		Msg("Updating finance of the branch")
+
+	result, err := finance.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update finance")
 		return err
 	}
 	if result.MatchedCount == 0 {
-		log.Error().Msg("No finance found for the branch")
+		log.Error().Str("branch_id", branch_id).Msg("No finance found for the branch")
 		return errors.New("no finance found for the branch")
 	}
 	return nil
@@ -228,13 +258,20 @@ func DecrementBalance(ctx context.Context, finance *mongo.Collection, branch_id 
 	case models.OnlineTransfer:
 		update["$inc"].(bson.M)["finance.balance.mobile_apps"] = -int32(transaction.Amount)
 	}
+
+	log.Info().
+		Interface("update", update).
+		Interface("filter", filter).
+		Str("Collection", finance.Name()).
+		Msg("Decrementing branch balance")
+
 	result, err := finance.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update finance")
 		return err
 	}
 	if result.MatchedCount == 0 {
-		log.Error().Msg("No finance found for the branch")
+		log.Error().Str("branch_id", branch_id).Msg("No finance found for the branch")
 		return errors.New("no finance found for the branch")
 	}
 	return nil

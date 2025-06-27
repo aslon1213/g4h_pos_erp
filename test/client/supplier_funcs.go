@@ -1,10 +1,11 @@
 package client
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 )
 
 func DecodeSupplierOutputSingle(resp *http.Response) (models.SupplierOutputSingle, error) {

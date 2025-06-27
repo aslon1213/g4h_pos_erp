@@ -1,10 +1,11 @@
 package suppliers
 
 import (
-	models "aslon1213/magazin_pos/pkg/repository"
-	"aslon1213/magazin_pos/pkg/utils"
 	"context"
 	"time"
+
+	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	"github.com/aslon1213/go-pos-erp/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
