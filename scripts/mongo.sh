@@ -21,3 +21,6 @@ docker exec -it mongo1 mongosh --eval "rs.initiate({
 })"
 
 echo "MongoDB setup complete!"
+
+# run redis container as well
+# docker run  -d --name redis --net mongoCluster -p 6379:6379 -p 8001:8001 redis/redis-stack:latest

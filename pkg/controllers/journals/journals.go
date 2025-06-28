@@ -499,7 +499,12 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 	if fetchTransactions {
 		log.Info().Str("journal_id", journalID.Hex()).Msg("Fetching transactions with lookup")
 		pipeline = mongo.Pipeline{
-			{{Key: "$match", Value: bson.D{{Key: "_id", Value: journalID}}}},
+			{{Key: "$match", Value: bson.D{
+				{Key: "$or", Value: bson.A{
+					bson.D{{Key: "_id", Value: journalID}},
+					bson.D{{Key: "_id", Value: c.Params("id")}},
+				}},
+			}}},
 			{
 				{Key: "$lookup", Value: bson.M{
 					"from":         "transactions",
