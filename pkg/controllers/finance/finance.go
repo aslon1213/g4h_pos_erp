@@ -54,7 +54,8 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 	}
 
 	var branches []models.BranchFinance
-
+	// database_url := f.collection.Database().Client()
+	// log.Debug().Str("Databse URL", f.collection.Database().Client()).Msg("Fetching branches")
 	if err := cursor.All(context.Background(), &branches); err != nil {
 		log.Error().Err(err).Msg("Failed to decode branches")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
