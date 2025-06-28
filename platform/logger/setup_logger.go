@@ -175,7 +175,7 @@ func CustomZerologMiddleware(c *fiber.Ctx) error {
 		Str("method", c.Method()).
 		Str("url", c.OriginalURL()).
 		Int("status", c.Response().StatusCode()).
-		Float64("latency", durationMs).
+		Float64("latency_ms", durationMs).
 		Str("ip", c.IP()).
 		Msg("Handled request")
 

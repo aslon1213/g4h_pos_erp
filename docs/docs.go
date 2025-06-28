@@ -11,7 +11,7 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "API Support",
-            "url": "https://github.com/github.com/aslon1213/go-pos-erp",
+            "url": "https://github.com/aslon1213/go-pos-erp",
             "email": "hamidovaslon13@gmail.com"
         },
         "version": "{{.Version}}"
@@ -2383,7 +2383,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "{config.host}:{config.port}",
+	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Magazin ERP/POS API",
