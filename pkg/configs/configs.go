@@ -8,6 +8,7 @@ type Config struct {
 	DB     DBConfig     `mapstructure:"database"`
 	Redis  RedisConfig  `mapstructure:"redis"`
 	Server ServerConfig `mapstructure:"server"`
+	S3     S3Config     `mapstructure:"s3"`
 }
 
 type DBConfig struct {
@@ -33,6 +34,14 @@ type RedisConfig struct {
 type ServerConfig struct {
 	Host string `mapstructure:"host"`
 	Port string `mapstructure:"port"`
+}
+
+type S3Config struct {
+	Region          string `mapstructure:"region"`
+	Endpoint        string `mapstructure:"endpoint"`
+	AccessKeyID     string `mapstructure:"access_key_id"`
+	SecretAccessKey string `mapstructure:"secret_access_key"`
+	ImageBucket     string `mapstructure:"image_bucket"`
 }
 
 func LoadConfig(path string) (*Config, error) {
