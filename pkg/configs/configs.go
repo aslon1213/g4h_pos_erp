@@ -31,6 +31,7 @@ type RedisConfig struct {
 }
 
 type ServerConfig struct {
+	Host string `mapstructure:"host"`
 	Port string `mapstructure:"port"`
 }
 
