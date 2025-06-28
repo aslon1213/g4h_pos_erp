@@ -82,7 +82,7 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 		}))
 	}
 	log.Info().Msg("Successfully fetched journal entry by ID")
-	log.Info().Interface("journal", journal).Msg("Journal")
+	// log.Info().Interface("journal", journal).Msg("Journal")
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(journal))
 }
 
