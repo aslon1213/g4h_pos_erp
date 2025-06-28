@@ -1,6 +1,8 @@
 package sales
 
 import (
+	"errors"
+
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/platform/database"
 
@@ -21,6 +23,19 @@ import (
 func (s *SalesTransactionsController) OpenSalesSession(c *fiber.Ctx) error {
 	branch_id := c.Params("branch_id")
 	log.Info().Str("branch_id", branch_id).Msg("Opening new sales session")
+
+	// check for branch_id existing
+	count, err := s.finances.CountDocuments(c.Context(), bson.M{"_id": branch_id})
+	if err != nil {
+		log.Error().Err(err).Str("branch_id", branch_id).Msg("Failed to find branch")
+		return models.ReturnError(c, err)
+	}
+
+	if count == 0 {
+		log.Error().Str("branch_id", branch_id).Msg("Branch not found")
+		return models.ReturnError(c, errors.New("branch not found"))
+	}
+
 	session, err := models.NewSalesSession(branch_id, s.cache)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create new sales session")
