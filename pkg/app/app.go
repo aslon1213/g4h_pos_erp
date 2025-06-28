@@ -10,7 +10,6 @@ import (
 	"github.com/aslon1213/go-pos-erp/platform/logger"
 
 	"github.com/gofiber/contrib/otelfiber"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -34,7 +33,6 @@ import (
 // @contact.name API Support
 // @contact.url https://github.com/aslon1213/go-pos-erp
 // @contact.email hamidovaslon13@gmail.com
-// @host {config.host}:{config.port}
 
 type App struct {
 	Logger *zerolog.Logger
@@ -56,12 +54,12 @@ func NewFiberApp() *fiber.App {
 	}()
 
 	// Provide a minimal config
-	app.Use(basicauth.New(basicauth.Config{
-		Users: map[string]string{
-			"john":  "doe",
-			"admin": "123456",
-		},
-	}))
+	// app.Use(basicauth.New(basicauth.Config{
+	// 	Users: map[string]string{
+	// 		"john":  "doe",
+	// 		"admin": "123456",
+	// 	},
+	// }))
 
 	app.Use(otelfiber.Middleware())
 
