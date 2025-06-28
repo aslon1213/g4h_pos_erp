@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	s3provider "github.com/aslon1213/go-pos-erp/platform/s3"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -19,6 +20,7 @@ type ProductsController struct {
 	TransactionsCollection *mongo.Collection
 	FinanceCollection      *mongo.Collection
 	SupplierCollection     *mongo.Collection
+	S3Client               *s3provider.S3Client
 }
 
 func NewProductsController(db *mongo.Database) *ProductsController {
