@@ -29,7 +29,7 @@ async def main():
         for _ in range(3):  # Run 10 batches
             tasks = []
             for _ in range(1000):  # 1000 requests per batch
-                url = f"http://localhost:12000/journals/649e78a656b78aefd50372e4"
+                url = f"http://api.g4h.uz/journals/649e78a656b78aefd50372e4"
                 tasks.append(fetch_data(session, url))
             results = await asyncio.gather(*tasks)
             # calculate the average time

@@ -41,7 +41,36 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		log.Error().Err(err).Msg("Failed to parse income input")
 		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
-			Message: err.Error(),
+			Message: "Invalid request body format",
+			Code:    fiber.StatusBadRequest,
+		}))
+	}
+
+	// Validate required fields
+	if input.Quantity <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+			Message: "Quantity must be greater than 0",
+			Code:    fiber.StatusBadRequest,
+		}))
+	}
+
+	if input.Price <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+			Message: "Price must be greater than 0",
+			Code:    fiber.StatusBadRequest,
+		}))
+	}
+
+	if input.SellingPrice <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+			Message: "Selling price must be greater than 0",
+			Code:    fiber.StatusBadRequest,
+		}))
+	}
+
+	if input.UploadedTo.ID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+			Message: "Upload location ID is required",
 			Code:    fiber.StatusBadRequest,
 		}))
 	}
