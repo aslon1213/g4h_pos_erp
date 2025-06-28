@@ -36,13 +36,17 @@ func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsCont
 
 func ProductsRoutes(router *fiber.App, productsController *products.ProductsController) {
 
-	router.Post("/products", productsController.CreateProduct)        // create product
-	router.Put("/products/:id", productsController.EditProduct)       // edit product
-	router.Delete("/products/:id", productsController.DeleteProduct)  // delete product
-	router.Get("/products/:id", productsController.GetProductByID)    // get product by id
-	router.Get("/products", productsController.QueryProducts)         // query products
-	router.Post("/products/:id/income", productsController.NewIncome) // create income
-	router.Post("/products/transfer", productsController.NewTransfer) // create transfer
+	router.Post("/products", productsController.CreateProduct)                        // create product
+	router.Put("/products/:id", productsController.EditProduct)                       // edit product
+	router.Delete("/products/:id", productsController.DeleteProduct)                  // delete product
+	router.Get("/products/:id", productsController.GetProductByID)                    // get product by id
+	router.Get("/products", productsController.QueryProducts)                         // query products
+	router.Post("/products/:id/income", productsController.NewIncome)                 // create income
+	router.Post("/products/transfer", productsController.NewTransfer)                 // create transfer
+	router.Post("/products/:id/images", productsController.UploadProductImage)        // upload product image
+	router.Delete("/products/:id/images/:key", productsController.DeleteProductImage) // delete product image
+	router.Get("/products/:id/images", productsController.GetImagesOfProduct)         // get images of product
+	router.Get("/products/images/:key", productsController.GetImage)                  // get image
 }
 
 func JournalsRoutes(router *fiber.App, journalsController *journal_handlers.JournalHandlers, operationsController *journal_handlers.OperationHandlers) {

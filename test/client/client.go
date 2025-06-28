@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
@@ -40,7 +41,7 @@ func (c *Client) MakeRequest(method, path string, body []byte, headers map[strin
 		if c.Token == "" {
 			c.Token = c.Login()
 		}
-		headers["Authorization"] = "Bearer " + c.Token
+		// headers["Authorization"] = "Bearer " + c.Token
 	}
 
 	client := &http.Client{}
@@ -62,10 +63,15 @@ func (c *Client) MakeRequest(method, path string, body []byte, headers map[strin
 	return resp, nil
 }
 
-func (c *Client) DecodeResponseMultiple(resp *http.Response, body []byte) (models.BranchFinanceOutput, error) {
+func (c *Client) DecodeResponseMultiple(resp *http.Response) (models.BranchFinanceOutput, error) {
 	output := models.BranchFinanceOutput{}
-	err := json.NewDecoder(resp.Body).Decode(&output)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(body, &output)
+	if err != nil {
+		log.Error().Str("body", string(body)).Err(err).Msg("Failed to decode response multiple")
 		return output, err
 	}
 	return output, nil
@@ -73,8 +79,13 @@ func (c *Client) DecodeResponseMultiple(resp *http.Response, body []byte) (model
 
 func (c *Client) DecodeResponseSingle(resp *http.Response) (models.BranchFinanceOutputSingle, error) {
 	output := models.BranchFinanceOutputSingle{}
-	err := json.NewDecoder(resp.Body).Decode(&output)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(body, &output)
+	if err != nil {
+		log.Error().Str("body", string(body)).Err(err).Msg("Failed to decode response single")
 		return output, err
 	}
 	return output, nil
@@ -95,7 +106,8 @@ func (c *Client) GetAllBranches() (resp *http.Response, output models.BranchFina
 	// 	return nil, models.BranchFinanceOutput{}, err
 	// }
 	// log.Info().Str("resp", string(body)).Msg("Getting all branches")
-	output, err = c.DecodeResponseMultiple(resp, nil)
+	output, err = c.DecodeResponseMultiple(resp)
+	log.Info().Str("output", fmt.Sprintf("%+v", output)).Err(err).Msg("Getting all branches")
 	return resp, output, err
 }
 

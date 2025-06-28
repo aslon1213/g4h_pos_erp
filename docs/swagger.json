@@ -5,12 +5,11 @@
         "title": "Magazin ERP/POS API",
         "contact": {
             "name": "API Support",
-            "url": "https://github.com/github.com/aslon1213/go-pos-erp",
+            "url": "https://github.com/aslon1213/go-pos-erp",
             "email": "hamidovaslon13@gmail.com"
         },
         "version": "1.0"
     },
-    "host": "{config.host}:{config.port}",
     "paths": {
         "/finance": {
             "post": {
