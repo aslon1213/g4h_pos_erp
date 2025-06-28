@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
+	"github.com/aslon1213/go-pos-erp/pkg/app"
 	"github.com/aslon1213/go-pos-erp/pkg/configs"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/test/client"
@@ -95,16 +97,17 @@ func SessionOperations() ([]float64, error) { // return time taken for every req
 
 func main() {
 
-	// app := app.New()
-	// // get all keys
-	// keys, err := app.Cache.RedisClient.Keys("sales_session:*").Result()
-	// if err != nil {
-	// 	log.Error().Err(err).Msg("Failed to get keys")
-	// 	return
-	// }
+	app := app.New()
+	// get all keys
+	keys, err := app.Cache.RedisClient.Keys("sales_session:*").Result()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get keys")
+		return
+	}
 
-	// // delete all sessions
-	// app.Cache.RedisClient.Del(keys...)
+	// delete all sessions
+	app.Cache.RedisClient.Del(keys...)
+	os.Exit(0)
 
 	concurrency := 100
 	duration := 30 * time.Second
