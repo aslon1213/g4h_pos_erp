@@ -26,24 +26,24 @@ definitions:
     type: object
   models.InitiatorType:
     enum:
-      - salary
-      - rent
-      - utilities
-      - other
-      - sale
-      - supplier
+    - salary
+    - rent
+    - utilities
+    - other
+    - sale
+    - supplier
     type: string
     x-enum-varnames:
-      - InitiatorTypeSalary
-      - InitiatorTypeRent
-      - InitiatorTypeUtilities
-      - InitiatorTypeOther
-      - InitiatorTypeSales
-      - InitiatorTypeSupplier
+    - InitiatorTypeSalary
+    - InitiatorTypeRent
+    - InitiatorTypeUtilities
+    - InitiatorTypeOther
+    - InitiatorTypeSales
+    - InitiatorTypeSupplier
   models.Journal:
     properties:
       branch:
-        $ref: "#/definitions/models.Branch"
+        $ref: '#/definitions/models.Branch'
       cash_left:
         type: integer
       date:
@@ -52,7 +52,7 @@ definitions:
         type: string
       operations:
         items:
-          $ref: "#/definitions/models.Transaction"
+          $ref: '#/definitions/models.Transaction'
         type: array
       shift_is_closed:
         type: boolean
@@ -68,13 +68,13 @@ definitions:
       description:
         type: string
       payment_method:
-        $ref: "#/definitions/models.PaymentMethod"
+        $ref: '#/definitions/models.PaymentMethod'
       supplier_id:
         type: string
       supplier_transaction:
         type: boolean
       type:
-        $ref: "#/definitions/models.TransactionType"
+        $ref: '#/definitions/models.TransactionType'
     type: object
   models.ManufacturerInfo:
     properties:
@@ -112,27 +112,27 @@ definitions:
       data: {}
       error:
         items:
-          $ref: "#/definitions/models.Error"
+          $ref: '#/definitions/models.Error'
         type: array
     type: object
   models.PaymentMethod:
     enum:
-      - cash
-      - bank
-      - terminal
-      - online_payment
-      - cheque
-      - online_transfer
-      - undefined
+    - cash
+    - bank
+    - terminal
+    - online_payment
+    - cheque
+    - online_transfer
+    - undefined
     type: string
     x-enum-varnames:
-      - PaymentMethodCash
-      - PaymentMethodBank
-      - PaymentMethodTerminal
-      - OnlineMobileAppPayment
-      - Cheque
-      - OnlineTransfer
-      - PaymentMethodUndefined
+    - PaymentMethodCash
+    - PaymentMethodBank
+    - PaymentMethodTerminal
+    - OnlineMobileAppPayment
+    - Cheque
+    - OnlineTransfer
+    - PaymentMethodUndefined
   models.ProductBase:
     properties:
       category:
@@ -145,7 +145,7 @@ definitions:
         type: string
       manufacturer:
         allOf:
-          - $ref: "#/definitions/models.ManufacturerInfo"
+        - $ref: '#/definitions/models.ManufacturerInfo'
         description: Manufacturer details
       minimum_stock_alert:
         description: Minimum stock alert
@@ -164,20 +164,20 @@ definitions:
         type: string
       place_type:
         allOf:
-          - $ref: "#/definitions/models.ProductPlaceType"
+        - $ref: '#/definitions/models.ProductPlaceType'
         description: Type of storage location
     type: object
   models.ProductPlaceType:
     enum:
-      - branch
-      - warehouse
+    - branch
+    - warehouse
     type: string
     x-enum-comments:
       ProductPlaceTypeBranch: Store branch location
       ProductPlaceTypeWarehouse: Central warehouse location
     x-enum-varnames:
-      - ProductPlaceTypeBranch
-      - ProductPlaceTypeWarehouse
+    - ProductPlaceTypeBranch
+    - ProductPlaceTypeWarehouse
   models.SupplierBase:
     properties:
       address:
@@ -208,9 +208,9 @@ definitions:
       id:
         type: string
       payment_method:
-        $ref: "#/definitions/models.PaymentMethod"
+        $ref: '#/definitions/models.PaymentMethod'
       type:
-        $ref: "#/definitions/models.InitiatorType"
+        $ref: '#/definitions/models.InitiatorType'
     type: object
   models.TransactionBase:
     properties:
@@ -219,45 +219,43 @@ definitions:
       description:
         type: string
       payment_method:
-        $ref: "#/definitions/models.PaymentMethod"
+        $ref: '#/definitions/models.PaymentMethod'
       type:
-        $ref: "#/definitions/models.TransactionType"
+        $ref: '#/definitions/models.TransactionType'
     type: object
   models.TransactionOutput:
     properties:
       data:
         items:
-          $ref: "#/definitions/models.Transaction"
+          $ref: '#/definitions/models.Transaction'
         type: array
       error:
         items:
-          $ref: "#/definitions/models.Error"
+          $ref: '#/definitions/models.Error'
         type: array
     type: object
   models.TransactionOutputSingle:
     properties:
       data:
-        $ref: "#/definitions/models.Transaction"
+        $ref: '#/definitions/models.Transaction'
       error:
         items:
-          $ref: "#/definitions/models.Error"
+          $ref: '#/definitions/models.Error'
         type: array
     type: object
   models.TransactionType:
     enum:
-      - credit
-      - debit
+    - credit
+    - debit
     type: string
     x-enum-comments:
-      TransactionTypeCredit:
-        credit means - income - when money is gained or received
+      TransactionTypeCredit: credit means - income - when money is gained or received
         into an account
-      TransactionTypeDebit:
-        debit means - outcome - when money is lost, spent, or
+      TransactionTypeDebit: debit means - outcome - when money is lost, spent, or
         withdrawn from an account
     x-enum-varnames:
-      - TransactionTypeCredit
-      - TransactionTypeDebit
+    - TransactionTypeCredit
+    - TransactionTypeDebit
   products.NewIncomeInput:
     properties:
       date:
@@ -276,7 +274,7 @@ definitions:
         type: string
       uploaded_to:
         allOf:
-          - $ref: "#/definitions/models.ProductPlace"
+        - $ref: '#/definitions/models.ProductPlace'
         description: Place where the product was uploaded to
     type: object
   sales.AddProductItemToSessionInput:
@@ -286,12 +284,11 @@ definitions:
       quantity:
         type: integer
     type: object
-host: "{config.host}:{config.port}"
 info:
   contact:
     email: hamidovaslon13@gmail.com
     name: API Support
-    url: https://github.com/github.com/aslon1213/go-pos-erp
+    url: https://github.com/aslon1213/go-pos-erp
   description: This is a ERP/POS API for Magazin.
   title: Magazin ERP/POS API
   version: "1.0"
@@ -299,1089 +296,1089 @@ paths:
   /finance:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Add new financial records for a branch
       parameters:
-        - description: Branch finance input
-          in: body
-          name: branch
-          required: true
-          schema:
-            $ref: "#/definitions/models.NewBranchFinanceInput"
+      - description: Branch finance input
+        in: body
+        name: branch
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewBranchFinanceInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Create new finance for a branch
       tags:
-        - finance
+      - finance
   /finance/branch/id/{id}:
     get:
       description: Retrieve a branch using its ID
       parameters:
-        - description: Branch ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Fetch branch by ID
       tags:
-        - finance
+      - finance
   /finance/branch/name/{branch_name}:
     get:
       description: Retrieve finance details using the branch name
       parameters:
-        - description: Branch Name
-          in: path
-          name: branch_name
-          required: true
-          type: string
+      - description: Branch Name
+        in: path
+        name: branch_name
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Fetch finance by branch name
       tags:
-        - finance
+      - finance
   /finance/branches:
     get:
       description: Retrieve all branches from the finance collection
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Fetch all branches
       tags:
-        - finance
+      - finance
   /finance/id/{id}:
     get:
       description: Retrieve finance details using its ID
       parameters:
-        - description: Finance ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Finance ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Fetch finance by ID
       tags:
-        - finance
+      - finance
   /journals:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new journal entry for a branch
       parameters:
-        - description: New Journal Entry Input
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/models.NewJournalEntryInput"
+      - description: New Journal Entry Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewJournalEntryInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Journal"
+            $ref: '#/definitions/models.Journal'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Create a new journal entry
       tags:
-        - journals
+      - journals
   /journals/{journal_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a journal entry by its ID
       parameters:
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Journal"
+            $ref: '#/definitions/models.Journal'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Get a journal entry by ID
       tags:
-        - journals
+      - journals
   /journals/{journal_id}/close:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Close a journal entry by updating its transactions
       parameters:
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
-        - description: Close Journal Entry Input
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/models.CloseJournalEntryInput"
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      - description: Close Journal Entry Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CloseJournalEntryInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             items:
-              $ref: "#/definitions/models.Transaction"
+              $ref: '#/definitions/models.Transaction'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Close a journal entry
       tags:
-        - journals
+      - journals
   /journals/{journal_id}/operations:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new transaction and update the journal
       parameters:
-        - description: Transaction data
-          in: body
-          name: transaction
-          required: true
-          schema:
-            $ref: "#/definitions/models.JournalOperationInput"
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.JournalOperationInput'
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Create a new operation transaction
       tags:
-        - journals/operations
+      - journals/operations
   /journals/{journal_id}/operations/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete an operation transaction by ID
       parameters:
-        - description: Operation ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Delete an operation transaction
       tags:
-        - journals/operations
+      - journals/operations
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get an operation transaction by ID
       parameters:
-        - description: Operation ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Get an operation transaction by ID
       tags:
-        - journals/operations
+      - journals/operations
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update an operation transaction by ID
       parameters:
-        - description: Operation ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Update an operation transaction
       tags:
-        - journals/operations
+      - journals/operations
   /journals/{journal_id}/reopen:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Reopen a journal entry by removing its closing transactions
       parameters:
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.Transaction"
+              $ref: '#/definitions/models.Transaction'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Reopen a closed journal entry
       tags:
-        - journals
+      - journals
   /journals/branch/{branch_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Query journal entries by branch ID
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Page number
-          in: query
-          name: page
-          type: integer
-        - description: Page size
-          in: query
-          name: page_size
-          type: integer
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.Journal"
+              $ref: '#/definitions/models.Journal'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Query journal entries
       tags:
-        - journals
+      - journals
   /journals/report:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a report of journal entries
       produces:
-        - application/json
+      - application/json
       responses: {}
       summary: Get a report
       tags:
-        - journals
+      - journals
   /products:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Query products based on various parameters
       parameters:
-        - description: Branch ID
-          in: query
-          name: branch_id
-          type: string
-        - description: SKU
-          in: query
-          name: sku
-          type: string
-        - description: Minimum price
-          in: query
-          name: price_min
-          type: number
-        - description: Maximum price
-          in: query
-          name: price_max
-          type: number
+      - description: Branch ID
+        in: query
+        name: branch_id
+        type: string
+      - description: SKU
+        in: query
+        name: sku
+        type: string
+      - description: Minimum price
+        in: query
+        name: price_min
+        type: number
+      - description: Maximum price
+        in: query
+        name: price_max
+        type: number
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Query products
       tags:
-        - products
+      - products
     post:
       consumes:
-        - application/json
+      - application/json
       description: Creates a new product with the given details
       parameters:
-        - description: Product details
-          in: body
-          name: product
-          required: true
-          schema:
-            $ref: "#/definitions/models.ProductBase"
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Create a new product
       tags:
-        - products
+      - products
   /products/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Deletes a product and its related data
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Delete a product
       tags:
-        - products
+      - products
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieves a product by its ID
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Get a product by ID
       tags:
-        - products
+      - products
     put:
       consumes:
-        - application/json
+      - application/json
       description: Updates an existing product with the given details
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Product details to update
-          in: body
-          name: product
-          required: true
-          schema:
-            $ref: "#/definitions/models.ProductBase"
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product details to update
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Edit a product
       tags:
-        - products
+      - products
   /products/{id}/income:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Adds new income entry for a product with quantity and price updates
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Income details
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/products.NewIncomeInput"
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Income details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/products.NewIncomeInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Add new income for a product
       tags:
-        - products
+      - products
   /products/transfer:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Transfers product quantity from one location to another
       produces:
-        - application/json
+      - application/json
       responses: {}
       summary: Transfer product between locations
       tags:
-        - products
+      - products
   /sales/session/{session_id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Deletes a sales session by ID
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Delete a sales session
       tags:
-        - sales/session
+      - sales/session
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieves details of a specific sales session
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Get a sales session by ID
       tags:
-        - sales/session
+      - sales/session
   /sales/session/{session_id}/close:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Closes an existing sales session and processes the transaction
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Close a sales session
       tags:
-        - sales/session
+      - sales/session
   /sales/session/{session_id}/product:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Adds a product item to an existing sales session
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
-        - description: Product details
-          in: body
-          name: product
-          required: true
-          schema:
-            $ref: "#/definitions/sales.AddProductItemToSessionInput"
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/sales.AddProductItemToSessionInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Add product to sales session
       tags:
-        - sales/session
+      - sales/session
   /sales/session/branch/{branch_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieves all sales sessions associated with a branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Get all sales sessions for a branch
       tags:
-        - sales/session
+      - sales/session
     post:
       consumes:
-        - application/json
+      - application/json
       description: Creates a new sales session for a branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Open a new sales session
       tags:
-        - sales/session
+      - sales/session
   /sales/transactions/{branch_id}:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new sales transaction for a branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Transaction details
-          in: body
-          name: transaction
-          required: true
-          schema:
-            $ref: "#/definitions/models.TransactionBase"
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Transaction details
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransactionBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Create a new sales transaction
       tags:
-        - sales/transactions
+      - sales/transactions
   /sales/transactions/{transaction_id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a sales transaction by ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: transaction_id
-          required: true
-          type: string
+      - description: Transaction ID
+        in: path
+        name: transaction_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Delete a sales transaction
       tags:
-        - sales/transactions
+      - sales/transactions
   /suppliers:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get all suppliers from the database
       parameters:
-        - description: Supplier name
-          in: query
-          name: name
-          type: string
-        - description: Supplier INN
-          in: query
-          name: inn
-          type: string
-        - description: Supplier branch
-          in: query
-          name: branch
-          type: string
-        - description: Supplier email
-          in: query
-          name: email
-          type: string
-        - description: Supplier phone
-          in: query
-          name: phone
-          type: string
-        - description: Supplier address
-          in: query
-          name: address
-          type: string
-        - description: Supplier notes
-          in: query
-          name: notes
-          type: string
+      - description: Supplier name
+        in: query
+        name: name
+        type: string
+      - description: Supplier INN
+        in: query
+        name: inn
+        type: string
+      - description: Supplier branch
+        in: query
+        name: branch
+        type: string
+      - description: Supplier email
+        in: query
+        name: email
+        type: string
+      - description: Supplier phone
+        in: query
+        name: phone
+        type: string
+      - description: Supplier address
+        in: query
+        name: address
+        type: string
+      - description: Supplier notes
+        in: query
+        name: notes
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Get all suppliers
       tags:
-        - suppliers
+      - suppliers
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new supplier in the database
       parameters:
-        - description: Supplier data
-          in: body
-          name: supplier
-          required: true
-          schema:
-            $ref: "#/definitions/models.SupplierBase"
+      - description: Supplier data
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/models.SupplierBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Create a new supplier
       tags:
-        - suppliers
+      - suppliers
   /suppliers/{branch_id}/{supplier_id}/transactions:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new transaction for a supplier and update financial records
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Supplier ID
-          in: path
-          name: supplier_id
-          required: true
-          type: string
-        - description: Transaction data
-          in: body
-          name: transaction
-          required: true
-          schema:
-            $ref: "#/definitions/models.TransactionBase"
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Supplier ID
+        in: path
+        name: supplier_id
+        required: true
+        type: string
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransactionBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Create a new transaction for a supplier
       tags:
-        - suppliers
-        - transactions
+      - suppliers
+      - transactions
   /suppliers/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a supplier from the database
       parameters:
-        - description: Supplier ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Delete a supplier
       tags:
-        - suppliers
+      - suppliers
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a supplier by its ID
       parameters:
-        - description: Supplier ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Get a supplier by ID
       tags:
-        - suppliers
+      - suppliers
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update a supplier's information
       parameters:
-        - description: Supplier ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Supplier data
-          in: body
-          name: supplier
-          required: true
-          schema:
-            $ref: "#/definitions/models.SupplierBase"
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Supplier data
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/models.SupplierBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       summary: Update a supplier
       tags:
-        - suppliers
+      - suppliers
   /transactions/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a transaction from the database by its ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: 'message" : "transaction was succesfully deleted'
@@ -1392,34 +1389,34 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Delete a transaction by ID
       tags:
-        - transactions
+      - transactions
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update transaction details by its ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Transaction amount
-          in: query
-          name: amount
-          type: string
-        - description: Transaction description
-          in: query
-          name: description
-          type: string
-        - description: Type of transaction
-          in: query
-          name: type
-          type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Transaction amount
+        in: query
+        name: amount
+        type: string
+      - description: Transaction description
+        in: query
+        name: description
+        type: string
+      - description: Type of transaction
+        in: query
+        name: type
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: 'message" : "transaction was succesfully updated'
@@ -1430,153 +1427,153 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Update a transaction by ID
       tags:
-        - transactions
+      - transactions
   /transactions/{transaction_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a single transaction by its ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: transaction_id
-          required: true
-          type: string
+      - description: Transaction ID
+        in: path
+        name: transaction_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.TransactionOutputSingle"
+            $ref: '#/definitions/models.TransactionOutputSingle'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Get a transaction by ID
       tags:
-        - transactions
+      - transactions
   /transactions/branch/{branch_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve transactions based on various query parameters
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Transaction description
-          in: query
-          name: description
-          type: string
-        - description: Minimum transaction amount
-          in: query
-          name: amount_min
-          type: integer
-        - description: Maximum transaction amount
-          in: query
-          name: amount_max
-          type: integer
-        - description: Payment method
-          in: query
-          name: payment_method
-          type: string
-        - description: Type of transaction
-          in: query
-          name: type_of_transaction
-          type: string
-        - description: Initiator type
-          in: query
-          name: initiator_type
-          type: string
-        - description: Minimum date
-          in: query
-          name: date_min
-          type: string
-        - description: Maximum date
-          in: query
-          name: date_max
-          type: string
-        - description: Page number
-          in: query
-          name: page
-          type: integer
-        - description: Number of transactions per page
-          in: query
-          name: count
-          type: integer
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Transaction description
+        in: query
+        name: description
+        type: string
+      - description: Minimum transaction amount
+        in: query
+        name: amount_min
+        type: integer
+      - description: Maximum transaction amount
+        in: query
+        name: amount_max
+        type: integer
+      - description: Payment method
+        in: query
+        name: payment_method
+        type: string
+      - description: Type of transaction
+        in: query
+        name: type_of_transaction
+        type: string
+      - description: Initiator type
+        in: query
+        name: initiator_type
+        type: string
+      - description: Minimum date
+        in: query
+        name: date_min
+        type: string
+      - description: Maximum date
+        in: query
+        name: date_max
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of transactions per page
+        in: query
+        name: count
+        type: integer
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.TransactionOutput"
+            $ref: '#/definitions/models.TransactionOutput'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       summary: Get transactions by query parameters
       tags:
-        - transactions
+      - transactions
   /transactions/docs/initiator_type:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a list of all possible initiator types for transactions
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.InitiatorType"
+              $ref: '#/definitions/models.InitiatorType'
             type: array
       summary: Get all initiator types
       tags:
-        - transactions
+      - transactions
   /transactions/docs/payment_method:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a list of all possible payment methods
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.PaymentMethod"
+              $ref: '#/definitions/models.PaymentMethod'
             type: array
       summary: Get all payment methods
       tags:
-        - transactions
+      - transactions
   /transactions/docs/type:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a list of all possible transaction types
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.TransactionType"
+              $ref: '#/definitions/models.TransactionType'
             type: array
       summary: Get all transaction types
       tags:
-        - transactions
+      - transactions
 swagger: "2.0"

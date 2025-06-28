@@ -26,7 +26,7 @@ func (s *SalesTransactionsController) OpenSalesSession(c *fiber.Ctx) error {
 		log.Error().Err(err).Msg("Failed to create new sales session")
 		return models.ReturnError(c, err)
 	}
-	return c.JSON(models.NewOutput(session))
+	return c.JSON(models.NewOutput([]*models.SalesSession{session}))
 }
 
 type AddProductItemToSessionInput struct {
@@ -68,9 +68,15 @@ func (s *SalesTransactionsController) AddProductItemToSession(c *fiber.Ctx) erro
 		log.Error().Err(err).Str("product_id", product_item.ID).Msg("Failed to find product")
 		return models.ReturnError(c, err)
 	}
+	log.Info().Interface("product_item", product_item).Msg("Product item")
 
 	for _, distribution := range product.QuantityDistribution {
 		if distribution.Place.PlaceType == models.ProductPlaceTypeBranch {
+			log.Info().Str("branch_id", distribution.Place.ID).Msg("Adding product to session")
+
+			// TODO: here may be the logic for synchronizing the product quantity of this product ---
+			// handle situations when the product quantity is not enough, product is not available, product is not in the branch, etc.
+
 			err = session.AddProductItem(product_item.ID, product_item.Quantity, distribution.Price, s.cache)
 			if err != nil {
 				log.Error().Err(err).Str("product_id", product_item.ID).Msg("Failed to add product item to session")
@@ -84,7 +90,7 @@ func (s *SalesTransactionsController) AddProductItemToSession(c *fiber.Ctx) erro
 		}
 	}
 
-	return c.JSON(models.NewOutput(session))
+	return c.JSON(models.NewOutput([]*models.SalesSession{session}))
 }
 
 // CloseSalesSession godoc
@@ -173,7 +179,7 @@ func (s *SalesTransactionsController) GetSalesSession(c *fiber.Ctx) error {
 		Interface("session", session).
 		Msg("Successfully retrieved sales session")
 
-	return c.JSON(models.NewOutput(session))
+	return c.JSON(models.NewOutput([]*models.SalesSession{session}))
 }
 
 // GetSalesOfSession godoc
@@ -234,5 +240,5 @@ func (s *SalesTransactionsController) DeleteSalesSession(c *fiber.Ctx) error {
 		return models.ReturnError(c, err)
 	}
 
-	return c.JSON(models.NewOutput(session))
+	return c.JSON(models.NewOutput([]*models.SalesSession{session}))
 }
