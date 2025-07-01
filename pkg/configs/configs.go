@@ -1,6 +1,10 @@
 package configs
 
 import (
+	"os"
+	"strings"
+
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
@@ -45,7 +49,12 @@ type S3Config struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	viper.SetConfigName("config")
+	filename := "config"
+	if strings.ToLower(os.Getenv("ENVIRONMENT")) != "production" {
+		filename = "config.local"
+	}
+	log.Info().Str("ENVIRONMENT", os.Getenv("ENVIRONMENT")).Str("filename", filename).Msg("ENVIRONMENT")
+	viper.SetConfigName(filename)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path)
 	viper.AddConfigPath("../")
