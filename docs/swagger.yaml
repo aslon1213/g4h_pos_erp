@@ -1,4 +1,11 @@
 definitions:
+  auth.User:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.Branch:
     properties:
       id:
@@ -293,7 +300,7 @@ info:
   title: Magazin ERP/POS API
   version: "1.0"
 paths:
-  /finance:
+  /api/finance:
     post:
       consumes:
       - application/json
@@ -320,10 +327,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Create new finance for a branch
       tags:
       - finance
-  /finance/branch/id/{id}:
+  /api/finance/branch/id/{id}:
     get:
       description: Retrieve a branch using its ID
       parameters:
@@ -343,10 +352,12 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Fetch branch by ID
       tags:
       - finance
-  /finance/branch/name/{branch_name}:
+  /api/finance/branch/name/{branch_name}:
     get:
       description: Retrieve finance details using the branch name
       parameters:
@@ -366,10 +377,12 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Fetch finance by branch name
       tags:
       - finance
-  /finance/branches:
+  /api/finance/branches:
     get:
       description: Retrieve all branches from the finance collection
       produces:
@@ -383,10 +396,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Fetch all branches
       tags:
       - finance
-  /finance/id/{id}:
+  /api/finance/id/{id}:
     get:
       description: Retrieve finance details using its ID
       parameters:
@@ -406,10 +421,12 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Fetch finance by ID
       tags:
       - finance
-  /journals:
+  /api/journals:
     post:
       consumes:
       - application/json
@@ -436,10 +453,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Create a new journal entry
       tags:
       - journals
-  /journals/{journal_id}:
+  /api/journals/{journal_id}:
     get:
       consumes:
       - application/json
@@ -461,10 +480,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Get a journal entry by ID
       tags:
       - journals
-  /journals/{journal_id}/close:
+  /api/journals/{journal_id}/close:
     post:
       consumes:
       - application/json
@@ -498,10 +519,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Close a journal entry
       tags:
       - journals
-  /journals/{journal_id}/operations:
+  /api/journals/{journal_id}/operations:
     post:
       consumes:
       - application/json
@@ -533,10 +556,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Create a new operation transaction
       tags:
       - journals/operations
-  /journals/{journal_id}/operations/{id}:
+  /api/journals/{journal_id}/operations/{id}:
     delete:
       consumes:
       - application/json
@@ -567,6 +592,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Delete an operation transaction
       tags:
       - journals/operations
@@ -600,6 +627,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Get an operation transaction by ID
       tags:
       - journals/operations
@@ -633,10 +662,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Update an operation transaction
       tags:
       - journals/operations
-  /journals/{journal_id}/reopen:
+  /api/journals/{journal_id}/reopen:
     post:
       consumes:
       - application/json
@@ -660,10 +691,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Reopen a closed journal entry
       tags:
       - journals
-  /journals/branch/{branch_id}:
+  /api/journals/branch/{branch_id}:
     get:
       consumes:
       - application/json
@@ -695,10 +728,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Query journal entries
       tags:
       - journals
-  /journals/report:
+  /api/journals/report:
     get:
       consumes:
       - application/json
@@ -706,10 +741,12 @@ paths:
       produces:
       - application/json
       responses: {}
+      security:
+      - BearerAuth: []
       summary: Get a report
       tags:
       - journals
-  /products:
+  /api/products:
     get:
       consumes:
       - application/json
@@ -746,6 +783,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Query products
       tags:
       - products
@@ -775,10 +814,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Create a new product
       tags:
       - products
-  /products/{id}:
+  /api/products/{id}:
     delete:
       consumes:
       - application/json
@@ -800,6 +841,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Delete a product
       tags:
       - products
@@ -824,6 +867,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Get a product by ID
       tags:
       - products
@@ -858,10 +903,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Edit a product
       tags:
       - products
-  /products/{id}/income:
+  /api/products/{id}/income:
     post:
       consumes:
       - application/json
@@ -897,10 +944,139 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Add new income for a product
       tags:
       - products
-  /products/transfer:
+  /api/products/{product_id}/images:
+    get:
+      description: Returns a list of image URLs for a given product
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get all images of a product
+      tags:
+      - products
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads an image file for a product and stores it in S3
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Image file to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Upload a product image
+      tags:
+      - products
+  /api/products/{product_id}/images/{key}:
+    delete:
+      description: Deletes a product image from S3 and removes reference from database
+      parameters:
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Image key to delete
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete a product image
+      tags:
+      - products
+  /api/products/images/{key}:
+    get:
+      description: Returns the image file for a given image key
+      parameters:
+      - description: Image key
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get a single product image
+      tags:
+      - products
+  /api/products/transfer:
     post:
       consumes:
       - application/json
@@ -908,10 +1084,12 @@ paths:
       produces:
       - application/json
       responses: {}
+      security:
+      - BearerAuth: []
       summary: Transfer product between locations
       tags:
       - products
-  /sales/session/{session_id}:
+  /api/sales/session/{session_id}:
     delete:
       consumes:
       - application/json
@@ -941,6 +1119,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Delete a sales session
       tags:
       - sales/session
@@ -973,10 +1153,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Get a sales session by ID
       tags:
       - sales/session
-  /sales/session/{session_id}/close:
+  /api/sales/session/{session_id}/close:
     post:
       consumes:
       - application/json
@@ -998,10 +1180,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Close a sales session
       tags:
       - sales/session
-  /sales/session/{session_id}/product:
+  /api/sales/session/{session_id}/product:
     post:
       consumes:
       - application/json
@@ -1033,10 +1217,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Add product to sales session
       tags:
       - sales/session
-  /sales/session/branch/{branch_id}:
+  /api/sales/session/branch/{branch_id}:
     get:
       consumes:
       - application/json
@@ -1066,6 +1252,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Get all sales sessions for a branch
       tags:
       - sales/session
@@ -1086,10 +1274,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Open a new sales session
       tags:
       - sales/session
-  /sales/transactions/{branch_id}:
+  /api/sales/transactions/{branch_id}:
     post:
       consumes:
       - application/json
@@ -1121,10 +1311,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Create a new sales transaction
       tags:
       - sales/transactions
-  /sales/transactions/{transaction_id}:
+  /api/sales/transactions/{transaction_id}:
     delete:
       consumes:
       - application/json
@@ -1146,10 +1338,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Delete a sales transaction
       tags:
       - sales/transactions
-  /suppliers:
+  /api/suppliers:
     get:
       consumes:
       - application/json
@@ -1194,6 +1388,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Get all suppliers
       tags:
       - suppliers
@@ -1227,10 +1423,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Create a new supplier
       tags:
       - suppliers
-  /suppliers/{branch_id}/{supplier_id}/transactions:
+  /api/suppliers/{branch_id}/{supplier_id}/transactions:
     post:
       consumes:
       - application/json
@@ -1267,11 +1465,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Create a new transaction for a supplier
       tags:
       - suppliers
       - transactions
-  /suppliers/{id}:
+  /api/suppliers/{id}:
     delete:
       consumes:
       - application/json
@@ -1297,6 +1497,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Delete a supplier
       tags:
       - suppliers
@@ -1325,6 +1527,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Get a supplier by ID
       tags:
       - suppliers
@@ -1363,10 +1567,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
       summary: Update a supplier
       tags:
       - suppliers
-  /transactions/{id}:
+  /api/transactions/{id}:
     delete:
       consumes:
       - application/json
@@ -1390,6 +1596,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Delete a transaction by ID
       tags:
       - transactions
@@ -1428,10 +1636,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Update a transaction by ID
       tags:
       - transactions
-  /transactions/{transaction_id}:
+  /api/transactions/{transaction_id}:
     get:
       consumes:
       - application/json
@@ -1453,10 +1663,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Get a transaction by ID
       tags:
       - transactions
-  /transactions/branch/{branch_id}:
+  /api/transactions/branch/{branch_id}:
     get:
       consumes:
       - application/json
@@ -1522,10 +1734,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
       summary: Get transactions by query parameters
       tags:
       - transactions
-  /transactions/docs/initiator_type:
+  /api/transactions/docs/initiator_type:
     get:
       consumes:
       - application/json
@@ -1539,10 +1753,12 @@ paths:
             items:
               $ref: '#/definitions/models.InitiatorType'
             type: array
+      security:
+      - BearerAuth: []
       summary: Get all initiator types
       tags:
       - transactions
-  /transactions/docs/payment_method:
+  /api/transactions/docs/payment_method:
     get:
       consumes:
       - application/json
@@ -1556,10 +1772,12 @@ paths:
             items:
               $ref: '#/definitions/models.PaymentMethod'
             type: array
+      security:
+      - BearerAuth: []
       summary: Get all payment methods
       tags:
       - transactions
-  /transactions/docs/type:
+  /api/transactions/docs/type:
     get:
       consumes:
       - application/json
@@ -1573,7 +1791,72 @@ paths:
             items:
               $ref: '#/definitions/models.TransactionType'
             type: array
+      security:
+      - BearerAuth: []
       summary: Get all transaction types
       tags:
       - transactions
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return a token
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

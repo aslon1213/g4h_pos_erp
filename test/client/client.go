@@ -27,22 +27,26 @@ func NewClient(host, port, username, password string) *Client {
 		Username: username,
 		Passwrod: password,
 	}
-	c.Token = c.Login()
+	_, token, err := c.Login()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to login")
+	}
+	c.Token = token
 	return c
-}
-
-func (c *Client) Login() string {
-	return ""
 }
 
 func (c *Client) MakeRequest(method, path string, body []byte, headers map[string]string, auth_required bool) (*http.Response, error) {
 
-	if auth_required {
-		if c.Token == "" {
-			c.Token = c.Login()
-		}
-		// headers["Authorization"] = "Bearer " + c.Token
-	}
+	// if auth_required {
+	// 	if c.Token == "" {
+	// 		_, token, err := c.Login()
+	// 		if err != nil {
+	// 			return nil, err
+	// 		}
+	// 		c.Token = token
+	// 	}
+	// 	// headers["Authorization"] = "Bearer " + c.Token
+	// }
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, "http://"+c.Host+c.Port+path, bytes.NewBuffer(body))
@@ -53,6 +57,8 @@ func (c *Client) MakeRequest(method, path string, body []byte, headers map[strin
 	for key, value := range headers {
 		req.Header.Set(key, value)
 	}
+	// set token to header
+	req.Header.Set("Authorization", c.Token)
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -97,7 +103,7 @@ func (c *Client) EncodeBody(body interface{}) ([]byte, error) {
 
 // Get all branches
 func (c *Client) GetAllBranches() (resp *http.Response, output models.BranchFinanceOutput, err error) {
-	resp, err = c.MakeRequest("GET", "/finance/branches", nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", "/api/finance/branches", nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutput{}, err
 	}
@@ -112,7 +118,7 @@ func (c *Client) GetAllBranches() (resp *http.Response, output models.BranchFina
 }
 
 func (c *Client) GetBranchByID(branchID string) (resp *http.Response, output models.BranchFinanceOutputSingle, err error) {
-	resp, err = c.MakeRequest("GET", fmt.Sprintf("/finance/id/%s", branchID), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/finance/id/%s", branchID), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutputSingle{}, err
 	}
@@ -122,7 +128,7 @@ func (c *Client) GetBranchByID(branchID string) (resp *http.Response, output mod
 }
 
 func (c *Client) GetBranchByName(branchName string) (resp *http.Response, output models.BranchFinanceOutputSingle, err error) {
-	resp, err = c.MakeRequest("GET", fmt.Sprintf("/finance/name/%s", branchName), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/finance/name/%s", branchName), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutputSingle{}, err
 	}
@@ -138,7 +144,7 @@ func (c *Client) CreateBranch(branch models.NewBranchFinanceInput) (resp *http.R
 
 	log.Info().Str("body", string(body)).Msg("Creating branch")
 
-	resp, err = c.MakeRequest("POST", "/finance", body, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("POST", "/api/finance", body, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutputSingle{}, err
 	}

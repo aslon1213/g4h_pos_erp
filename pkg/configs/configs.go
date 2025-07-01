@@ -36,8 +36,10 @@ type RedisConfig struct {
 }
 
 type ServerConfig struct {
-	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
+	Host               string `mapstructure:"host"`
+	Port               string `mapstructure:"port"`
+	SecretSymmetricKey string `mapstructure:"secret_symmetric_key"`
+	TokenExpiryHours   int    `mapstructure:"token_expiry_hours"`
 }
 
 type S3Config struct {
