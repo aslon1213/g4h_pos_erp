@@ -23,7 +23,7 @@ type ProductsController struct {
 	S3Client               *s3provider.S3Client
 }
 
-func NewProductsController(db *mongo.Database) *ProductsController {
+func New(db *mongo.Database) *ProductsController {
 	return &ProductsController{
 		ProductsCollection:     db.Collection("products"),
 		TransactionsCollection: db.Collection("transactions"),
@@ -33,6 +33,7 @@ func NewProductsController(db *mongo.Database) *ProductsController {
 }
 
 // CreateProduct godoc
+// @Security BearerAuth
 // @Summary Create a new product
 // @Description Creates a new product with the given details
 // @Tags products
@@ -42,7 +43,7 @@ func NewProductsController(db *mongo.Database) *ProductsController {
 // @Success 201 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /products [post]
+// @Router /api/products [post]
 func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 	_, span := otel.Tracer("products").Start(c.Context(), "create_product")
 	defer span.End()
@@ -79,6 +80,7 @@ func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 }
 
 // EditProduct godoc
+// @Security BearerAuth
 // @Summary Edit a product
 // @Description Updates an existing product with the given details
 // @Tags products
@@ -89,7 +91,7 @@ func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /products/{id} [put]
+// @Router /api/products/{id} [put]
 func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 	_, span := otel.Tracer("products").Start(c.Context(), "edit_product")
 	defer span.End()
@@ -168,6 +170,7 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 }
 
 // DeleteProduct godoc
+// @Security BearerAuth
 // @Summary Delete a product
 // @Description Deletes a product and its related data
 // @Tags products
@@ -176,7 +179,7 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 // @Param id path string true "Product ID"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /products/{id} [delete]
+// @Router /api/products/{id} [delete]
 func (p *ProductsController) DeleteProduct(c *fiber.Ctx) error {
 	_, span := otel.Tracer("products").Start(c.Context(), "delete_product")
 	defer span.End()
@@ -204,6 +207,7 @@ func (p *ProductsController) DeleteProduct(c *fiber.Ctx) error {
 }
 
 // GetProductByID godoc
+// @Security BearerAuth
 // @Summary Get a product by ID
 // @Description Retrieves a product by its ID
 // @Tags products
@@ -212,7 +216,7 @@ func (p *ProductsController) DeleteProduct(c *fiber.Ctx) error {
 // @Param id path string true "Product ID"
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /products/{id} [get]
+// @Router /api/products/{id} [get]
 func (p *ProductsController) GetProductByID(c *fiber.Ctx) error {
 	_, span := otel.Tracer("products").Start(c.Context(), "get_product_by_id")
 	defer span.End()
@@ -237,6 +241,7 @@ func (p *ProductsController) GetProductByID(c *fiber.Ctx) error {
 }
 
 // QueryProducts godoc
+// @Security BearerAuth
 // @Summary Query products
 // @Description Query products based on various parameters
 // @Tags products
@@ -249,7 +254,7 @@ func (p *ProductsController) GetProductByID(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /products [get]
+// @Router /api/products [get]
 func (p *ProductsController) QueryProducts(c *fiber.Ctx) error {
 	_, span := otel.Tracer("products").Start(c.Context(), "query_products")
 	defer span.End()

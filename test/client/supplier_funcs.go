@@ -27,7 +27,7 @@ func DecodeSupplierOutput(resp *http.Response) (models.SupplierOutput, error) {
 }
 
 func (c *Client) GetAllSuppliers() (resp *http.Response, output models.SupplierOutput, err error) {
-	resp, err = c.MakeRequest("GET", "/suppliers", nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", "/api/suppliers", nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.SupplierOutput{}, err
 	}
@@ -36,7 +36,7 @@ func (c *Client) GetAllSuppliers() (resp *http.Response, output models.SupplierO
 }
 
 func (c *Client) GetSupplierByID(id string) (resp *http.Response, output models.SupplierOutputSingle, err error) {
-	resp, err = c.MakeRequest("GET", fmt.Sprintf("/suppliers/%s", id), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/suppliers/%s", id), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.SupplierOutputSingle{}, err
 	}
@@ -49,7 +49,7 @@ func (c *Client) CreateSupplier(supplier models.SupplierBase) (resp *http.Respon
 	if err != nil {
 		return nil, models.SupplierOutputSingle{}, err
 	}
-	resp, err = c.MakeRequest("POST", "/suppliers", body, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("POST", "/api/suppliers", body, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.SupplierOutputSingle{}, err
 	}
@@ -62,7 +62,7 @@ func (c *Client) UpdateSupplier(id string, supplier models.SupplierBase) (resp *
 	if err != nil {
 		return nil, map[string]string{}, err
 	}
-	resp, err = c.MakeRequest("PUT", fmt.Sprintf("/suppliers/%s", id), body, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("PUT", fmt.Sprintf("/api/suppliers/%s", id), body, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, map[string]string{}, err
 	}
@@ -75,7 +75,7 @@ func (c *Client) UpdateSupplier(id string, supplier models.SupplierBase) (resp *
 }
 
 func (c *Client) DeleteSupplier(id string) (resp *http.Response, output map[string]string, err error) {
-	resp, err = c.MakeRequest("DELETE", fmt.Sprintf("/suppliers/%s", id), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("DELETE", fmt.Sprintf("/api/suppliers/%s", id), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, map[string]string{}, err
 	}
@@ -109,7 +109,7 @@ func (c *Client) NewSupplierTransaction(branch_id, supplier_id string, transacti
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}
-	resp, err = c.MakeRequest("POST", fmt.Sprintf("/suppliers/%s/%s/transactions", branch_id, supplier_id), body, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("POST", fmt.Sprintf("/api/suppliers/%s/%s/transactions", branch_id, supplier_id), body, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}

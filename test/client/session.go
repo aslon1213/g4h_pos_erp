@@ -24,7 +24,7 @@ func DecodeSessionResponse(response *http.Response) ([]*models.SalesSession, err
 }
 
 func (c *Client) NewSession(branch_id string) (*models.SalesSession, error) {
-	endpoint := fmt.Sprintf("/sales/session/branch/%s", branch_id)
+	endpoint := fmt.Sprintf("/api/sales/session/branch/%s", branch_id)
 	response, err := c.MakeRequest("POST", endpoint, nil, nil, false)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (c *Client) NewSession(branch_id string) (*models.SalesSession, error) {
 }
 
 func (c *Client) GerSalesSession(session_id string) (*models.SalesSession, error) {
-	endpoint := fmt.Sprintf("/sales/session/%s", session_id)
+	endpoint := fmt.Sprintf("/api/sales/session/%s", session_id)
 	response, err := c.MakeRequest("GET", endpoint, nil, nil, false)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ type AddProductItemToSessionInput struct {
 
 func (c *Client) AddProductToSession(session_id string, product_id string, quantity int) (*models.SalesSession, error) {
 
-	endpoint := fmt.Sprintf("/sales/session/%s/product", session_id)
+	endpoint := fmt.Sprintf("/api/sales/session/%s/product", session_id)
 
 	input := AddProductItemToSessionInput{
 		ID:       product_id,
@@ -97,7 +97,7 @@ func (c *Client) GetSalesSessionByBranchID(branch_id string) ([]*models.SalesSes
 }
 
 func (c *Client) DeleteSalesSession(session_id string) (*models.SalesSession, error) {
-	endpoint := fmt.Sprintf("/sales/session/%s", session_id)
+	endpoint := fmt.Sprintf("/api/sales/session/%s", session_id)
 	response, err := c.MakeRequest("DELETE", endpoint, nil, nil, false)
 	if err != nil {
 		return nil, err

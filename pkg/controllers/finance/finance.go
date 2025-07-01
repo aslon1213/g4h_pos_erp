@@ -38,13 +38,14 @@ func New(db *mongo.Database) *FinanceController {
 }
 
 // GetBranches godoc
+// @Security BearerAuth
 // @Summary Fetch all branches
 // @Description Retrieve all branches from the finance collection
 // @Tags finance
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /finance/branches [get]
+// @Router /api/finance/branches [get]
 func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 	log.Debug().Msg("Fetching all branches")
 	cursor, err := f.collection.Find(context.Background(), bson.M{})
@@ -73,6 +74,7 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 }
 
 // GetBranchByBranchID godoc
+// @Security BearerAuth
 // @Summary Fetch branch by ID
 // @Description Retrieve a branch using its ID
 // @Tags finance
@@ -80,7 +82,7 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /finance/branch/id/{id} [get]
+// @Router /api/finance/branch/id/{id} [get]
 func (f *FinanceController) GetBranchByBranchID(c *fiber.Ctx) error {
 	branchID := c.Params("id")
 	log.Debug().Str("branch_id", branchID).Msg("Fetching branch by ID")
@@ -98,6 +100,7 @@ func (f *FinanceController) GetBranchByBranchID(c *fiber.Ctx) error {
 }
 
 // GetFinanceByBranchName godoc
+// @Security BearerAuth
 // @Summary Fetch finance by branch name
 // @Description Retrieve finance details using the branch name
 // @Tags finance
@@ -105,7 +108,7 @@ func (f *FinanceController) GetBranchByBranchID(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /finance/branch/name/{branch_name} [get]
+// @Router /api/finance/branch/name/{branch_name} [get]
 func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 	branchName := c.Params("branch_name")
 	log.Debug().Str("branch_name", branchName).Msg("Fetching finance by branch name")
@@ -127,6 +130,7 @@ func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 }
 
 // NewFinanceOfBranch godoc
+// @Security BearerAuth
 // @Summary Create new finance for a branch
 // @Description Add new financial records for a branch
 // @Tags finance
@@ -136,7 +140,7 @@ func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 // @Success 201 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /finance [post]
+// @Router /api/finance [post]
 func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 	log.Debug().Msg("Creating new finance for branch")
 	var Input models.NewBranchFinanceInput
@@ -175,6 +179,7 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 }
 
 // GetFinanceByID godoc
+// @Security BearerAuth
 // @Summary Fetch finance by ID
 // @Description Retrieve finance details using its ID
 // @Tags finance
@@ -182,7 +187,7 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
-// @Router /finance/id/{id} [get]
+// @Router /api/finance/id/{id} [get]
 func (f *FinanceController) GetFinanceByID(c *fiber.Ctx) error {
 	financeID := c.Params("id")
 	log.Debug().Str("finance_id", financeID).Msg("Fetching finance by ID")
