@@ -52,6 +52,21 @@ type LoginInput struct {
 	Password string `bson:"password"`
 }
 
+// Info handles user info
+// @Summary Get user info
+// @Description Get user info
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]string "message"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /api/auth/me [get]
+func (a *AuthControllers) InfoMe(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{
+		"message": "Hello, World!",
+	})
+}
+
 // Login handles user login
 // @Summary Login a user
 // @Description Authenticate user and return a token
