@@ -32,6 +32,7 @@ func New(db *mongo.Database, cache *cache.Cache) *SalesTransactionsController {
 }
 
 // CreateSalesTransaction godoc
+// @Security BearerAuth
 // @Summary Create a new sales transaction
 // @Description Create a new sales transaction for a branch
 // @Tags sales/transactions
@@ -42,7 +43,7 @@ func New(db *mongo.Database, cache *cache.Cache) *SalesTransactionsController {
 // @Success 201 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/transactions/{branch_id} [post]
+// @Router /api/sales/transactions/{branch_id} [post]
 func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error {
 	branch_id := c.Params("branch_id")
 	transaction_base := models.TransactionBase{}
@@ -133,6 +134,7 @@ func NewTransaction(ctx context.Context, transaction_base models.TransactionBase
 }
 
 // DeleteSalesTransaction godoc
+// @Security BearerAuth
 // @Summary Delete a sales transaction
 // @Description Delete a sales transaction by ID
 // @Tags sales/transactions
@@ -141,7 +143,7 @@ func NewTransaction(ctx context.Context, transaction_base models.TransactionBase
 // @Param transaction_id path string true "Transaction ID"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/transactions/{transaction_id} [delete]
+// @Router /api/sales/transactions/{transaction_id} [delete]
 func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error {
 	transaction_id := c.Params("transaction_id")
 	log.Info().Str("transaction_id", transaction_id).Msg("Deleting sales transaction")

@@ -2,7 +2,8 @@ package app
 
 import (
 	"context"
-	"log"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/aslon1213/go-pos-erp/pkg/configs"
 	"github.com/aslon1213/go-pos-erp/platform/cache"
@@ -33,6 +34,9 @@ import (
 // @contact.name API Support
 // @contact.url https://github.com/aslon1213/go-pos-erp
 // @contact.email hamidovaslon13@gmail.com
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 type App struct {
 	Logger *zerolog.Logger
@@ -45,6 +49,8 @@ type App struct {
 var tracer = otel.Tracer("fiber-server")
 
 func NewFiberApp() *fiber.App {
+	config, _ := configs.LoadConfig(".")
+
 	app := fiber.New()
 	tp := initTracer()
 	defer func() {
@@ -59,12 +65,14 @@ func NewFiberApp() *fiber.App {
 	// 		"john":  "doe",
 	// 		"admin": "123456",
 	// 	},
+
 	// }))
 
 	app.Use(otelfiber.Middleware())
-
 	app.Use(cors.New())
 	app.Use(logger.CustomZerologMiddleware)
+	log.Info().Str("secret_symmetric_key", config.Server.SecretSymmetricKey).Msg("secret_symmetric_key")
+
 	app.Get("/docs/*", fiberSwagger.WrapHandler)
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Redirect("/docs/index.html")
@@ -75,7 +83,7 @@ func NewFiberApp() *fiber.App {
 func New() *App {
 	config, err := configs.LoadConfig(".")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 
 	return &App{
@@ -90,7 +98,7 @@ func New() *App {
 func initTracer() *sdktrace.TracerProvider {
 	exporter, err := stdout.New(stdout.WithPrettyPrint())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("Failed to initialize tracer")
 	}
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),

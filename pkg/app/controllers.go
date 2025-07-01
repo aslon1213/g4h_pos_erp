@@ -1,15 +1,18 @@
 package app
 
 import (
+	"github.com/aslon1213/go-pos-erp/pkg/configs"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/auth"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/finance"
 	journal_handlers "github.com/aslon1213/go-pos-erp/pkg/controllers/journals"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/products"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/sales"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/suppliers"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/transactions"
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
 	"github.com/aslon1213/go-pos-erp/pkg/routes"
 	"github.com/aslon1213/go-pos-erp/platform/cache"
-
+	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -23,6 +26,8 @@ type Controllers struct {
 	Journals     *journal_handlers.JournalHandlers
 	Operations   *journal_handlers.OperationHandlers
 	Products     *products.ProductsController
+	Auth         *auth.AuthControllers
+	Middlewares  *middleware.Middlewares
 }
 
 func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
@@ -34,14 +39,32 @@ func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
 		Sales:        sales.New(db, cache),
 		Journals:     journal_handlers.New(db, cache),
 		Operations:   journal_handlers.NewOperationsHandler(db, cache),
-		Products:     products.NewProductsController(db),
+		Products:     products.New(db),
+		Auth:         auth.New(db),
+		Middlewares:  middleware.New(db),
 	}
 	log.Debug().Msg("Controllers initialized successfully")
 	return controllers
 }
 
 func SetupRoutes(app *fiber.App, controllers *Controllers) {
+
+	config, err := configs.LoadConfig(".")
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to load config")
+	}
+
+	app.Group("/api", pasetoware.New(
+		pasetoware.Config{
+			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			// TokenPrefix:    "Bearer",
+			SuccessHandler: controllers.Middlewares.AuthMiddleware,
+		},
+	))
+
 	log.Debug().Msg("Setting up routes")
+	routes.AuthRoutes(app, controllers.Auth)
+	log.Debug().Msg("Auth routes set up successfully")
 	routes.SuppliersRoutes(app, controllers.Suppliers)
 	log.Debug().Msg("Suppliers routes set up successfully")
 	routes.TransactionsRoutes(app, controllers.Transactions)

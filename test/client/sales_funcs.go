@@ -15,7 +15,7 @@ func (c *Client) CreateSalesTransaction(branch_id string, transaction models.Tra
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}
-	resp, err = c.MakeRequest("POST", "/sales/"+branch_id, json_transaction, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("POST", "/api/sales/"+branch_id, json_transaction, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}
@@ -24,7 +24,7 @@ func (c *Client) CreateSalesTransaction(branch_id string, transaction models.Tra
 }
 
 func (c *Client) DeleteSalesTransaction(branch_id string, transaction_id string) (resp *http.Response, output models.TransactionOutputSingle, err error) {
-	resp, err = c.MakeRequest("DELETE", "/sales/"+branch_id+"/"+transaction_id, nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("DELETE", "/api/sales/"+branch_id+"/"+transaction_id, nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}
