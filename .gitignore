@@ -41,3 +41,4 @@ bin/main
 migrate.ipynb
 journal_api.journals.json
 data/
+config.local.yaml
