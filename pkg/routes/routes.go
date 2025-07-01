@@ -16,8 +16,7 @@ func AuthRoutes(router *fiber.App, authController *auth.AuthControllers) {
 
 	router.Post("/auth/login", authController.Login)
 	router.Post("/auth/register", authController.Register)
-	api := router.Group("/api")
-	api.Get("/auth/me", authController.InfoMe)
+	router.Get("api/auth/me", authController.InfoMe)
 }
 
 func SuppliersRoutes(router *fiber.App, suppliersController *suppliers.SuppliersController) {
