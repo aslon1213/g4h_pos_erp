@@ -28,7 +28,7 @@ func (c *Client) CreateProduct(base *models.ProductBase) (*http.Response, models
 
 	resp, err := c.MakeRequest(
 		"POST",
-		"/products",
+		"/api/products",
 		body,
 		map[string]string{},
 		true,
@@ -53,7 +53,7 @@ func (c *Client) EditProduct(id string, base *models.ProductBase) (*http.Respons
 	}
 	resp, err := c.MakeRequest(
 		"PUT",
-		"/products/"+id,
+		"/api/products/"+id,
 		body,
 		map[string]string{},
 		true,
@@ -73,7 +73,7 @@ func (c *Client) EditProduct(id string, base *models.ProductBase) (*http.Respons
 func (c *Client) DeleteProduct(id string) (*http.Response, models.ProductOutput, error) {
 	resp, err := c.MakeRequest(
 		"DELETE",
-		"/products/"+id,
+		"/api/products/"+id,
 		nil,
 		map[string]string{},
 		true,
@@ -111,7 +111,7 @@ func (c *Client) QueryProducts(params *models.ProductQueryParams) (*http.Respons
 	}
 	resp, err := c.MakeRequest(
 		"GET",
-		"/products?"+query,
+		"/api/products?"+query,
 		nil,
 		map[string]string{},
 		true,
