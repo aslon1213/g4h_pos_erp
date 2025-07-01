@@ -45,6 +45,7 @@ func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHand
 }
 
 // NewOperationTransaction godoc
+// @Security BearerAuth
 // @Summary Create a new operation transaction
 // @Description Create a new transaction and update the journal
 // @Tags journals/operations
@@ -55,7 +56,7 @@ func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHand
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /journals/{journal_id}/operations [post]
+// @Router /api/journals/{journal_id}/operations [post]
 func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	transaction := models.JournalOperationInput{}
 	if err := c.BodyParser(&transaction); err != nil {
@@ -161,6 +162,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 }
 
 // UpdateOperationTransactionByID godoc
+// @Security BearerAuth
 // @Summary Update an operation transaction
 // @Description Update an operation transaction by ID
 // @Tags journals/operations
@@ -171,12 +173,13 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /journals/{journal_id}/operations/{id} [put]
+// @Router /api/journals/{journal_id}/operations/{id} [put]
 func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
 	panic("Not implemented")
 }
 
 // DeleteOperationTransactionByID godoc
+// @Security BearerAuth
 // @Summary Delete an operation transaction
 // @Description Delete an operation transaction by ID
 // @Tags journals/operations
@@ -187,12 +190,13 @@ func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /journals/{journal_id}/operations/{id} [delete]
+// @Router /api/journals/{journal_id}/operations/{id} [delete]
 func (o *OperationHandlers) DeleteOperationTransactionByID(c *fiber.Ctx) error {
 	panic("Not implemented")
 }
 
 // GetOperationTransactionByID godoc
+// @Security BearerAuth
 // @Summary Get an operation transaction by ID
 // @Description Get an operation transaction by ID
 // @Tags journals/operations
@@ -203,7 +207,7 @@ func (o *OperationHandlers) DeleteOperationTransactionByID(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /journals/{journal_id}/operations/{id} [get]
+// @Router /api/journals/{journal_id}/operations/{id} [get]
 func (o *OperationHandlers) GetOperationTransactionByID(c *fiber.Ctx) error {
 	panic("Not implemented")
 }

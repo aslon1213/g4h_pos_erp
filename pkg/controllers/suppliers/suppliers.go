@@ -44,6 +44,7 @@ type SupplierQuery struct {
 }
 
 // GetSuppliers godoc
+// @Security BearerAuth
 // @Summary Get all suppliers
 // @Description Get all suppliers from the database
 // @Tags suppliers
@@ -58,7 +59,7 @@ type SupplierQuery struct {
 // @Param notes query string false "Supplier notes"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /suppliers [get]
+// @Router /api/suppliers [get]
 func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 
 	var query SupplierQuery
@@ -140,6 +141,7 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 }
 
 // GetSupplierByID godoc
+// @Security BearerAuth
 // @Summary Get a supplier by ID
 // @Description Get a supplier by its ID
 // @Tags suppliers
@@ -149,7 +151,7 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /suppliers/{id} [get]
+// @Router /api/suppliers/{id} [get]
 func (s *SuppliersController) GetSupplierByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Debug().Str("id", id).Msg("Getting supplier by ID")
@@ -176,6 +178,7 @@ func (s *SuppliersController) GetSupplierByID(c *fiber.Ctx) error {
 }
 
 // CreateSupplier godoc
+// @Security BearerAuth
 // @Summary Create a new supplier
 // @Description Create a new supplier in the database
 // @Tags suppliers
@@ -186,7 +189,7 @@ func (s *SuppliersController) GetSupplierByID(c *fiber.Ctx) error {
 // @Failure 400 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /suppliers [post]
+// @Router /api/suppliers [post]
 func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	log.Debug().Msg("Creating new supplier")
 
@@ -251,6 +254,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 }
 
 // UpdateSupplier godoc
+// @Security BearerAuth
 // @Summary Update a supplier
 // @Description Update a supplier's information
 // @Tags suppliers
@@ -262,7 +266,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 // @Failure 400 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /suppliers/{id} [put]
+// @Router /api/suppliers/{id} [put]
 func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Debug().Str("id", id).Msg("Updating supplier")
@@ -324,6 +328,7 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 }
 
 // DeleteSupplier godoc
+// @Security BearerAuth
 // @Summary Delete a supplier
 // @Description Delete a supplier from the database
 // @Tags suppliers
@@ -333,7 +338,7 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /suppliers/{id} [delete]
+// @Router /api/suppliers/{id} [delete]
 func (s *SuppliersController) DeleteSupplier(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Debug().Str("id", id).Msg("Deleting supplier")

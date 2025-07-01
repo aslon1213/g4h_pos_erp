@@ -14,6 +14,7 @@ import (
 )
 
 // NewTransaction godoc
+// @Security BearerAuth
 // @Summary Create a new transaction for a supplier
 // @Description Create a new transaction for a supplier and update financial records
 // @Tags suppliers, transactions
@@ -25,7 +26,7 @@ import (
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /suppliers/{branch_id}/{supplier_id}/transactions [post]
+// @Router /api/suppliers/{branch_id}/{supplier_id}/transactions [post]
 func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	// if suppliers gets money, that is when we payed money to them,
 	// so we need to add money to the supplier's balance and decrease the debt of the branch also decrease the balance of the branch
