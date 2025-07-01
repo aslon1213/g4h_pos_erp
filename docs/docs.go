@@ -19,8 +19,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/finance": {
+        "/api/finance": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add new financial records for a branch",
                 "consumes": [
                     "application/json"
@@ -65,8 +70,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/branch/id/{id}": {
+        "/api/finance/branch/id/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a branch using its ID",
                 "produces": [
                     "application/json"
@@ -100,8 +110,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/branch/name/{branch_name}": {
+        "/api/finance/branch/name/{branch_name}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve finance details using the branch name",
                 "produces": [
                     "application/json"
@@ -135,8 +150,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/branches": {
+        "/api/finance/branches": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve all branches from the finance collection",
                 "produces": [
                     "application/json"
@@ -161,8 +181,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/finance/id/{id}": {
+        "/api/finance/id/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve finance details using its ID",
                 "produces": [
                     "application/json"
@@ -196,8 +221,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals": {
+        "/api/journals": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new journal entry for a branch",
                 "consumes": [
                     "application/json"
@@ -242,8 +272,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals/branch/{branch_id}": {
+        "/api/journals/branch/{branch_id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Query journal entries by branch ID",
                 "consumes": [
                     "application/json"
@@ -295,8 +330,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals/report": {
+        "/api/journals/report": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a report of journal entries",
                 "consumes": [
                     "application/json"
@@ -311,8 +351,13 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/journals/{journal_id}": {
+        "/api/journals/{journal_id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a journal entry by its ID",
                 "consumes": [
                     "application/json"
@@ -349,8 +394,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals/{journal_id}/close": {
+        "/api/journals/{journal_id}/close": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Close a journal entry by updating its transactions",
                 "consumes": [
                     "application/json"
@@ -405,8 +455,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals/{journal_id}/operations": {
+        "/api/journals/{journal_id}/operations": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new transaction and update the journal",
                 "consumes": [
                     "application/json"
@@ -458,8 +513,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals/{journal_id}/operations/{id}": {
+        "/api/journals/{journal_id}/operations/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get an operation transaction by ID",
                 "consumes": [
                     "application/json"
@@ -509,6 +569,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an operation transaction by ID",
                 "consumes": [
                     "application/json"
@@ -558,6 +623,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an operation transaction by ID",
                 "consumes": [
                     "application/json"
@@ -607,8 +677,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/journals/{journal_id}/reopen": {
+        "/api/journals/{journal_id}/reopen": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Reopen a journal entry by removing its closing transactions",
                 "consumes": [
                     "application/json"
@@ -648,8 +723,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/products": {
+        "/api/products": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Query products based on various parameters",
                 "consumes": [
                     "application/json"
@@ -709,6 +789,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new product with the given details",
                 "consumes": [
                     "application/json"
@@ -753,8 +838,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/transfer": {
+        "/api/products/images/{key}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the image file for a given image key",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Get a single product image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Image key",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/transfer": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Transfers product quantity from one location to another",
                 "consumes": [
                     "application/json"
@@ -769,8 +905,13 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/products/{id}": {
+        "/api/products/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a product by its ID",
                 "consumes": [
                     "application/json"
@@ -807,6 +948,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates an existing product with the given details",
                 "consumes": [
                     "application/json"
@@ -858,6 +1004,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a product and its related data",
                 "consumes": [
                     "application/json"
@@ -894,8 +1045,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/products/{id}/income": {
+        "/api/products/{id}/income": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Adds new income entry for a product with quantity and price updates",
                 "consumes": [
                     "application/json"
@@ -953,8 +1109,166 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/session/branch/{branch_id}": {
+        "/api/products/{product_id}/images": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns a list of image URLs for a given product",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Get all images of a product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Uploads an image file for a product and stores it in S3",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Upload a product image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image file to upload",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{product_id}/images/{key}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a product image from S3 and removes reference from database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Delete a product image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Image key to delete",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sales/session/branch/{branch_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves all sales sessions associated with a branch",
                 "consumes": [
                     "application/json"
@@ -1003,6 +1317,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new sales session for a branch",
                 "consumes": [
                     "application/json"
@@ -1033,8 +1352,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/session/{session_id}": {
+        "/api/sales/session/{session_id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves details of a specific sales session",
                 "consumes": [
                     "application/json"
@@ -1083,6 +1407,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a sales session by ID",
                 "consumes": [
                     "application/json"
@@ -1131,8 +1460,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/session/{session_id}/close": {
+        "/api/sales/session/{session_id}/close": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Closes an existing sales session and processes the transaction",
                 "consumes": [
                     "application/json"
@@ -1169,8 +1503,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/session/{session_id}/product": {
+        "/api/sales/session/{session_id}/product": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Adds a product item to an existing sales session",
                 "consumes": [
                     "application/json"
@@ -1222,8 +1561,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/transactions/{branch_id}": {
+        "/api/sales/transactions/{branch_id}": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new sales transaction for a branch",
                 "consumes": [
                     "application/json"
@@ -1275,8 +1619,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/sales/transactions/{transaction_id}": {
+        "/api/sales/transactions/{transaction_id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a sales transaction by ID",
                 "consumes": [
                     "application/json"
@@ -1313,8 +1662,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/suppliers": {
+        "/api/suppliers": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get all suppliers from the database",
                 "consumes": [
                     "application/json"
@@ -1386,6 +1740,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new supplier in the database",
                 "consumes": [
                     "application/json"
@@ -1436,8 +1795,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/suppliers/{branch_id}/{supplier_id}/transactions": {
+        "/api/suppliers/{branch_id}/{supplier_id}/transactions": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new transaction for a supplier and update financial records",
                 "consumes": [
                     "application/json"
@@ -1497,8 +1861,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/suppliers/{id}": {
+        "/api/suppliers/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a supplier by its ID",
                 "consumes": [
                     "application/json"
@@ -1541,6 +1910,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update a supplier's information",
                 "consumes": [
                     "application/json"
@@ -1598,6 +1972,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a supplier from the database",
                 "consumes": [
                     "application/json"
@@ -1640,8 +2019,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/branch/{branch_id}": {
+        "/api/transactions/branch/{branch_id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve transactions based on various query parameters",
                 "consumes": [
                     "application/json"
@@ -1744,8 +2128,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/docs/initiator_type": {
+        "/api/transactions/docs/initiator_type": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all possible initiator types for transactions",
                 "consumes": [
                     "application/json"
@@ -1770,8 +2159,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/docs/payment_method": {
+        "/api/transactions/docs/payment_method": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all possible payment methods",
                 "consumes": [
                     "application/json"
@@ -1796,8 +2190,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/docs/type": {
+        "/api/transactions/docs/type": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a list of all possible transaction types",
                 "consumes": [
                     "application/json"
@@ -1822,8 +2221,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/{id}": {
+        "/api/transactions/{id}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update transaction details by its ID",
                 "consumes": [
                     "application/json"
@@ -1881,6 +2285,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a transaction from the database by its ID",
                 "consumes": [
                     "application/json"
@@ -1920,8 +2329,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/{transaction_id}": {
+        "/api/transactions/{transaction_id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve a single transaction by its ID",
                 "consumes": [
                     "application/json"
@@ -1957,9 +2371,109 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/auth/login": {
+            "post": {
+                "description": "Authenticate user and return a token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login a user",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "description": "Create a new user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "auth.User": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Branch": {
             "type": "object",
             "properties": {
@@ -2376,6 +2890,13 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
