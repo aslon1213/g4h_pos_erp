@@ -11,6 +11,7 @@ import (
 	"github.com/aslon1213/go-pos-erp/platform/logger"
 
 	"github.com/gofiber/contrib/otelfiber"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -73,6 +74,17 @@ func NewFiberApp() *fiber.App {
 	app.Use(logger.CustomZerologMiddleware)
 	log.Info().Str("secret_symmetric_key", config.Server.SecretSymmetricKey).Msg("secret_symmetric_key")
 
+	app.Group(
+		"/docs",
+		basicauth.New(basicauth.Config{
+			Users: map[string]string{
+				config.Server.AdminDocsUsers[0].Username: config.Server.AdminDocsUsers[0].Password,
+				config.Server.AdminDocsUsers[1].Username: config.Server.AdminDocsUsers[1].Password,
+			},
+			Realm: "Restricted",
+		}),
+	)
+
 	app.Get("/docs/*", fiberSwagger.WrapHandler)
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Redirect("/docs/index.html")
@@ -118,4 +130,10 @@ func (a *App) Run() {
 	controllers := NewControllers(a.DB.Database(a.Config.DB.Database), a.Cache)
 	SetupRoutes(a.Router, controllers)
 	a.Router.Listen(a.Config.Server.Port)
+}
+
+func (app *App) MigrateDatabase() {
+
+	// migrate db to json and save to s3
+
 }

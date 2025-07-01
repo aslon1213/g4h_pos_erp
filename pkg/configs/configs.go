@@ -36,10 +36,11 @@ type RedisConfig struct {
 }
 
 type ServerConfig struct {
-	Host               string `mapstructure:"host"`
-	Port               string `mapstructure:"port"`
-	SecretSymmetricKey string `mapstructure:"secret_symmetric_key"`
-	TokenExpiryHours   int    `mapstructure:"token_expiry_hours"`
+	Host               string          `mapstructure:"host"`
+	Port               string          `mapstructure:"port"`
+	SecretSymmetricKey string          `mapstructure:"secret_symmetric_key"`
+	TokenExpiryHours   int             `mapstructure:"token_expiry_hours"`
+	AdminDocsUsers     []AdminDocsUser `mapstructure:"admin_docs_users"`
 }
 
 type S3Config struct {
@@ -48,6 +49,11 @@ type S3Config struct {
 	AccessKeyID     string `mapstructure:"access_key_id"`
 	SecretAccessKey string `mapstructure:"secret_access_key"`
 	ImageBucket     string `mapstructure:"image_bucket"`
+}
+
+type AdminDocsUser struct {
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
 }
 
 func LoadConfig(path string) (*Config, error) {
