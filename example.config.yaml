@@ -28,3 +28,8 @@ server:
   port: ":12000"
   secret_symmetric_key: "hello-world"
   token_expiry_hours: 48
+  admin_docs_users:
+    - username: "admin"
+      password: "admin"
+    - username: "dev"
+      password: "dev456"
