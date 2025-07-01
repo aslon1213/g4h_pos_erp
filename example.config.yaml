@@ -1,5 +1,5 @@
 database:
-  host: "localhost"
+  host: "mongo1"
   port: "27017"
   username: "admin"
   password: "admin"
@@ -8,6 +8,14 @@ database:
   min_pool_size: 10
   auth: false
   replica_set: myReplicaSet
+  url: mongodb://localhost:27017/?replicate_set=myReplicaSet
+
+s3:
+  region: ""
+  endpoint: ""
+  access_key_id: ""
+  secret_access_key: ""
+  image_bucket: ""
 
 redis:
   host: "localhost"
@@ -16,4 +24,7 @@ redis:
   database: 0
 
 server:
-  port: ":9999"
+  host: localhost
+  port: ":12000"
+  secret_symmetric_key: "hello-world"
+  token_expiry_hours: 48

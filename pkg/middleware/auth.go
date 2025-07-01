@@ -1,31 +1,38 @@
 package middleware
 
 import (
-	"fmt"
-	"net/http"
-	"os"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func AuthMiddleware(c *fiber.Ctx) {
-	token := c.Get("Authorization")
-	if token == "" {
-		c.Status(http.StatusUnauthorized)
-		return
+type Middlewares struct {
+	UserCollection *mongo.Collection
+}
+
+func New(db *mongo.Database) *Middlewares {
+	return &Middlewares{
+		UserCollection: db.Collection("users"),
 	}
+}
 
-	claims, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
-	})
+func (m *Middlewares) AuthMiddleware(c *fiber.Ctx) error {
 
-	if err != nil {
-		c.Status(http.StatusUnauthorized)
-		return
-	}
-	fmt.Println(claims)
+	// values := c.Locals(
+	// 	pasetoware.DefaultContextKey,
+	// ).(string)
 
-	c.Locals("user", "test")
+	// got username
+	// username := values
 
+	// // retreive the user
+	// user := &models.User{}
+	// err := m.UserCollection.FindOne(c.Context(), bson.M{"username": username}).Decode(user)
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("Failed to find user")
+	// 	return c.SendStatus(fiber.StatusUnauthorized)
+	// }
+	// // add the user to the context
+	// c.Locals("user", user)
+
+	return c.Next()
 }

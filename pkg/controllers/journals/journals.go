@@ -62,6 +62,7 @@ func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
 }
 
 // GetJournalEntryByID godoc
+// @Security BearerAuth
 // @Summary Get a journal entry by ID
 // @Description Get a journal entry by its ID
 // @Tags journals
@@ -70,7 +71,7 @@ func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
 // @Param journal_id path string true "Journal ID"
 // @Success 200 {object} models.Journal
 // @Failure 500 {object} models.Error
-// @Router /journals/{journal_id} [get]
+// @Router /api/journals/{journal_id} [get]
 func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 	// log.Info().Msg("Fetching journal entry by ID")
 	journal, err := j.FetchJournalByID(j.ctx, c, true)
@@ -87,6 +88,7 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 }
 
 // QueryJournalEntries godoc
+// @Security BearerAuth
 // @Summary Query journal entries
 // @Description Query journal entries by branch ID
 // @Tags journals
@@ -97,7 +99,7 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 // @Param page_size query int false "Page size"
 // @Success 200 {array} models.Journal
 // @Failure 500 {object} models.Error
-// @Router /journals/branch/{branch_id} [get]
+// @Router /api/journals/branch/{branch_id} [get]
 func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 	ctx, span := j.Tracer.Start(j.ctx, "query_journal_entries")
 	defer span.End()
@@ -171,6 +173,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 }
 
 // NewJournalEntry godoc
+// @Security BearerAuth
 // @Summary Create a new journal entry
 // @Description Create a new journal entry for a branch
 // @Tags journals
@@ -180,7 +183,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 // @Success 201 {object} models.Journal
 // @Failure 400 {object} models.Error
 // @Failure 500 {object} models.Error
-// @Router /journals [post]
+// @Router /api/journals [post]
 func (j *JournalHandlers) NewJournalEntry(c *fiber.Ctx) error {
 	log.Info().Msg("Creating new journal entry")
 	input := models.NewJournalEntryInput{}
@@ -239,6 +242,7 @@ func (j *JournalHandlers) NewJournalEntry(c *fiber.Ctx) error {
 }
 
 // CloseJournalEntry godoc
+// @Security BearerAuth
 // @Summary Close a journal entry
 // @Description Close a journal entry by updating its transactions
 // @Tags journals
@@ -249,7 +253,7 @@ func (j *JournalHandlers) NewJournalEntry(c *fiber.Ctx) error {
 // @Success 201 {array} models.Transaction
 // @Failure 400 {object} models.Error
 // @Failure 500 {object} models.Error
-// @Router /journals/{journal_id}/close [post]
+// @Router /api/journals/{journal_id}/close [post]
 func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	log.Info().Msg("Closing journal entry")
 	journalID, err := ParseJournalID(c)
@@ -373,6 +377,7 @@ func (j *JournalHandlers) FetchJournalByID(ctx context.Context, c *fiber.Ctx, fe
 }
 
 // ReOpenJournalEntry godoc
+// @Security BearerAuth
 // @Summary Reopen a closed journal entry
 // @Description Reopen a journal entry by removing its closing transactions
 // @Tags journals
@@ -381,7 +386,7 @@ func (j *JournalHandlers) FetchJournalByID(ctx context.Context, c *fiber.Ctx, fe
 // @Param journal_id path string true "Journal ID"
 // @Success 200 {array} models.Transaction
 // @Failure 500 {object} models.Error
-// @Router /journals/{journal_id}/reopen [post]
+// @Router /api/journals/{journal_id}/reopen [post]
 func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	log.Info().Msg("Reopening journal entry")
 	// start a db transaction
@@ -475,12 +480,13 @@ func ParseJournalID(c *fiber.Ctx) (bson.ObjectID, error) {
 }
 
 // GetReport godoc
+// @Security BearerAuth
 // @Summary Get a report
 // @Description Get a report of journal entries
 // @Tags journals
 // @Accept json
 // @Produce json
-// @Router /journals/report [get]
+// @Router /api/journals/report [get]
 func (j *JournalHandlers) GetReport(c *fiber.Ctx) error {
 	log.Info().Msg("Generating report")
 	panic("Not implemented")

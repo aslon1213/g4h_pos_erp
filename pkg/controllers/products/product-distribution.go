@@ -21,6 +21,7 @@ type NewIncomeInput struct {
 }
 
 // NewIncome godoc
+// @Security BearerAuth
 // @Summary Add new income for a product
 // @Description Adds new income entry for a product with quantity and price updates
 // @Tags products
@@ -32,7 +33,7 @@ type NewIncomeInput struct {
 // @Failure 400 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /products/{id}/income [post]
+// @Router /api/products/{id}/income [post]
 func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 	log.Info().Msg("Starting new income process")
 
@@ -191,12 +192,13 @@ func AppendQuantityDistribution(ctx context.Context, input NewIncomeInput, produ
 }
 
 // NewTransfer godoc
+// @Security BearerAuth
 // @Summary Transfer product between locations
 // @Description Transfers product quantity from one location to another
 // @Tags products
 // @Accept json
 // @Produce json
-// @Router /products/transfer [post]
+// @Router /api/products/transfer [post]
 func (p *ProductsController) NewTransfer(c *fiber.Ctx) error {
 	panic("Not implemented")
 	return nil
