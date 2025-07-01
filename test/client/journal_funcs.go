@@ -41,7 +41,7 @@ func (c *Client) OpenJournal(journal models.NewJournalEntryInput) (*http.Respons
 	if err != nil {
 		return nil, models.JournalOutput{}, err
 	}
-	endpoint := fmt.Sprintf("/journals")
+	endpoint := fmt.Sprintf("/api/journals")
 
 	resp, err := c.MakeRequest(
 		"POST",
@@ -64,7 +64,7 @@ func (c *Client) OpenJournal(journal models.NewJournalEntryInput) (*http.Respons
 
 func (c *Client) GetJournalByID(journal_id string) (*http.Response, models.JournalOutput, error) {
 
-	endpoint := fmt.Sprintf("/journals/%s", journal_id)
+	endpoint := fmt.Sprintf("/api/journals/%s", journal_id)
 
 	resp, err := c.MakeRequest(
 		"GET",
@@ -81,7 +81,7 @@ func (c *Client) GetJournalByID(journal_id string) (*http.Response, models.Journ
 
 func (c *Client) QueryJournalEntries(branch_id string, queryParams models.JournalQueryParams) (*http.Response, models.JournalOutputList, error) {
 
-	endpoint := fmt.Sprintf("/journals/branch/%s?page=%d&page_size=%d", branch_id, queryParams.Page, queryParams.PageSize)
+	endpoint := fmt.Sprintf("/api/journals/branch/%s?page=%d&page_size=%d", branch_id, queryParams.Page, queryParams.PageSize)
 
 	resp, err := c.MakeRequest(
 		"GET",
@@ -104,7 +104,7 @@ func (c *Client) CloseJournal(journal_id string, input models.CloseJournalEntryI
 		return nil, models.JournalOutput{}, err
 	}
 
-	endpoint := fmt.Sprintf("/journals/%s/close", journal_id)
+	endpoint := fmt.Sprintf("/api/journals/%s/close", journal_id)
 
 	resp, err := c.MakeRequest(
 		"POST",
@@ -123,7 +123,7 @@ func (c *Client) CloseJournal(journal_id string, input models.CloseJournalEntryI
 
 func (c *Client) ReOpenJournal(journal_id string) (*http.Response, models.JournalOutput, error) {
 
-	endpoint := fmt.Sprintf("/journals/%s/reopen", journal_id)
+	endpoint := fmt.Sprintf("/api/journals/%s/reopen", journal_id)
 
 	resp, err := c.MakeRequest(
 		"POST",
@@ -147,7 +147,7 @@ func (c *Client) NewJournalOperation(journal_id string, operation models.Journal
 		return nil, models.JournalOutput{}, err
 	}
 
-	endpoint := fmt.Sprintf("/journals/%s/operations", journal_id)
+	endpoint := fmt.Sprintf("/api/journals/%s/operations", journal_id)
 
 	resp, err := c.MakeRequest(
 		"POST",

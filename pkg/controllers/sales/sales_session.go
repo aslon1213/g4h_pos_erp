@@ -12,6 +12,7 @@ import (
 )
 
 // OpenSalesSession godoc
+// @Security BearerAuth
 // @Summary Open a new sales session
 // @Description Creates a new sales session for a branch
 // @Tags sales/session
@@ -19,7 +20,7 @@ import (
 // @Produce json
 // @Param branch_id path string true "Branch ID"
 // @Success 200 {object} models.Output
-// @Router /sales/session/branch/{branch_id} [post]
+// @Router /api/sales/session/branch/{branch_id} [post]
 func (s *SalesTransactionsController) OpenSalesSession(c *fiber.Ctx) error {
 	branch_id := c.Params("branch_id")
 	log.Info().Str("branch_id", branch_id).Msg("Opening new sales session")
@@ -50,6 +51,7 @@ type AddProductItemToSessionInput struct {
 }
 
 // AddProductItemToSession godoc
+// @Security BearerAuth
 // @Summary Add product to sales session
 // @Description Adds a product item to an existing sales session
 // @Tags sales/session
@@ -60,7 +62,7 @@ type AddProductItemToSessionInput struct {
 // @Success 200 {object} models.Output
 // @Failure 400 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/session/{session_id}/product [post]
+// @Router /api/sales/session/{session_id}/product [post]
 func (s *SalesTransactionsController) AddProductItemToSession(c *fiber.Ctx) error {
 	session_id := c.Params("session_id")
 
@@ -109,6 +111,7 @@ func (s *SalesTransactionsController) AddProductItemToSession(c *fiber.Ctx) erro
 }
 
 // CloseSalesSession godoc
+// @Security BearerAuth
 // @Summary Close a sales session
 // @Description Closes an existing sales session and processes the transaction
 // @Tags sales/session
@@ -117,7 +120,7 @@ func (s *SalesTransactionsController) AddProductItemToSession(c *fiber.Ctx) erro
 // @Param session_id path string true "Session ID"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/session/{session_id}/close [post]
+// @Router /api/sales/session/{session_id}/close [post]
 func (s *SalesTransactionsController) CloseSalesSession(c *fiber.Ctx) error {
 	session_id := c.Params("session_id")
 	log.Info().Str("session_id", session_id).Msg("Closing sales session")
@@ -168,6 +171,7 @@ func (s *SalesTransactionsController) CloseSalesSession(c *fiber.Ctx) error {
 }
 
 // GetSalesSession godoc
+// @Security BearerAuth
 // @Summary Get a sales session by ID
 // @Description Retrieves details of a specific sales session
 // @Tags sales/session
@@ -178,7 +182,7 @@ func (s *SalesTransactionsController) CloseSalesSession(c *fiber.Ctx) error {
 // @Failure 400 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/session/{session_id} [get]
+// @Router /api/sales/session/{session_id} [get]
 func (s *SalesTransactionsController) GetSalesSession(c *fiber.Ctx) error {
 	session_id := c.Params("session_id")
 	log.Info().Str("session_id", session_id).Msg("Getting sales session")
@@ -198,6 +202,7 @@ func (s *SalesTransactionsController) GetSalesSession(c *fiber.Ctx) error {
 }
 
 // GetSalesOfSession godoc
+// @Security BearerAuth
 // @Summary Get all sales sessions for a branch
 // @Description Retrieves all sales sessions associated with a branch
 // @Tags sales/session
@@ -208,7 +213,7 @@ func (s *SalesTransactionsController) GetSalesSession(c *fiber.Ctx) error {
 // @Failure 400 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/session/branch/{branch_id} [get]
+// @Router /api/sales/session/branch/{branch_id} [get]
 func (s *SalesTransactionsController) GetSalesSessionsOfBranch(c *fiber.Ctx) error {
 	branch_id := c.Params("branch_id")
 	log.Info().Str("branch_id", branch_id).Msg("Getting sales sessions for branch")
@@ -228,6 +233,7 @@ func (s *SalesTransactionsController) GetSalesSessionsOfBranch(c *fiber.Ctx) err
 }
 
 // DeleteSalesSession godoc
+// @Security BearerAuth
 // @Summary Delete a sales session
 // @Description Deletes a sales session by ID
 // @Tags sales/session
@@ -238,7 +244,7 @@ func (s *SalesTransactionsController) GetSalesSessionsOfBranch(c *fiber.Ctx) err
 // @Failure 400 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Failure 500 {object} models.Output
-// @Router /sales/session/{session_id} [delete]
+// @Router /api/sales/session/{session_id} [delete]
 func (s *SalesTransactionsController) DeleteSalesSession(c *fiber.Ctx) error {
 	session_id := c.Params("session_id")
 	log.Info().Str("session_id", session_id).Msg("Deleting sales session")
