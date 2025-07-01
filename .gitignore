@@ -40,3 +40,4 @@ bin/main
 *.log
 migrate.ipynb
 journal_api.journals.json
+data/
