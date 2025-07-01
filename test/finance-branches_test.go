@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"io"
 	logging "log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/aslon1213/go-pos-erp/pkg/configs"
 	"github.com/aslon1213/go-pos-erp/pkg/utils"
 	"github.com/aslon1213/go-pos-erp/test/client"
+	"go.mongodb.org/mongo-driver/bson"
 
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
@@ -22,10 +24,10 @@ func TestMain(m *testing.M) {
 	logging.SetOutput(io.Discard)
 	app := app.New()
 
-	// app.DB.Database("magazin").Collection("finance").DeleteMany(context.Background(), bson.M{})
-	// app.DB.Database("magazin").Collection("suppliers").DeleteMany(context.Background(), bson.M{})
-	// app.DB.Database("magazin").Collection("transactions").DeleteMany(context.Background(), bson.M{})
-	// app.DB.Database("magazin").Collection("journals").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("finance").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("suppliers").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("transactions").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("journals").DeleteMany(context.Background(), bson.M{})
 
 	go app.Run()
 	m.Run()

@@ -26,6 +26,7 @@ services:
     build:
       context: ..
       dockerfile: build/Dockerfile
+    container_name: api
     ports:
       - "12000:12000"
     # depends_on:

@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Client) GetTransactions(branch_id string, description string, amount_min uint32, amount_max uint32, payment_method models.PaymentMethod, type_of_transaction models.TransactionType, initiator_type models.InitiatorType, date_min time.Time, date_max time.Time, page int, count int) (resp *http.Response, output models.TransactionOutput, err error) {
-	url := fmt.Sprintf("/transactions/branch/%s?", branch_id)
+	url := fmt.Sprintf("/api/transactions/branch/%s?", branch_id)
 	if description != "" {
 		url += fmt.Sprintf("description=%s&", description)
 	}
@@ -46,7 +46,7 @@ func (c *Client) GetTransactions(branch_id string, description string, amount_mi
 }
 
 func (c *Client) GetTransactionByID(branch_id string, transaction_id string) (resp *http.Response, output models.TransactionOutputSingle, err error) {
-	resp, err = c.MakeRequest("GET", fmt.Sprintf("/transactions/%s", transaction_id), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/transactions/%s", transaction_id), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}

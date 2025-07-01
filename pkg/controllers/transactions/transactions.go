@@ -27,6 +27,7 @@ func New(db *mongo.Database) *TransactionsController {
 }
 
 // GetTransactionsByQueryParams godoc
+// @Security BearerAuth
 // @Summary Get transactions by query parameters
 // @Description Retrieve transactions based on various query parameters
 // @Tags transactions
@@ -46,7 +47,7 @@ func New(db *mongo.Database) *TransactionsController {
 // @Success 200 {object} models.TransactionOutput
 // @Failure 400 {object} models.Error
 // @Failure 500 {object} models.Error
-// @Router /transactions/branch/{branch_id} [get]
+// @Router /api/transactions/branch/{branch_id} [get]
 func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) error {
 	s.logger.Info().Msg("GetTransactionsByQueryParams called")
 	branch_id := c.Params("branch_id")
@@ -139,6 +140,7 @@ func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) erro
 }
 
 // GetTransactionByID godoc
+// @Security BearerAuth
 // @Summary Get a transaction by ID
 // @Description Retrieve a single transaction by its ID
 // @Tags transactions
@@ -147,7 +149,7 @@ func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) erro
 // @Param transaction_id path string true "Transaction ID"
 // @Success 200 {object} models.TransactionOutputSingle
 // @Failure 500 {object} models.Error
-// @Router /transactions/{transaction_id} [get]
+// @Router /api/transactions/{transaction_id} [get]
 func (t *TransactionsController) GetTransactionByID(c *fiber.Ctx) error {
 	t.logger.Info().Msg("GetTransactionByID called")
 	transaction_id := c.Params("id")
@@ -165,6 +167,7 @@ func (t *TransactionsController) GetTransactionByID(c *fiber.Ctx) error {
 }
 
 // UpdateTransactionByID godoc
+// @Security BearerAuth
 // @Summary Update a transaction by ID
 // @Description Update transaction details by its ID
 // @Tags transactions
@@ -176,7 +179,7 @@ func (t *TransactionsController) GetTransactionByID(c *fiber.Ctx) error {
 // @Param type query string false "Type of transaction"
 // @Success 200 {object} map[string]string "message" : "transaction was succesfully updated"
 // @Failure 500 {object} models.Error
-// @Router /transactions/{id} [put]
+// @Router /api/transactions/{id} [put]
 func (t *TransactionsController) UpdateTransactionByID(c *fiber.Ctx) error {
 	t.logger.Info().Msg("UpdateTransactionByID called")
 	idx := c.Params("id")
@@ -215,6 +218,7 @@ func (t *TransactionsController) UpdateTransactionByID(c *fiber.Ctx) error {
 }
 
 // DeleteTransaction godoc
+// @Security BearerAuth
 // @Summary Delete a transaction by ID
 // @Description Delete a transaction from the database by its ID
 // @Tags transactions
@@ -223,7 +227,7 @@ func (t *TransactionsController) UpdateTransactionByID(c *fiber.Ctx) error {
 // @Param id path string true "Transaction ID"
 // @Success 200 {object} map[string]string "message" : "transaction was succesfully deleted"
 // @Failure 500 {object} models.Error
-// @Router /transactions/{id} [delete]
+// @Router /api/transactions/{id} [delete]
 func (t *TransactionsController) DeleteTransactionByID(c *fiber.Ctx) error {
 	t.logger.Info().Msg("DeleteTransactionByID called")
 	panic("not implemented")
@@ -248,13 +252,14 @@ func (t *TransactionsController) DeleteTransactionByID(c *fiber.Ctx) error {
 }
 
 // GetInitiatorType godoc
+// @Security BearerAuth
 // @Summary Get all initiator types
 // @Description Retrieve a list of all possible initiator types for transactions
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.InitiatorType
-// @Router /transactions/docs/initiator_type [get]
+// @Router /api/transactions/docs/initiator_type [get]
 func (t *TransactionsController) GetInitiatorType(c *fiber.Ctx) error {
 	t.logger.Info().Msg("GetInitiatorType called")
 	types := []models.InitiatorType{
@@ -269,13 +274,14 @@ func (t *TransactionsController) GetInitiatorType(c *fiber.Ctx) error {
 }
 
 // GetTransactionType godoc
+// @Security BearerAuth
 // @Summary Get all transaction types
 // @Description Retrieve a list of all possible transaction types
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.TransactionType
-// @Router /transactions/docs/type [get]
+// @Router /api/transactions/docs/type [get]
 func (t *TransactionsController) GetTransactionType(c *fiber.Ctx) error {
 	t.logger.Info().Msg("GetTransactionType called")
 	types := []models.TransactionType{
@@ -286,13 +292,14 @@ func (t *TransactionsController) GetTransactionType(c *fiber.Ctx) error {
 }
 
 // GetPaymentMethod godoc
+// @Security BearerAuth
 // @Summary Get all payment methods
 // @Description Retrieve a list of all possible payment methods
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.PaymentMethod
-// @Router /transactions/docs/payment_method [get]
+// @Router /api/transactions/docs/payment_method [get]
 func (t *TransactionsController) GetPaymentMethod(c *fiber.Ctx) error {
 	t.logger.Info().Msg("GetPaymentMethod called")
 	methods := []models.PaymentMethod{
