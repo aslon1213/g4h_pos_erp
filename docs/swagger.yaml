@@ -1,5 +1,5 @@
 definitions:
-  auth.User:
+  auth.LoginInput:
     properties:
       password:
         type: string
@@ -263,6 +263,23 @@ definitions:
     x-enum-varnames:
     - TransactionTypeCredit
     - TransactionTypeDebit
+  models.User:
+    properties:
+      branch:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
   products.NewIncomeInput:
     properties:
       date:
@@ -300,6 +317,29 @@ info:
   title: Magazin ERP/POS API
   version: "1.0"
 paths:
+  /api/auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Get user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get user info
+      tags:
+      - auth
   /api/finance:
     post:
       consumes:
@@ -1807,7 +1847,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/auth.User'
+          $ref: '#/definitions/auth.LoginInput'
       produces:
       - application/json
       responses:
@@ -1839,7 +1879,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/auth.User'
+          $ref: '#/definitions/models.User'
       produces:
       - application/json
       responses:
