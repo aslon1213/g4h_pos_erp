@@ -54,6 +54,7 @@ type LoginInput struct {
 
 // Info handles user info
 // @Summary Get user info
+// @Security BearerAuth
 // @Description Get user info
 // @Tags auth
 // @Accept json
@@ -73,7 +74,7 @@ func (a *AuthControllers) InfoMe(c *fiber.Ctx) error {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body User true "User credentials"
+// @Param user body LoginInput true "User credentials"
 // @Success 200 {object} map[string]string "token"
 // @Failure 500 {string} string "Internal Server Error"
 // @Failure 401 {string} string "Unauthorized"
