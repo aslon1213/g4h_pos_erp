@@ -77,5 +77,8 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
+	// log environment
+	log.Info().Interface("config", config).Msg("Config loaded")
+
 	return &config, nil
 }
