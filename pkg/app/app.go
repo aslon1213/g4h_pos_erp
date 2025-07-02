@@ -72,7 +72,6 @@ func NewFiberApp() *fiber.App {
 	app.Use(otelfiber.Middleware())
 	app.Use(cors.New())
 	app.Use(logger.CustomZerologMiddleware)
-	log.Info().Str("secret_symmetric_key", config.Server.SecretSymmetricKey).Msg("secret_symmetric_key")
 
 	app.Group(
 		"/docs",
