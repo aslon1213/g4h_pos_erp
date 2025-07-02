@@ -2,7 +2,6 @@ package configs
 
 import (
 	"crypto/rand"
-	"encoding/base64"
 	"os"
 	"strings"
 
@@ -85,12 +84,11 @@ func LoadConfig(path string) (*Config, error) {
 	return &config, nil
 }
 
-func GenerateSecretSymmetricKey() string {
-	secretSymmetricKey := ""
+func GenerateSecretSymmetricKey() []byte {
 	key := make([]byte, 32)
 	if _, err := rand.Read(key); err != nil {
 		log.Fatal().Err(err).Msg("Failed to generate symmetric key")
 	}
-	secretSymmetricKey = base64.StdEncoding.EncodeToString(key)
-	return secretSymmetricKey
+	log.Info().Str("secret_symmetric_key", string(key)).Int("Length", len(key)).Msg("secret_symmetric_key")
+	return key
 }
