@@ -49,14 +49,9 @@ func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
 
 func SetupRoutes(app *fiber.App, controllers *Controllers) {
 
-	config, err := configs.LoadConfig(".")
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to load config")
-	}
-
 	app.Group("/api", pasetoware.New(
 		pasetoware.Config{
-			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			SymmetricKey: []byte(configs.GenerateSecretSymmetricKey()),
 			// TokenPrefix:    "Bearer",
 			SuccessHandler: controllers.Middlewares.AuthMiddleware,
 		},
