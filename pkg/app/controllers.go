@@ -51,7 +51,7 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 
 	app.Group("/api", pasetoware.New(
 		pasetoware.Config{
-			SymmetricKey: []byte(configs.GenerateSecretSymmetricKey()),
+			SymmetricKey: configs.GenerateSecretSymmetricKey(),
 			// TokenPrefix:    "Bearer",
 			SuccessHandler: controllers.Middlewares.AuthMiddleware,
 		},
