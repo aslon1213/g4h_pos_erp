@@ -21,6 +21,7 @@ type ProductsController struct {
 	TransactionsCollection *mongo.Collection
 	FinanceCollection      *mongo.Collection
 	SupplierCollection     *mongo.Collection
+	ActivitiesCollection   *mongo.Collection
 	S3Client               *s3provider.S3Client
 }
 
@@ -30,6 +31,7 @@ func New(db *mongo.Database) *ProductsController {
 		TransactionsCollection: db.Collection("transactions"),
 		FinanceCollection:      db.Collection("finance"),
 		SupplierCollection:     db.Collection("suppliers"),
+		ActivitiesCollection:   db.Collection("activities"),
 	}
 }
 
@@ -62,10 +64,6 @@ func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 
 	product := models.NewProduct(base)
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeCreateProduct)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, product.ID)
-	middleware.LogActivity(c)
 
 	span.AddEvent("Inserting product", trace.WithAttributes(attribute.String("product", fmt.Sprintf("%v", product))))
 	log.Debug().Interface("product", product).Msg("Inserting product")
@@ -73,13 +71,13 @@ func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 	_, err := p.ProductsCollection.InsertOne(c.Context(), product)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to insert product")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
-
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateProduct, product.ID, p.ActivitiesCollection)
 	log.Info().Str("id", product.ID).Msg("Successfully created product")
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(
 		[]models.Product{*product},
@@ -115,12 +113,6 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 		}))
 	}
 
-	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeEditProduct)
-	middleware.SetUser(c, c.Locals("user").(string))
-
-	middleware.LogActivity(c)
-
 	update := bson.M{
 		"$set": bson.M{},
 	}
@@ -155,16 +147,12 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 	if product.MinimumStockAlert != 0 {
 		update["$set"].(bson.M)["minimum_stock_alert"] = product.MinimumStockAlert
 	}
-	middleware.SetData(c, fiber.Map{
-		"id":     id,
-		"update": update,
-	})
 
 	log.Debug().Interface("update", update).Msg("Updating product")
 	_, err := p.ProductsCollection.UpdateOne(c.Context(), bson.M{"_id": id}, update)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update product")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -176,12 +164,19 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 	if err != nil {
 
 		log.Error().Err(err).Msg("Failed to fetch updated product")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
+
+	// log activity
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeEditProduct, fiber.Map{
+		"id":     id,
+		"update": update,
+		"user":   c.Locals("user").(string),
+	}, p.ActivitiesCollection)
 
 	log.Info().Str("id", id).Msg("Successfully updated product")
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(
@@ -207,16 +202,10 @@ func (p *ProductsController) DeleteProduct(c *fiber.Ctx) error {
 	id := c.Params("id")
 	log.Info().Str("id", id).Msg("Deleting product")
 
-	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeDeleteProduct)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, id)
-	middleware.LogActivity(c)
-
 	_, err := p.ProductsCollection.DeleteOne(c.Context(), bson.M{"_id": id})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete product")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -224,6 +213,10 @@ func (p *ProductsController) DeleteProduct(c *fiber.Ctx) error {
 	}
 
 	log.Info().Str("id", id).Msg("Successfully deleted product")
+	// log activity
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeDeleteProduct, fiber.Map{
+		"id": id,
+	}, p.ActivitiesCollection)
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(
 		[]models.Product{
 			{

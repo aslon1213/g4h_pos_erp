@@ -14,7 +14,7 @@ import (
 )
 
 func AuthRoutes(router *fiber.App, authController *auth.AuthControllers, middleware *middleware.Middlewares) {
-	auth := router.Group("/auth", middleware.RecordActicityMiddleware)
+	auth := router.Group("/auth")
 	auth.Post("/login", authController.Login)                                // login -- activity logged here if succesfull
 	auth.Post("/register", authController.Register)                          // register -- activity logged here if succesfull
 	router.Get("/api/auth/me", authController.InfoMe)                        // get user info
@@ -23,7 +23,7 @@ func AuthRoutes(router *fiber.App, authController *auth.AuthControllers, middlew
 }
 
 func SuppliersRoutes(router *fiber.App, suppliersController *suppliers.SuppliersController, middleware *middleware.Middlewares) {
-	api := router.Group("/api", middleware.RecordActicityMiddleware)
+	api := router.Group("/api")
 	api.Get("/suppliers", suppliersController.GetSuppliers)                                         // get all suppliers
 	api.Get("/suppliers/:id", suppliersController.GetSupplierByID)                                  // get supplier by id
 	api.Post("/suppliers", suppliersController.CreateSupplier)                                      // create supplier -- activity logged here if succesfull                                   // create supplier
@@ -33,7 +33,7 @@ func SuppliersRoutes(router *fiber.App, suppliersController *suppliers.Suppliers
 }
 
 func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsController, middleware *middleware.Middlewares) {
-	api := router.Group("/api", middleware.RecordActicityMiddleware)
+	api := router.Group("/api")
 	api.Post("/sales/transactions/:branch_id", salesController.CreateSalesTransaction)        // create sales transaction -- activity logged here if succesfull
 	api.Delete("/sales/transactions/:transaction_id", salesController.DeleteSalesTransaction) // delete sales transaction -- activity logged here if succesfull
 	// sales session routes
@@ -48,7 +48,7 @@ func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsCont
 }
 
 func ProductsRoutes(router *fiber.App, productsController *products.ProductsController, middleware *middleware.Middlewares) {
-	api := router.Group("/api", middleware.RecordActicityMiddleware)
+	api := router.Group("/api")
 
 	api.Post("/products", productsController.CreateProduct)                        // create product -- activity logged here if succesfull
 	api.Put("/products/:id", productsController.EditProduct)                       // edit product -- activity logged here if succesfull
@@ -64,7 +64,7 @@ func ProductsRoutes(router *fiber.App, productsController *products.ProductsCont
 }
 
 func JournalsRoutes(router *fiber.App, journalsController *journal_handlers.JournalHandlers, operationsController *journal_handlers.OperationHandlers, middleware *middleware.Middlewares) {
-	api := router.Group("/api", middleware.RecordActicityMiddleware)
+	api := router.Group("/api")
 	api.Get("/journals/:id", journalsController.GetJournalEntryByID)               // get journal entry by id
 	api.Get("/journals/branch/:branch_id", journalsController.QueryJournalEntries) // query journal entries
 	api.Post("/journals", journalsController.NewJournalEntry)                      // create journal entry -- activity logged here if succesfull
@@ -84,7 +84,7 @@ func InternalExpensesRoutes(router *fiber.App, middleware *middleware.Middleware
 }
 
 func FinanceRoutes(router *fiber.App, financeController *finance.FinanceController, middleware *middleware.Middlewares) {
-	api := router.Group("/api", middleware.RecordActicityMiddleware)
+	api := router.Group("/api")
 	api.Get("/finance/branches", financeController.GetBranches)                            // get all branches
 	api.Get("/finance/branch/id/:id", financeController.GetFinanceBranchByBranchID)        // get branch by id
 	api.Get("/finance/branch/name/:branch_name", financeController.GetFinanceByBranchName) // get branch by name
@@ -94,7 +94,7 @@ func FinanceRoutes(router *fiber.App, financeController *finance.FinanceControll
 }
 
 func TransactionsRoutes(router *fiber.App, transactionsController *transactions.TransactionsController, middleware *middleware.Middlewares) {
-	api := router.Group("/api", middleware.RecordActicityMiddleware)
+	api := router.Group("/api")
 	api.Get("/transactions/branch/:branch_id", transactionsController.GetTransactionsByQueryParams) // get transactions by query params
 	api.Get("/transactions/:id", transactionsController.GetTransactionByID)                         // get transaction by id
 	// router.Post("/transactions/:branch_id", transactionsController.Tra)
