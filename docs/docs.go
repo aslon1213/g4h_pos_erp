@@ -2502,6 +2502,10 @@ const docTemplate = `{
     "definitions": {
         "auth.LoginInput": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string"
