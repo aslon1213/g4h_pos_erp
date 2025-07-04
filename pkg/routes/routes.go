@@ -15,9 +15,11 @@ import (
 
 func AuthRoutes(router *fiber.App, authController *auth.AuthControllers, middleware *middleware.Middlewares) {
 	auth := router.Group("/auth", middleware.RecordActicityMiddleware)
-	auth.Post("/login", authController.Login)       // login -- activity logged here if succesfull
-	auth.Post("/register", authController.Register) // register -- activity logged here if succesfull
-	router.Get("api/auth/me", authController.InfoMe)
+	auth.Post("/login", authController.Login)                                // login -- activity logged here if succesfull
+	auth.Post("/register", authController.Register)                          // register -- activity logged here if succesfull
+	router.Get("/api/auth/me", authController.InfoMe)                        // get user info
+	router.Get("/api/activities/recent", authController.GetRecentActivities) // get recent activities
+	router.Get("/api/activities/me", authController.GetActivitesOfUser)      // get activities of user
 }
 
 func SuppliersRoutes(router *fiber.App, suppliersController *suppliers.SuppliersController, middleware *middleware.Middlewares) {
