@@ -5,6 +5,9 @@ definitions:
         type: string
       username:
         type: string
+    required:
+    - password
+    - username
     type: object
   models.Branch:
     properties:

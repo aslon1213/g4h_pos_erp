@@ -5,6 +5,7 @@ import (
 
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/sales"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/suppliers"
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/platform/cache"
 	"github.com/aslon1213/go-pos-erp/platform/database"
@@ -80,6 +81,10 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		}))
 	}
 	defer ses.EndSession(ctx)
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeCreateTransaction)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, transaction)
 	ids := []string{}
 	log.Info().Msg("Fetching journal by ID")
 	journal, err := FetchJournalByID(ctx, c, true, o.JournalsCollection)
@@ -97,6 +102,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		sales_transaction, err := sales.NewTransaction(ctx, transaction.TransactionBase, journal.Branch.ID, o.TransactionsCollection, o.FinancesCollection)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create sales transaction")
+
 			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 				Message: err.Error(),
 				Code:    fiber.StatusInternalServerError,
@@ -108,6 +114,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		transaction.TransactionBase.Type = models.TransactionTypeCredit
 		if transaction.SupplierID == "" {
 			log.Error().Msg("Supplier ID is required")
+
 			return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
 				Message: "Supplier ID is required",
 				Code:    fiber.StatusBadRequest,
@@ -117,6 +124,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		supplier_transaction, err := suppliers.NewSupplierTransaction(ctx, transaction.TransactionBase, transaction.SupplierID, journal.Branch.ID, o.TransactionsCollection, o.JournalsCollection, o.SuppliersCollections)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create supplier transaction")
+
 			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 				Message: err.Error(),
 				Code:    fiber.StatusInternalServerError,
@@ -157,6 +165,8 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		}))
 	}
 
+	middleware.LogActivity(c)
+
 	log.Info().Msg("Transaction created successfully")
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(journal))
 }
@@ -175,7 +185,14 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 // @Failure 500 {object} models.Output
 // @Router /api/journals/{journal_id}/operations/{id} [put]
 func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeEditOperation)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, c.Params("id"))
+	// middleware.LogActivity(c)
+
 	panic("Not implemented")
+
 }
 
 // DeleteOperationTransactionByID godoc
@@ -192,6 +209,12 @@ func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
 // @Failure 500 {object} models.Output
 // @Router /api/journals/{journal_id}/operations/{id} [delete]
 func (o *OperationHandlers) DeleteOperationTransactionByID(c *fiber.Ctx) error {
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeDeleteOperation)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, c.Params("id"))
+	// middleware.LogActivity(c)
+
 	panic("Not implemented")
 }
 
@@ -209,5 +232,7 @@ func (o *OperationHandlers) DeleteOperationTransactionByID(c *fiber.Ctx) error {
 // @Failure 500 {object} models.Output
 // @Router /api/journals/{journal_id}/operations/{id} [get]
 func (o *OperationHandlers) GetOperationTransactionByID(c *fiber.Ctx) error {
+	// log activity
+
 	panic("Not implemented")
 }
