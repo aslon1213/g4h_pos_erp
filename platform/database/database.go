@@ -6,7 +6,6 @@ import (
 
 	"github.com/aslon1213/go-pos-erp/pkg/configs"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -62,13 +61,13 @@ func NewTransaction(ctx context.Context, session *mongo.Session) error {
 	return nil
 }
 
-func StartTransaction(c *fiber.Ctx, client *mongo.Client) (*mongo.Session, context.Context, error) {
+func StartTransaction(client *mongo.Client) (*mongo.Session, context.Context, error) {
 	session, err := NewSession(client)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return nil, nil, err
 	}
-	ctx := mongo.NewSessionContext(c.Context(), session)
+	ctx := mongo.NewSessionContext(context.Background(), session)
 	if err := session.StartTransaction(); err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return nil, nil, err
