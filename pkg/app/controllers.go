@@ -32,6 +32,7 @@ type Controllers struct {
 
 func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
 	log.Debug().Msg("Initializing new controllers")
+	middleware := middleware.New(db)
 	controllers := &Controllers{
 		Finance:      finance.New(db),
 		Suppliers:    suppliers.New(db),
@@ -41,7 +42,7 @@ func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
 		Operations:   journal_handlers.NewOperationsHandler(db, cache),
 		Products:     products.New(db),
 		Auth:         auth.New(db),
-		Middlewares:  middleware.New(db),
+		Middlewares:  middleware,
 	}
 	log.Debug().Msg("Controllers initialized successfully")
 	return controllers
@@ -61,19 +62,19 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	))
 
 	log.Debug().Msg("Setting up routes")
-	routes.AuthRoutes(app, controllers.Auth)
+	routes.AuthRoutes(app, controllers.Auth, controllers.Middlewares)
 	log.Debug().Msg("Auth routes set up successfully")
-	routes.SuppliersRoutes(app, controllers.Suppliers)
+	routes.SuppliersRoutes(app, controllers.Suppliers, controllers.Middlewares)
 	log.Debug().Msg("Suppliers routes set up successfully")
-	routes.TransactionsRoutes(app, controllers.Transactions)
+	routes.TransactionsRoutes(app, controllers.Transactions, controllers.Middlewares)
 	log.Debug().Msg("Transactions routes set up successfully")
-	routes.FinanceRoutes(app, controllers.Finance)
+	routes.FinanceRoutes(app, controllers.Finance, controllers.Middlewares)
 	log.Debug().Msg("Finance routes set up successfully")
-	routes.SalesRoutes(app, controllers.Sales)
+	routes.SalesRoutes(app, controllers.Sales, controllers.Middlewares)
 	log.Debug().Msg("Sales routes set up successfully")
-	routes.JournalsRoutes(app, controllers.Journals, controllers.Operations)
+	routes.JournalsRoutes(app, controllers.Journals, controllers.Operations, controllers.Middlewares)
 	log.Debug().Msg("Journals routes set up successfully")
-	routes.ProductsRoutes(app, controllers.Products)
+	routes.ProductsRoutes(app, controllers.Products, controllers.Middlewares)
 	log.Debug().Msg("Products routes set up successfully")
 	log.Debug().Msg("All routes set up successfully")
 }
