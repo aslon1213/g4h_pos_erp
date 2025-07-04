@@ -118,7 +118,7 @@ func (c *Client) GetAllBranches() (resp *http.Response, output models.BranchFina
 }
 
 func (c *Client) GetBranchByID(branchID string) (resp *http.Response, output models.BranchFinanceOutputSingle, err error) {
-	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/finance/id/%s", branchID), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/finance/branch/id/%s", branchID), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutputSingle{}, err
 	}
@@ -128,7 +128,7 @@ func (c *Client) GetBranchByID(branchID string) (resp *http.Response, output mod
 }
 
 func (c *Client) GetBranchByName(branchName string) (resp *http.Response, output models.BranchFinanceOutputSingle, err error) {
-	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/finance/name/%s", branchName), nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", fmt.Sprintf("/api/finance/branch/name/%s", branchName), nil, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.BranchFinanceOutputSingle{}, err
 	}

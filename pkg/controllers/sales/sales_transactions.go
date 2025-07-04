@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/platform/cache"
 	"github.com/aslon1213/go-pos-erp/platform/database"
@@ -69,8 +70,16 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 		}))
 	}
 	defer ses.EndSession(ctx)
+
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeCreateTransaction)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, transaction_base)
+	middleware.LogActivity(c)
+
 	transaction, err := NewTransaction(ctx, transaction_base, branch_id, s.transactions, s.finances)
 	if err != nil {
+		middleware.DontLogActivity(c)
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -79,6 +88,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
+		middleware.DontLogActivity(c)
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -157,6 +167,12 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 		}))
 	}
 	defer ses.EndSession(ctx)
+
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeDeleteTransaction)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, transaction_id)
+	middleware.LogActivity(c)
 
 	transaction, err := DeleteSalesTransaction(ctx, transaction_id, s.transactions, s.finances)
 	if err != nil {
