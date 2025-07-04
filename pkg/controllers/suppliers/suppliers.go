@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/pkg/utils"
 
@@ -215,12 +216,18 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeCreateSupplier)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, supplier)
+	middleware.LogActivity(c)
 
 	// check the branch exists
 	branch := models.BranchFinance{}
 	err := s.financeCollection.FindOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": supplierBase.Branch}, {"branch_name": supplierBase.Branch}}}).Decode(&branch)
 	if err != nil {
 		log.Error().Err(err).Str("id or name", supplierBase.Branch).Msg("Branch not found")
+		middleware.DontLogActivity(c)
 		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
 			Message: "Branch not found",
 			Code:    fiber.StatusNotFound,
@@ -232,6 +239,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	_, err = s.suppliersCollection.InsertOne(context.Background(), supplier)
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier")
+		middleware.DontLogActivity(c)
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -244,6 +252,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	}}})
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier to finance")
+		middleware.DontLogActivity(c)
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
