@@ -320,6 +320,48 @@ info:
   title: Magazin ERP/POS API
   version: "1.0"
 paths:
+  /api/activities/me:
+    get:
+      consumes:
+      - application/json
+      description: Get the 25 most recent activities for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Get activities of current user
+      tags:
+      - auth
+  /api/activities/recent:
+    get:
+      consumes:
+      - application/json
+      description: Get the 25 most recent activities across all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Get recent activities
+      tags:
+      - auth
   /api/auth/me:
     get:
       consumes:
@@ -446,7 +488,7 @@ paths:
       - finance
   /api/finance/id/{id}:
     get:
-      description: Retrieve finance details using its ID
+      description: Retrieve finance details using its ID --- ObjectID not branch_id
       parameters:
       - description: Finance ID
         in: path
