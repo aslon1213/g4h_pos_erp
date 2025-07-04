@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/suppliers"
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/aslon1213/go-pos-erp/platform/database"
 
@@ -76,12 +77,22 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 		}))
 	}
 
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeProductIncome)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, fiber.Map{
+		"product_id": product_id,
+		"input":      input,
+	})
+	middleware.LogActivity(c)
+
 	log.Debug().Str("product_id", product_id).Interface("input", input).Msg("Processing income for product")
 
 	// start a db transactions
 	session, ctx, err := database.StartTransaction(c, p.ProductsCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
+		middleware.DontLogActivity(c)
 		return models.ReturnError(c, err)
 	}
 	defer session.EndSession(ctx)
@@ -91,11 +102,13 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 	res := p.ProductsCollection.FindOne(c.Context(), bson.M{"_id": product_id})
 	if res.Err() != nil {
 		log.Error().Err(res.Err()).Str("product_id", product_id).Msg("Product not found")
+		middleware.DontLogActivity(c)
 		return models.ReturnError(c, res.Err())
 	}
 	err = res.Decode(product)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to decode product")
+		middleware.DontLogActivity(c)
 		return models.ReturnError(c, err)
 	}
 
@@ -114,12 +127,14 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 				_, err = p.ProductsCollection.UpdateOne(ctx, filter, update)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to update quantity distribution")
+					middleware.DontLogActivity(c)
 					return models.AbortTransactionAndReturnError(ctx, session, c, err)
 				}
 			} else {
 				err = AppendQuantityDistribution(ctx, input, product, session, p)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed to create new distribution")
+					middleware.DontLogActivity(c)
 					return models.AbortTransactionAndReturnError(ctx, session, c, err)
 				}
 			}
@@ -128,6 +143,7 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 		err = AppendQuantityDistribution(ctx, input, product, session, p)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create new distribution")
+			middleware.DontLogActivity(c)
 			return models.AbortTransactionAndReturnError(ctx, session, c, err)
 		}
 	}
@@ -153,6 +169,7 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 	log.Debug().Interface("supplier_transaction", supplier_transaction).Msg("Supplier transaction created")
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create supplier transaction")
+		middleware.DontLogActivity(c)
 		return models.AbortTransactionAndReturnError(ctx, session, c, err)
 	}
 
@@ -160,6 +177,7 @@ func (p *ProductsController) NewIncome(c *fiber.Ctx) error {
 	err = session.CommitTransaction(c.Context())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
+		middleware.DontLogActivity(c)
 		return models.AbortTransactionAndReturnError(ctx, session, c, err)
 	}
 
@@ -200,6 +218,12 @@ func AppendQuantityDistribution(ctx context.Context, input NewIncomeInput, produ
 // @Produce json
 // @Router /api/products/transfer [post]
 func (p *ProductsController) NewTransfer(c *fiber.Ctx) error {
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeProductTransfer)
+	middleware.SetUser(c, c.Locals("user").(string))
+	middleware.SetData(c, c.Body())
+	middleware.LogActivity(c)
+
 	panic("Not implemented")
 	return nil
 }
