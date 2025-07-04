@@ -204,3 +204,59 @@ func (a *AuthControllers) Register(c *fiber.Ctx) error {
 	log.Info().Str("username", user.Username).Msg("User registered successfully")
 	return c.SendStatus(fiber.StatusCreated)
 }
+
+// GetRecentActivities godoc
+// @Summary Get recent activities
+// @Security BearerAuth
+// @Description Get the 25 most recent activities across all users
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Output
+// @Failure 500 {object} models.Output "Internal Server Error"
+// @Router /api/activities/recent [get]
+func (a *AuthControllers) GetRecentActivities(c *fiber.Ctx) error {
+	log.Info().Msg("Getting recent activities")
+	activities, err := a.ActivitiesCollection.Find(c.Context(), bson.M{}, options.Find().SetSort(bson.M{"date": -1}).SetLimit(25))
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	var activities_output []middleware.Activity
+	err = activities.All(c.Context(), &activities_output)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	return c.JSON(models.NewOutput(
+		activities_output,
+	))
+}
+
+// GetActivitesOfUser godoc
+// @Summary Get activities of current user
+// @Security BearerAuth
+// @Description Get the 25 most recent activities for the authenticated user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Output
+// @Failure 500 {object} models.Output "Internal Server Error"
+// @Router /api/activities/me [get]
+func (a *AuthControllers) GetActivitesOfUser(c *fiber.Ctx) error {
+	log.Info().Str("user", c.Locals("user").(string)).Msg("Getting activities of user")
+	activities, err := a.ActivitiesCollection.Find(c.Context(), bson.M{"user_id": c.Locals("user").(string)}, options.Find().SetSort(bson.M{"date": -1}).SetLimit(25))
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	var activities_output []middleware.Activity
+	err = activities.All(c.Context(), &activities_output)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	return c.JSON(models.NewOutput(
+		activities_output,
+	))
+}
