@@ -6,6 +6,8 @@ import (
 
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
+	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -83,7 +85,7 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 // @Success 200 {object} models.Output
 // @Failure 404 {object} models.Output
 // @Router /api/finance/branch/id/{id} [get]
-func (f *FinanceController) GetBranchByBranchID(c *fiber.Ctx) error {
+func (f *FinanceController) GetFinanceBranchByBranchID(c *fiber.Ctx) error {
 	branchID := c.Params("id")
 	log.Debug().Str("branch_id", branchID).Msg("Fetching branch by ID")
 	filter := bson.M{"branch_id": branchID}
@@ -166,6 +168,10 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 		},
 		Suppliers: []string{},
 	}
+	// log activity
+	middleware.SetActionType(c, middleware.ActivityTypeCreateFinance)
+	middleware.SetUser(c, c.Locals(pasetoware.DefaultContextKey).(string))
+	middleware.SetData(c, branchFinance)
 
 	log.Info().Str("branch_id", branchFinance.BranchID).Msg("Inserting new branch finance")
 	_, err := f.collection.InsertOne(context.Background(), branchFinance)
@@ -174,6 +180,8 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 
+	middleware.LogActivity(c)
+
 	log.Debug().Str("branch_id", branchFinance.BranchID).Msg("Successfully created new branch finance")
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(branchFinance))
 }
@@ -181,7 +189,7 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 // GetFinanceByID godoc
 // @Security BearerAuth
 // @Summary Fetch finance by ID
-// @Description Retrieve finance details using its ID
+// @Description Retrieve finance details using its ID --- ObjectID not branch_id
 // @Tags finance
 // @Param id path string true "Finance ID"
 // @Produce json
@@ -190,12 +198,12 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 // @Router /api/finance/id/{id} [get]
 func (f *FinanceController) GetFinanceByID(c *fiber.Ctx) error {
 	financeID := c.Params("id")
-	log.Debug().Str("finance_id", financeID).Msg("Fetching finance by ID")
+	log.Debug().Str("id", financeID).Msg("Fetching finance by ID")
 
 	// convert to objectsid
 	financeIDBson, err := bson.ObjectIDFromHex(financeID)
 	if err != nil {
-		log.Error().Err(err).Str("finance_id", financeID).Msg("Invalid finance ID")
+		log.Error().Err(err).Str("id", financeID).Msg("Invalid finance ID")
 		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.NewError("Invalid finance ID", fiber.StatusBadRequest)))
 	}
 
@@ -204,10 +212,10 @@ func (f *FinanceController) GetFinanceByID(c *fiber.Ctx) error {
 	var finance models.BranchFinance
 	err = f.collection.FindOne(context.Background(), filter).Decode(&finance)
 	if err != nil {
-		log.Error().Err(err).Str("finance_id", financeID).Msg("Finance not found")
+		log.Error().Err(err).Str("id", financeID).Msg("Finance not found")
 		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.NewError("Finance not found", fiber.StatusNotFound)))
 	}
 
-	log.Debug().Str("finance_id", financeID).Msg("Successfully fetched finance")
+	log.Debug().Str("id", financeID).Msg("Successfully fetched finance")
 	return c.JSON(models.NewOutput(finance))
 }

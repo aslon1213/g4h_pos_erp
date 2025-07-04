@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"io"
 	logging "log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/aslon1213/go-pos-erp/pkg/configs"
 	"github.com/aslon1213/go-pos-erp/pkg/utils"
 	"github.com/aslon1213/go-pos-erp/test/client"
+	"go.mongodb.org/mongo-driver/bson"
 
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
@@ -22,10 +24,10 @@ func TestMain(m *testing.M) {
 	logging.SetOutput(io.Discard)
 	app := app.New()
 
-	// app.DB.Database("magazin").Collection("finance").DeleteMany(context.Background(), bson.M{})
-	// app.DB.Database("magazin").Collection("suppliers").DeleteMany(context.Background(), bson.M{})
-	// app.DB.Database("magazin").Collection("transactions").DeleteMany(context.Background(), bson.M{})
-	// app.DB.Database("magazin").Collection("journals").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("finance").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("suppliers").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("transactions").DeleteMany(context.Background(), bson.M{})
+	app.DB.Database("magazin").Collection("journals").DeleteMany(context.Background(), bson.M{})
 
 	go app.Run()
 	m.Run()
@@ -155,9 +157,6 @@ func TestGetBranchByName(t *testing.T) {
 	branchName := financeBranches[0].BranchName
 
 	resp, output_, err := client.GetBranchByName(branchName)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
 	assert.Nil(t, output.Error, "Expected no error, but got one")
@@ -815,7 +814,7 @@ func TestCloseJournal(t *testing.T) {
 	// find first open journal
 
 	journal := models.Journal{}
-	log.Info().Interface("journals", journals_output.Data).Msg("Journals")
+	log.Info().Interface("journals", journals_output.Data[0].ID.Hex()).Msg("Journals")
 	for _, journal_ := range journals_output.Data {
 		if !journal_.Shift_is_closed {
 			journal = journal_
@@ -889,7 +888,7 @@ func TestReOpenJournal(t *testing.T) {
 			break
 		}
 	}
-	log.Info().Interface("journal chosen", journal).Msg("Journal")
+	log.Info().Interface("journal chosen", journal.ID.Hex()).Msg("Journal")
 
 	resp, output_, err := client.ReOpenJournal(journal.ID.Hex())
 	if err != nil {

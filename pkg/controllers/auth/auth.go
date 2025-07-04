@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/aslon1213/go-pos-erp/pkg/configs"
+	"github.com/aslon1213/go-pos-erp/pkg/middleware"
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,8 +19,9 @@ import (
 
 // AuthControllers handles authentication-related operations
 type AuthControllers struct {
-	UserCollection     *mongo.Collection
-	SecretSymmetricKey string
+	UserCollection       *mongo.Collection
+	ActivitiesCollection *mongo.Collection
+	SecretSymmetricKey   string
 }
 
 // New initializes a new AuthControllers instance
@@ -41,15 +43,16 @@ func New(db *mongo.Database) *AuthControllers {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 	return &AuthControllers{
-		UserCollection:     users_collection,
-		SecretSymmetricKey: config.Server.SecretSymmetricKey,
+		UserCollection:       users_collection,
+		ActivitiesCollection: db.Collection("activities"),
+		SecretSymmetricKey:   config.Server.SecretSymmetricKey,
 	}
 }
 
 // User represents a user in the system
 type LoginInput struct {
-	Username string `bson:"username"`
-	Password string `bson:"password"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 // Info handles user info
@@ -82,25 +85,43 @@ func (a *AuthControllers) InfoMe(c *fiber.Ctx) error {
 func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	var user_to_check LoginInput
 
-	err := c.BodyParser(&user_to_check)
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to parse user")
-		return c.SendStatus(fiber.StatusInternalServerError)
+	if err := c.BodyParser(&user_to_check); err != nil {
+		log.Error().Err(err).Msg("Failed to parse request body")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
 	}
+
+	// Validate required fields
+	if user_to_check.Username == "" || user_to_check.Password == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Username and password are required",
+		})
+	}
+	middleware.SetActionType(c, middleware.ActivityTypeLogin)
+	middleware.SetUser(c, user_to_check.Username)
+	middleware.LogActivity(c)
 	pass := user_to_check.Password
 
 	// check in the database if the user exists
 	user_db := models.User{}
-	err = a.UserCollection.FindOne(c.Context(), bson.M{"username": user_to_check.Username}).Decode(&user_db)
+	err := a.UserCollection.FindOne(c.Context(), bson.M{"username": user_to_check.Username}).Decode(&user_db)
 
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find user")
-		return c.SendStatus(fiber.StatusInternalServerError)
+		// no user found
+		middleware.SetData(c, fiber.Map{
+			"error": "User not found",
+		})
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
 	equal := bcrypt.CompareHashAndPassword([]byte(user_db.Password), []byte(pass))
 	if equal != nil {
 		log.Warn().Msg("Unauthorized access attempt")
+		middleware.SetData(c, fiber.Map{
+			"error": "Invalid password",
+		})
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
@@ -108,6 +129,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	encryptedToken, err := pasetoware.CreateToken([]byte(a.SecretSymmetricKey), user_to_check.Username, 48*time.Hour, pasetoware.PurposeLocal)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create token")
+		middleware.DontLogActivity(c)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	payload, err := pasetoware.NewPayload(
@@ -116,6 +138,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create payload")
+		middleware.DontLogActivity(c)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -142,11 +165,28 @@ func (a *AuthControllers) Register(c *fiber.Ctx) error {
 		log.Error().Err(err).Msg("Failed to parse user")
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+	// validate the user
+
+	// log the action
+	middleware.SetActionType(c, middleware.ActivityTypeRegister)
+	middleware.SetUser(c, user.Username)
+	middleware.SetData(
+		c,
+		map[string]string{
+			"username": user.Username,
+			"email":    user.Email,
+			"role":     user.Role,
+			"phone":    user.Phone,
+			"branch":   user.Branch,
+		},
+	)
+	middleware.LogActivity(c)
 
 	// Hash the password using bcrypt
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to hash password")
+		middleware.DontLogActivity(c)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -157,9 +197,66 @@ func (a *AuthControllers) Register(c *fiber.Ctx) error {
 	_, err = a.UserCollection.InsertOne(c.Context(), newUser)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to register user")
+		middleware.DontLogActivity(c)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	log.Info().Str("username", user.Username).Msg("User registered successfully")
 	return c.SendStatus(fiber.StatusCreated)
+}
+
+// GetRecentActivities godoc
+// @Summary Get recent activities
+// @Security BearerAuth
+// @Description Get the 25 most recent activities across all users
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Output
+// @Failure 500 {object} models.Output "Internal Server Error"
+// @Router /api/activities/recent [get]
+func (a *AuthControllers) GetRecentActivities(c *fiber.Ctx) error {
+	log.Info().Msg("Getting recent activities")
+	activities, err := a.ActivitiesCollection.Find(c.Context(), bson.M{}, options.Find().SetSort(bson.M{"date": -1}).SetLimit(25))
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	var activities_output []middleware.Activity
+	err = activities.All(c.Context(), &activities_output)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	return c.JSON(models.NewOutput(
+		activities_output,
+	))
+}
+
+// GetActivitesOfUser godoc
+// @Summary Get activities of current user
+// @Security BearerAuth
+// @Description Get the 25 most recent activities for the authenticated user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Output
+// @Failure 500 {object} models.Output "Internal Server Error"
+// @Router /api/activities/me [get]
+func (a *AuthControllers) GetActivitesOfUser(c *fiber.Ctx) error {
+	log.Info().Str("user", c.Locals("user").(string)).Msg("Getting activities of user")
+	activities, err := a.ActivitiesCollection.Find(c.Context(), bson.M{"user_id": c.Locals("user").(string)}, options.Find().SetSort(bson.M{"date": -1}).SetLimit(25))
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	var activities_output []middleware.Activity
+	err = activities.All(c.Context(), &activities_output)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get recent activities")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.NewError("Failed to get recent activities", fiber.StatusInternalServerError)))
+	}
+	return c.JSON(models.NewOutput(
+		activities_output,
+	))
 }

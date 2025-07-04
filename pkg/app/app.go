@@ -21,6 +21,7 @@ import (
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	_ "github.com/aslon1213/go-pos-erp/docs"
+	"github.com/go-playground/validator/v10"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -49,10 +50,60 @@ type App struct {
 
 var tracer = otel.Tracer("fiber-server")
 
+type (
+	ErrorResponse struct {
+		Error       bool
+		FailedField string
+		Tag         string
+		Value       interface{}
+	}
+
+	XValidator struct {
+		validator *validator.Validate
+	}
+
+	GlobalErrorHandlerResp struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	}
+)
+
+var validate = validator.New()
+
+func (v XValidator) Validate(data interface{}) []ErrorResponse {
+	validationErrors := []ErrorResponse{}
+
+	errs := validate.Struct(data)
+	if errs != nil {
+		for _, err := range errs.(validator.ValidationErrors) {
+			// In this case data object is actually holding the User struct
+			var elem ErrorResponse
+
+			elem.FailedField = err.Field() // Export struct field name
+			elem.Tag = err.Tag()           // Export struct tag
+			elem.Value = err.Value()       // Export field value
+			elem.Error = true
+
+			validationErrors = append(validationErrors, elem)
+		}
+	}
+
+	return validationErrors
+}
+
 func NewFiberApp() *fiber.App {
 	config, _ := configs.LoadConfig(".")
 
-	app := fiber.New()
+	app := fiber.New(
+	// fiber.Config{
+	// 	ErrorHandler: func(c *fiber.Ctx, err error) error {
+	// 		return c.Status(fiber.StatusBadRequest).JSON(GlobalErrorHandlerResp{
+	// 			Success: false,
+	// 			Message: err.Error(),
+	// 		})
+	// 	},
+	// },
+	)
 	tp := initTracer()
 	defer func() {
 		if err := tp.Shutdown(context.Background()); err != nil {
