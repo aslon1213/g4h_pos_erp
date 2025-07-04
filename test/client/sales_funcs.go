@@ -15,7 +15,7 @@ func (c *Client) CreateSalesTransaction(branch_id string, transaction models.Tra
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}
-	resp, err = c.MakeRequest("POST", "/api/sales/"+branch_id, json_transaction, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("POST", "/api/sales/transactions/"+branch_id, json_transaction, map[string]string{"Content-Type": "application/json"}, false)
 	if err != nil {
 		return nil, models.TransactionOutputSingle{}, err
 	}

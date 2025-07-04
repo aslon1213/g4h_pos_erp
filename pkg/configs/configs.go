@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var ENVT_TYPE_LOGGED bool = false
+
 type Config struct {
 	DB     DBConfig     `mapstructure:"database"`
 	Redis  RedisConfig  `mapstructure:"redis"`
@@ -62,7 +64,10 @@ func LoadConfig(path string) (*Config, error) {
 	if strings.ToLower(os.Getenv("ENVIRONMENT")) != "production" {
 		filename = "config.local"
 	}
-	log.Info().Str("ENVIRONMENT", os.Getenv("ENVIRONMENT")).Str("filename", filename).Msg("ENVIRONMENT")
+	if !ENVT_TYPE_LOGGED {
+		log.Info().Str("ENVIRONMENT", os.Getenv("ENVIRONMENT")).Str("filename", filename).Msg("ENVIRONMENT")
+		ENVT_TYPE_LOGGED = true
+	}
 	viper.SetConfigName(filename)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path)
@@ -79,7 +84,9 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	// log environment
-	log.Info().Interface("config", config).Msg("Config loaded")
+	if strings.ToLower(os.Getenv("LOG_ENV")) == "true" {
+		log.Info().Interface("config", config).Msg("Config loaded")
+	}
 
 	return &config, nil
 }
