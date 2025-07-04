@@ -7,7 +7,6 @@ import (
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
 	"github.com/aslon1213/go-pos-erp/pkg/middleware"
-	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -168,10 +167,6 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 		},
 		Suppliers: []string{},
 	}
-	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeCreateFinance)
-	middleware.SetUser(c, c.Locals(pasetoware.DefaultContextKey).(string))
-	middleware.SetData(c, branchFinance)
 
 	log.Info().Str("branch_id", branchFinance.BranchID).Msg("Inserting new branch finance")
 	_, err := f.collection.InsertOne(context.Background(), branchFinance)
@@ -180,7 +175,7 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 
-	middleware.LogActivity(c)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateFinance, branchFinance, f.collection)
 
 	log.Debug().Str("branch_id", branchFinance.BranchID).Msg("Successfully created new branch finance")
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(branchFinance))

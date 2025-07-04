@@ -23,6 +23,7 @@ type OperationHandlers struct {
 	JournalsCollection     *mongo.Collection
 	SuppliersCollections   *mongo.Collection
 	TransactionsCollection *mongo.Collection
+	ActivitiesCollection   *mongo.Collection
 	RedisClient            *cache.Cache
 }
 
@@ -33,7 +34,7 @@ func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHand
 	suppliersCollections := db.Collection("suppliers")
 	financesCollection := db.Collection("finance")
 	transactionsCollection := db.Collection("transactions")
-
+	activitiesCollection := db.Collection("activities")
 	return &OperationHandlers{
 		ctx:                    ctx,
 		OperationsCollection:   operationsCollection,
@@ -42,6 +43,7 @@ func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHand
 		SuppliersCollections:   suppliersCollections,
 		TransactionsCollection: transactionsCollection,
 		RedisClient:            cache,
+		ActivitiesCollection:   activitiesCollection,
 	}
 }
 
@@ -72,7 +74,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 
 	// transaction_created := &models.Transaction{}
 	// start a new session and transaction
-	ses, ctx, err := database.StartTransaction(c, o.JournalsCollection.Database().Client())
+	ses, ctx, err := database.StartTransaction(o.JournalsCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -82,9 +84,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	}
 	defer ses.EndSession(ctx)
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeCreateTransaction)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, transaction)
+
 	ids := []string{}
 	log.Info().Msg("Fetching journal by ID")
 	journal, err := FetchJournalByID(ctx, c, true, o.JournalsCollection)
@@ -165,7 +165,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		}))
 	}
 
-	middleware.LogActivity(c)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateTransaction, transaction, o.ActivitiesCollection)
 
 	log.Info().Msg("Transaction created successfully")
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(journal))
@@ -186,10 +186,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 // @Router /api/journals/{journal_id}/operations/{id} [put]
 func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeEditOperation)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, c.Params("id"))
-	// middleware.LogActivity(c)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeEditOperation, c.Params("id"), o.ActivitiesCollection)
 
 	panic("Not implemented")
 
@@ -210,10 +207,7 @@ func (o *OperationHandlers) UpdateOperationTransactionByID(c *fiber.Ctx) error {
 // @Router /api/journals/{journal_id}/operations/{id} [delete]
 func (o *OperationHandlers) DeleteOperationTransactionByID(c *fiber.Ctx) error {
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeDeleteOperation)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, c.Params("id"))
-	// middleware.LogActivity(c)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeDeleteOperation, c.Params("id"), o.ActivitiesCollection)
 
 	panic("Not implemented")
 }

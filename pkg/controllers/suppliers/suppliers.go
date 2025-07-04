@@ -19,6 +19,7 @@ type SuppliersController struct {
 	suppliersCollection    *mongo.Collection
 	transactionsCollection *mongo.Collection
 	financeCollection      *mongo.Collection
+	activitiesCollection   *mongo.Collection
 	DB                     *mongo.Database
 }
 
@@ -30,6 +31,7 @@ func New(db *mongo.Database) *SuppliersController {
 		suppliersCollection:    db.Collection("suppliers"),
 		transactionsCollection: db.Collection("transactions"),
 		financeCollection:      db.Collection("finance"),
+		activitiesCollection:   db.Collection("activities"),
 		DB:                     db,
 	}
 }
@@ -217,17 +219,14 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 		UpdatedAt: now,
 	}
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeCreateSupplier)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, supplier)
-	middleware.LogActivity(c)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateSupplier, supplier, s.activitiesCollection)
 
 	// check the branch exists
 	branch := models.BranchFinance{}
 	err := s.financeCollection.FindOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": supplierBase.Branch}, {"branch_name": supplierBase.Branch}}}).Decode(&branch)
 	if err != nil {
 		log.Error().Err(err).Str("id or name", supplierBase.Branch).Msg("Branch not found")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
 			Message: "Branch not found",
 			Code:    fiber.StatusNotFound,
@@ -239,7 +238,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	_, err = s.suppliersCollection.InsertOne(context.Background(), supplier)
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -252,7 +251,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	}}})
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier to finance")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
