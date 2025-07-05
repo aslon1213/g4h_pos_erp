@@ -58,7 +58,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	}
 
 	// Start a session
-	sess, ctx, err := database.StartTransaction(c, s.transactionsCollection.Database().Client())
+	sess, ctx, err := database.StartTransaction(s.transactionsCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{

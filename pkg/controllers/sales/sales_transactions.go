@@ -19,6 +19,7 @@ type SalesTransactionsController struct {
 	transactions *mongo.Collection
 	finances     *mongo.Collection
 	products     *mongo.Collection
+	activities   *mongo.Collection
 	cache        *cache.Cache
 }
 
@@ -28,6 +29,7 @@ func New(db *mongo.Database, cache *cache.Cache) *SalesTransactionsController {
 		transactions: db.Collection("transactions"),
 		finances:     db.Collection("finance"),
 		products:     db.Collection("products"),
+		activities:   db.Collection("activities"),
 		cache:        cache,
 	}
 }
@@ -61,7 +63,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 		Interface("transaction_base", transaction_base).
 		Msg("Creating new sales transaction")
 
-	ses, ctx, err := database.StartTransaction(c, s.transactions.Database().Client())
+	ses, ctx, err := database.StartTransaction(s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -72,14 +74,12 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 	defer ses.EndSession(ctx)
 
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeCreateTransaction)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, transaction_base)
-	middleware.LogActivity(c)
+
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateTransaction, transaction_base, s.activities)
 
 	transaction, err := NewTransaction(ctx, transaction_base, branch_id, s.transactions, s.finances)
 	if err != nil {
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -88,7 +88,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -158,7 +158,7 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 	transaction_id := c.Params("transaction_id")
 	log.Info().Str("transaction_id", transaction_id).Msg("Deleting sales transaction")
 
-	ses, ctx, err := database.StartTransaction(c, s.transactions.Database().Client())
+	ses, ctx, err := database.StartTransaction(s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -169,10 +169,7 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 	defer ses.EndSession(ctx)
 
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeDeleteTransaction)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, transaction_id)
-	middleware.LogActivity(c)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeDeleteTransaction, transaction_id, s.activities)
 
 	transaction, err := DeleteSalesTransaction(ctx, transaction_id, s.transactions, s.finances)
 	if err != nil {

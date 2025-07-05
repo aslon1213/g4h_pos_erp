@@ -28,6 +28,7 @@ type JournalHandlers struct {
 	JournalCollection      *mongo.Collection
 	FinanceCollection      *mongo.Collection
 	TransactionsCollection *mongo.Collection
+	ActivitiesCollection   *mongo.Collection
 	RedisClient            *cache.Cache
 	Tracer                 trace.Tracer
 }
@@ -51,12 +52,14 @@ func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
 	}
 	financeCollection := db.Collection("finance")
 	transactionsCollection := db.Collection("transactions")
+	activitiesCollection := db.Collection("activities")
 	tracer := otel.Tracer("journals")
 	return &JournalHandlers{
 		ctx:                    ctx,
 		JournalCollection:      journalCollection,
 		FinanceCollection:      financeCollection,
 		TransactionsCollection: transactionsCollection,
+		ActivitiesCollection:   activitiesCollection,
 		Tracer:                 tracer,
 		RedisClient:            cache,
 	}
@@ -231,19 +234,17 @@ func (j *JournalHandlers) NewJournalEntry(c *fiber.Ctx) error {
 		},
 		Operations: []string{},
 	}
-	middleware.SetActionType(c, middleware.ActivityTypeCreateJournal)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, input)
-	middleware.LogActivity(c)
+
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateJournal, input, j.ActivitiesCollection)
 
 	_, err = j.JournalCollection.InsertOne(j.ctx, journal)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to insert new journal entry")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 	log.Info().Msg("Successfully created new journal entry")
-	middleware.DontLogActivity(c)
+
 	return c.Status(fiber.StatusCreated).JSON(models.NewOutput(
 		journal,
 	))
@@ -282,22 +283,19 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 		})
 	}
 	// log activity
-	middleware.SetActionType(c, middleware.ActivityTypeCloseJournal)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, map[string]string{
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCloseJournal, map[string]string{
 		"journal_id":      journalID.Hex(),
 		"cash_left":       fmt.Sprintf("%d", input.CashLeft),
 		"terminal_income": fmt.Sprintf("%d", input.TerminalIncome),
-	})
-	middleware.LogActivity(c)
+	}, j.ActivitiesCollection)
 
 	// make transactions - [cash, terminal]
 
 	// start a db transaction
-	ses, ctx, err := database.StartTransaction(c, j.JournalCollection.Database().Client())
+	ses, ctx, err := database.StartTransaction(j.JournalCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -308,7 +306,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	journal, err := FetchJournalByID(ctx, c, true, j.JournalCollection)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find journal entry")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -337,7 +335,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create terminal transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -351,7 +349,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create cash left transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -369,7 +367,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update journal entry")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -377,7 +375,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	// commit the transaction
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -414,7 +412,7 @@ func (j *JournalHandlers) FetchJournalByID(ctx context.Context, c *fiber.Ctx, fe
 func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	log.Info().Msg("Reopening journal entry")
 	// start a db transaction
-	ses, ctx, err := database.StartTransaction(c, j.JournalCollection.Database().Client())
+	ses, ctx, err := database.StartTransaction(j.JournalCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -425,19 +423,14 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 
 	// log activity
 
-	middleware.LogActivity(c)
 	defer ses.EndSession(ctx)
 	// fetch journal Info
 	journal := models.JournalWithTransactionID{}
 	journalID, err := ParseJournalID(c)
-	middleware.SetActionType(c, middleware.ActivityTypeReopenJournal)
-	middleware.SetUser(c, c.Locals("user").(string))
-	middleware.SetData(c, map[string]string{
-		"journal_id": journalID.Hex(),
-	})
+
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to parse journal ID")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
@@ -447,7 +440,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	err = j.JournalCollection.FindOne(ctx, bson.M{"_id": journalID}).Decode(&journal)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal entry")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -458,7 +451,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	_, err = sales.DeleteSalesTransaction(ctx, journal.Operations[len(journal.Operations)-1], j.TransactionsCollection, j.FinanceCollection)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete cash left transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -467,7 +460,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	_, err = sales.DeleteSalesTransaction(ctx, journal.Operations[len(journal.Operations)-2], j.TransactionsCollection, j.FinanceCollection)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete terminal transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -478,7 +471,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update journal entry")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -487,7 +480,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	// commit the transaction
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
@@ -498,12 +491,16 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	journal_new, err := FetchJournalByID(ctx, c, true, j.JournalCollection)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal entry")
-		middleware.DontLogActivity(c)
+
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeReopenJournal, map[string]string{
+		"journal_id": journalID.Hex(),
+	}, j.ActivitiesCollection)
+
 	return c.Status(fiber.StatusOK).JSON(models.NewOutput(
 		journal_new,
 	))
