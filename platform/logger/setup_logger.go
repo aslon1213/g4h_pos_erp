@@ -197,7 +197,7 @@ func SetupLogger() *zerolog.Logger {
 	if environment == "PRODUCTION" {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	} else {
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
 	// Enable development mode for local development (pretty console output)

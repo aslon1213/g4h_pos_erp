@@ -9,6 +9,47 @@ definitions:
     - password
     - username
     type: object
+  models.BNPL:
+    properties:
+      branch_id:
+        type: string
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      id:
+        type: string
+      paid_amount:
+        type: integer
+      products:
+        additionalProperties:
+          $ref: '#/definitions/models.SalesSessionItem'
+        description: products in the BNPL
+        type: object
+      status:
+        allOf:
+        - $ref: '#/definitions/models.BNPLStatus'
+        description: active, completed, cancelled
+      total_amount:
+        type: integer
+      transactions:
+        description: id of transactions
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+    type: object
+  models.BNPLStatus:
+    enum:
+    - active
+    - completed
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - BNPLStatusActive
+    - BNPLStatusCompleted
+    - BNPLStatusCancelled
   models.Branch:
     properties:
       id:
@@ -27,6 +68,20 @@ definitions:
       terminal_income:
         type: integer
     type: object
+  models.CustomerBase:
+    properties:
+      additional_info:
+        additionalProperties:
+          type: string
+        type: object
+      address:
+        description: Email   string `json:"email" bson:"email"`
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
   models.Error:
     properties:
       code:
@@ -42,7 +97,10 @@ definitions:
     - other
     - sale
     - supplier
+    - bnpl
     type: string
+    x-enum-comments:
+      InitiatorTypeBNPL: buy now pay later BNPL transactions
     x-enum-varnames:
     - InitiatorTypeSalary
     - InitiatorTypeRent
@@ -50,6 +108,7 @@ definitions:
     - InitiatorTypeOther
     - InitiatorTypeSales
     - InitiatorTypeSupplier
+    - InitiatorTypeBNPL
   models.Journal:
     properties:
       branch:
@@ -103,6 +162,21 @@ definitions:
       phone:
         description: Contact phone number
         type: string
+    type: object
+  models.NewBNPLInput:
+    properties:
+      branch_id:
+        type: string
+      calculate_total_amount:
+        type: boolean
+      customer_id:
+        type: string
+      products:
+        additionalProperties:
+          $ref: '#/definitions/models.SalesSessionItem'
+        type: object
+      total_amount:
+        type: integer
     type: object
   models.NewBranchFinanceInput:
     properties:
@@ -188,6 +262,13 @@ definitions:
     x-enum-varnames:
     - ProductPlaceTypeBranch
     - ProductPlaceTypeWarehouse
+  models.SalesSessionItem:
+    properties:
+      price:
+        type: integer
+      quantity:
+        type: integer
+    type: object
   models.SupplierBase:
     properties:
       address:
@@ -385,6 +466,331 @@ paths:
       summary: Get user info
       tags:
       - auth
+  /api/bnpl:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Buy Now Pay Later transaction
+      parameters:
+      - description: BNPL input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewBNPLInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BNPL'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
+      summary: Create new BNPL
+      tags:
+      - BNPL
+  /api/bnpl/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing BNPL transaction
+      parameters:
+      - description: BNPL ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
+      summary: Delete BNPL
+      tags:
+      - BNPL
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific BNPL transaction
+      parameters:
+      - description: BNPL ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BNPL'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
+      summary: Get BNPL details
+      tags:
+      - BNPL
+  /api/bnpl/{id}/credit:
+    post:
+      consumes:
+      - application/json
+      description: Add a credit payment to an existing BNPL
+      parameters:
+      - description: BNPL ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payment amount
+        in: query
+        name: amount
+        required: true
+        type: integer
+      - default: cash
+        description: Payment method
+        in: query
+        name: payment_method
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BNPL'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
+      summary: Credit BNPL payment
+      tags:
+      - BNPL
+  /api/customers:
+    get:
+      consumes:
+      - application/json
+      description: Get all customers from the database
+      parameters:
+      - description: Customer name
+        in: query
+        name: name
+        type: string
+      - description: Customer phone
+        in: query
+        name: phone
+        type: string
+      - description: Customer address
+        in: query
+        name: address
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of customers per page
+        in: query
+        name: count
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Get all customers
+      tags:
+      - customers
+    post:
+      consumes:
+      - application/json
+      description: Create a new customer in the database
+      parameters:
+      - description: Customer data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerBase'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Output'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Create a new customer
+      tags:
+      - customers
+  /api/customers/{customer_id}/bnpls:
+    get:
+      consumes:
+      - application/json
+      description: Get all BNPL transactions for a specific customer
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
+      summary: Get customer BNPLs
+      tags:
+      - BNPL
+  /api/customers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a customer from the database
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Delete a customer
+      tags:
+      - customers
+    get:
+      consumes:
+      - application/json
+      description: Get a customer by its ID
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Get a customer by ID
+      tags:
+      - customers
+    put:
+      consumes:
+      - application/json
+      description: Update an existing customer in the database
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Customer data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerBase'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Output'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Output'
+      security:
+      - BearerAuth: []
+      summary: Update a customer
+      tags:
+      - customers
   /api/finance:
     post:
       consumes:
