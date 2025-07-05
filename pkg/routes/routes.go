@@ -2,6 +2,8 @@ package routes
 
 import (
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/auth"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/customers"
+	"github.com/aslon1213/go-pos-erp/pkg/controllers/customers/bnpl"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/finance"
 	journal_handlers "github.com/aslon1213/go-pos-erp/pkg/controllers/journals"
 	"github.com/aslon1213/go-pos-erp/pkg/controllers/products"
@@ -103,4 +105,22 @@ func TransactionsRoutes(router *fiber.App, transactionsController *transactions.
 	api.Get("/transactions/docs/initiator_type", transactionsController.GetInitiatorType) // get initiator type
 	api.Get("/transactions/docs/type", transactionsController.GetTransactionType)         // get transaction type
 	api.Get("/transactions/docs/payment_method", transactionsController.GetPaymentMethod) // get payment method
+}
+
+func CustomerRoutes(router *fiber.App, customerController *customers.CustomersController, middleware *middleware.Middlewares) {
+	api := router.Group("/api")
+	api.Get("/customers", customerController.GetCustomers)          // get all customers
+	api.Get("/customers/:id", customerController.GetCustomerByID)   // get customer by id
+	api.Post("/customers", customerController.CreateCustomer)       // create customer -- activity logged here if succesfull
+	api.Put("/customers/:id", customerController.UpdateCustomer)    // update customer
+	api.Delete("/customers/:id", customerController.DeleteCustomer) // delete customer
+}
+
+func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middleware *middleware.Middlewares) {
+	api := router.Group("/api")
+	api.Post("/bnpl", bnplController.NewBNPL)                                   // create bnpl -- activity logged here if succesfull
+	api.Post("/bnpl/:id/credit", bnplController.CreditBNPL)                     // credit bnpl
+	api.Delete("/bnpl/:id", bnplController.DeleteBNPL)                          // delete bnpl
+	api.Get("/bnpl/:id", bnplController.GetBNPLByID)                            // get bnpl by id
+	api.Get("/customers/:customer_id/bnpls", bnplController.GetBNPLSofCustomer) // get bnpls of customer
 }

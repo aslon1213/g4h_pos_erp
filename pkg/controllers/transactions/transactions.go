@@ -312,3 +312,13 @@ func (t *TransactionsController) GetPaymentMethod(c *fiber.Ctx) error {
 	}
 	return c.JSON(models.NewOutput(methods))
 }
+
+func NewTransaction(ctx context.Context, transaction models.TransactionBase, initiatorType models.InitiatorType, branchID string, transactionsCollection *mongo.Collection) (string, error) {
+	trx := models.NewTransaction(&transaction, initiatorType, branchID)
+	_, err := transactionsCollection.InsertOne(ctx, trx)
+	if err != nil {
+		return "", err
+	}
+	return trx.ID, nil
+
+}

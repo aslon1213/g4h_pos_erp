@@ -77,6 +77,7 @@ type Activity struct {
 
 func LogActivityWithCtx(ctx *fiber.Ctx, action ActivityType, data interface{}, collection *mongo.Collection) {
 	log.Debug().Msg("LogActivityWithCtx called")
+
 	LogActivity(ctx.Locals("user").(string), action, data, ctx.IP(), ctx.Response().StatusCode(), collection)
 }
 
