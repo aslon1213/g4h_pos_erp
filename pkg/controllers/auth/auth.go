@@ -167,6 +167,7 @@ func (a *AuthControllers) Register(c *fiber.Ctx) error {
 	// validate the user
 
 	// log the action
+	c.Locals("user", user.Username)
 	middleware.LogActivityWithCtx(c, middleware.ActivityTypeRegister, fiber.Map{
 		"username": user.Username,
 		"email":    user.Email,
