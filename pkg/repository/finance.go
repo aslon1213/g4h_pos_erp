@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"fmt"
 	"slices"
 	"time"
@@ -9,7 +8,6 @@ import (
 	"github.com/aslon1213/go-pos-erp/pkg/utils"
 
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type TransactionType string
@@ -45,6 +43,7 @@ const (
 	InitiatorTypeOther     InitiatorType = "other"
 	InitiatorTypeSales     InitiatorType = "sale"
 	InitiatorTypeSupplier  InitiatorType = "supplier"
+	InitiatorTypeBNPL      InitiatorType = "bnpl" // buy now pay later BNPL transactions
 )
 
 type PaymentMethod string
@@ -57,7 +56,6 @@ type PaymentMethod string
 // | Mobile Payment    | e.g., Apple Pay, Google Pay, QR scan | Mobile payment, Digital wallet|
 // | Cheque            | Written order to transfer money      | Cheque payment               |
 // | Online Transfer   | e.g., PayPal, Stripe, Revolut        | Online payment, e-payment    |
-// | UPI (India)       | Unified Payments Interface transfer  | UPI transaction              |
 
 const (
 	PaymentMethodCash      PaymentMethod = "cash"
@@ -213,14 +211,4 @@ type BranchFinanceOutput struct {
 type BranchFinanceOutputSingle struct {
 	Data  BranchFinance `json:"data" bson:"data"`
 	Error []Error       `json:"error" bson:"error"`
-}
-
-func (f Finance) CreateTransaction(transaction Transaction, mongoCollection *mongo.Collection) error {
-
-	_, err := mongoCollection.InsertOne(context.Background(), transaction)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
