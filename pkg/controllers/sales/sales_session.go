@@ -130,7 +130,7 @@ func (s *SalesTransactionsController) CloseSalesSession(c *fiber.Ctx) error {
 		return models.ReturnError(c, err)
 	}
 
-	ses, ctx, err := database.StartTransaction(c, s.transactions.Database().Client())
+	ses, ctx, err := database.StartTransaction(s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 		return models.ReturnError(c, err)

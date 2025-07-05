@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -52,44 +51,50 @@ type Activity struct {
 	Status int          `bson:"status"`
 }
 
-func SetActionType(ctx *fiber.Ctx, action ActivityType) {
-	log.Debug().Str("action", string(action)).Msg("SetActionType called")
-	ctx.Locals(
-		"action",
-		action,
-	)
+// func SetActionType(ctx *fiber.Ctx, action ActivityType) {
+// 	log.Debug().Str("action", string(action)).Msg("SetActionType called")
+// 	ctx.Locals(
+// 		"action",
+// 		action,
+// 	)
+// }
+
+// func SetUser(ctx *fiber.Ctx, user string) {
+// 	log.Debug().Str("user", user).Msg("SetUser called")
+// 	ctx.Locals(
+// 		"user",
+// 		user,
+// 	)
+// }
+
+// func SetData(ctx *fiber.Ctx, data interface{}) {
+// 	log.Debug().Interface("data", data).Msg("SetData called")
+// 	ctx.Locals(
+// 		"data",
+// 		data,
+// 	)
+// }
+
+func LogActivityWithCtx(ctx *fiber.Ctx, action ActivityType, data interface{}, collection *mongo.Collection) {
+	log.Debug().Msg("LogActivityWithCtx called")
+
+	LogActivity(ctx.Locals("user").(string), action, data, ctx.IP(), ctx.Response().StatusCode(), collection)
 }
 
-func SetUser(ctx *fiber.Ctx, user string) {
-	log.Debug().Str("user", user).Msg("SetUser called")
-	ctx.Locals(
-		"user",
-		user,
-	)
-}
-
-func SetData(ctx *fiber.Ctx, data interface{}) {
-	log.Debug().Interface("data", data).Msg("SetData called")
-	ctx.Locals(
-		"data",
-		data,
-	)
-}
-
-func LogActivity(ctx *fiber.Ctx) {
+func LogActivity(user string, action ActivityType, data interface{}, ip string, status int, collection *mongo.Collection) {
 	log.Debug().Msg("LogActivity called")
-	ctx.Locals(
-		"log_activity",
-		true,
-	)
-}
-
-func DontLogActivity(ctx *fiber.Ctx) {
-	log.Debug().Msg("DontLogActivity called")
-	ctx.Locals(
-		"log_activity",
-		false,
-	)
+	activity := Activity{
+		UserID: user,
+		Action: action,
+		Data:   data,
+		IP:     ip,
+		Status: status,
+		Date:   time.Now(),
+	}
+	_, err := collection.InsertOne(context.Background(), activity)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to insert activity")
+	}
 }
 
 func RecordActicity(ctx context.Context, activity Activity, activities *mongo.Collection) error {
@@ -98,50 +103,4 @@ func RecordActicity(ctx context.Context, activity Activity, activities *mongo.Co
 		return err
 	}
 	return nil
-}
-
-func (a *Middlewares) RecordActicityMiddleware(c *fiber.Ctx) error {
-	//
-
-	log.Debug().Msg("RecordActicityMiddleware calling next functions")
-	c_err := c.Next()
-
-	log_activity, ok := c.Locals("log_activity").(bool)
-	if !ok {
-		log_activity = false
-	}
-	log.Debug().Msg("log_activity: " + strconv.FormatBool(log_activity))
-	if log_activity {
-
-		action, ok := c.Locals("action").(ActivityType)
-		if !ok {
-			log.Error().Msg("Action not found")
-			return c_err
-		}
-
-		user, ok := c.Locals("user").(string)
-		if !ok {
-			log.Error().Msg("User not found")
-			return c_err
-		}
-
-		data := c.Locals("data")
-
-		log.Debug().Interface("data", data).Str("action", string(action)).Str("user", user).Msg("Activity data")
-		activity := Activity{
-			UserID: user,
-			Action: action,
-			Data:   data,
-			IP:     c.IP(),
-			Date:   time.Now(),
-			Status: c.Response().StatusCode(),
-		}
-
-		err := RecordActicity(c.Context(), activity, a.ActivitiesCollection)
-		log.Debug().Msg("Activity recorded")
-		if err != nil {
-			return c_err
-		}
-	}
-	return c_err
 }

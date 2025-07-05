@@ -98,9 +98,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 			"error": "Username and password are required",
 		})
 	}
-	middleware.SetActionType(c, middleware.ActivityTypeLogin)
-	middleware.SetUser(c, user_to_check.Username)
-	middleware.LogActivity(c)
+
 	pass := user_to_check.Password
 
 	// check in the database if the user exists
@@ -110,18 +108,19 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find user")
 		// no user found
-		middleware.SetData(c, fiber.Map{
+		middleware.LogActivityWithCtx(c, middleware.ActivityTypeLogin, fiber.Map{
 			"error": "User not found",
-		})
+		}, a.ActivitiesCollection)
+
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
 	equal := bcrypt.CompareHashAndPassword([]byte(user_db.Password), []byte(pass))
 	if equal != nil {
 		log.Warn().Msg("Unauthorized access attempt")
-		middleware.SetData(c, fiber.Map{
+		middleware.LogActivityWithCtx(c, middleware.ActivityTypeLogin, fiber.Map{
 			"error": "Invalid password",
-		})
+		}, a.ActivitiesCollection)
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
@@ -129,7 +128,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	encryptedToken, err := pasetoware.CreateToken([]byte(a.SecretSymmetricKey), user_to_check.Username, 48*time.Hour, pasetoware.PurposeLocal)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create token")
-		middleware.DontLogActivity(c)
+
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	payload, err := pasetoware.NewPayload(
@@ -138,7 +137,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create payload")
-		middleware.DontLogActivity(c)
+
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -168,25 +167,20 @@ func (a *AuthControllers) Register(c *fiber.Ctx) error {
 	// validate the user
 
 	// log the action
-	middleware.SetActionType(c, middleware.ActivityTypeRegister)
-	middleware.SetUser(c, user.Username)
-	middleware.SetData(
-		c,
-		map[string]string{
-			"username": user.Username,
-			"email":    user.Email,
-			"role":     user.Role,
-			"phone":    user.Phone,
-			"branch":   user.Branch,
-		},
-	)
-	middleware.LogActivity(c)
+	c.Locals("user", user.Username)
+	middleware.LogActivityWithCtx(c, middleware.ActivityTypeRegister, fiber.Map{
+		"username": user.Username,
+		"email":    user.Email,
+		"role":     user.Role,
+		"phone":    user.Phone,
+		"branch":   user.Branch,
+	}, a.ActivitiesCollection)
 
 	// Hash the password using bcrypt
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to hash password")
-		middleware.DontLogActivity(c)
+
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
@@ -197,7 +191,7 @@ func (a *AuthControllers) Register(c *fiber.Ctx) error {
 	_, err = a.UserCollection.InsertOne(c.Context(), newUser)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to register user")
-		middleware.DontLogActivity(c)
+
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
