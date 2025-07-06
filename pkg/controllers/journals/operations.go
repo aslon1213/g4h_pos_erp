@@ -64,7 +64,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	transaction := models.JournalOperationInput{}
 	if err := c.BodyParser(&transaction); err != nil {
 		log.Error().Err(err).Msg("Failed to parse transaction data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -77,7 +77,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	ses, ctx, err := database.StartTransaction(o.JournalsCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -90,7 +90,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	journal, err := FetchJournalByID(ctx, c, true, o.JournalsCollection)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal by ID")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -103,7 +103,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create sales transaction")
 
-			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: err.Error(),
 				Code:    fiber.StatusInternalServerError,
 			}))
@@ -115,7 +115,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		if transaction.SupplierID == "" {
 			log.Error().Msg("Supplier ID is required")
 
-			return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Supplier ID is required",
 				Code:    fiber.StatusBadRequest,
 			}))
@@ -125,7 +125,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 		if err != nil {
 			log.Error().Err(err).Msg("Failed to create supplier transaction")
 
-			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: err.Error(),
 				Code:    fiber.StatusInternalServerError,
 			}))
@@ -150,7 +150,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update journal total")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -159,7 +159,7 @@ func (o *OperationHandlers) NewOperationTransaction(c *fiber.Ctx) error {
 	// commit the transaction
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
