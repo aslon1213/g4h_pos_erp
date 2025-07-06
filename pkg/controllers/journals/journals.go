@@ -81,7 +81,7 @@ func (j *JournalHandlers) GetJournalEntryByID(c *fiber.Ctx) error {
 	journal, err := j.FetchJournalByID(j.ctx, c, true)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal entry by ID")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -112,7 +112,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 	queryParams := models.JournalQueryParams{}
 	if err := c.QueryParser(&queryParams); err != nil {
 		log.Error().Err(err).Msg("Failed to parse query parameters")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -155,7 +155,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 	cursor, err := j.JournalCollection.Aggregate(ctx, pipeline)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to aggregate journal entries")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -165,7 +165,7 @@ func (j *JournalHandlers) QueryJournalEntries(c *fiber.Ctx) error {
 	var results []models.Journal
 	if err := cursor.All(ctx, &results); err != nil {
 		log.Error().Err(err).Msg("Failed to decode journal entries")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -241,7 +241,7 @@ func (j *JournalHandlers) NewJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to insert new journal entry")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 	log.Info().Msg("Successfully created new journal entry")
 
@@ -296,7 +296,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -376,7 +376,7 @@ func (j *JournalHandlers) CloseJournalEntry(c *fiber.Ctx) error {
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -415,7 +415,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	ses, ctx, err := database.StartTransaction(j.JournalCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -431,7 +431,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to parse journal ID")
 
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -441,7 +441,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal entry")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -452,7 +452,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete cash left transaction")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -461,7 +461,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete terminal transaction")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -472,7 +472,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update journal entry")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -481,7 +481,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -492,7 +492,7 @@ func (j *JournalHandlers) ReOpenJournalEntry(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch journal entry")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))

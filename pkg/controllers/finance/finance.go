@@ -52,7 +52,7 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 	cursor, err := f.collection.Find(context.Background(), bson.M{})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to fetch branches")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 
 	var branches []models.BranchFinance
@@ -60,7 +60,7 @@ func (f *FinanceController) GetBranches(c *fiber.Ctx) error {
 	// log.Debug().Str("Databse URL", f.collection.Database().Client()).Msg("Fetching branches")
 	if err := cursor.All(context.Background(), &branches); err != nil {
 		log.Error().Err(err).Msg("Failed to decode branches")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 	if branches == nil {
 		log.Warn().Msg("No branches found")
@@ -93,7 +93,7 @@ func (f *FinanceController) GetFinanceBranchByBranchID(c *fiber.Ctx) error {
 	err := f.collection.FindOne(context.Background(), filter).Decode(&branch)
 	if err != nil {
 		log.Error().Err(err).Str("branch_id", branchID).Msg("Branch not found")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.NewError("Branch not found", fiber.StatusNotFound)))
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.NewError("Branch not found", fiber.StatusNotFound)))
 	}
 
 	log.Debug().Str("branch_id", branchID).Msg("Successfully fetched branch")
@@ -123,7 +123,7 @@ func (f *FinanceController) GetFinanceByBranchName(c *fiber.Ctx) error {
 	err := f.collection.FindOne(context.Background(), filter).Decode(&branch)
 	if err != nil {
 		log.Error().Err(err).Str("branch_name", branchName).Msg("Branch not found")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.NewError("Branch not found", fiber.StatusNotFound)))
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.NewError("Branch not found", fiber.StatusNotFound)))
 	}
 
 	log.Debug().Str("branch_name", branchName).Msg("Successfully fetched branch finance")
@@ -148,7 +148,7 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(&Input); err != nil {
 		log.Error().Err(err).Msg("Failed to parse input for new branch finance")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusBadRequest)))
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.NewError(err.Error(), fiber.StatusBadRequest)))
 	}
 
 	branchFinance := models.BranchFinance{
@@ -172,7 +172,7 @@ func (f *FinanceController) NewFinanceOfBranch(c *fiber.Ctx) error {
 	_, err := f.collection.InsertOne(context.Background(), branchFinance)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to insert new branch finance")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusInternalServerError)))
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.NewError(err.Error(), fiber.StatusInternalServerError)))
 	}
 
 	middleware.LogActivityWithCtx(c, middleware.ActivityTypeCreateFinance, branchFinance, f.collection)
@@ -199,7 +199,7 @@ func (f *FinanceController) GetFinanceByID(c *fiber.Ctx) error {
 	financeIDBson, err := bson.ObjectIDFromHex(financeID)
 	if err != nil {
 		log.Error().Err(err).Str("id", financeID).Msg("Invalid finance ID")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.NewError("Invalid finance ID", fiber.StatusBadRequest)))
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.NewError("Invalid finance ID", fiber.StatusBadRequest)))
 	}
 
 	filter := bson.M{"_id": financeIDBson}
@@ -208,7 +208,7 @@ func (f *FinanceController) GetFinanceByID(c *fiber.Ctx) error {
 	err = f.collection.FindOne(context.Background(), filter).Decode(&finance)
 	if err != nil {
 		log.Error().Err(err).Str("id", financeID).Msg("Finance not found")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.NewError("Finance not found", fiber.StatusNotFound)))
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.NewError("Finance not found", fiber.StatusNotFound)))
 	}
 
 	log.Debug().Str("id", financeID).Msg("Successfully fetched finance")

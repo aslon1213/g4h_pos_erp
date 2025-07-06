@@ -2,10 +2,8 @@ package models
 
 import (
 	"context"
-	"reflect"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -21,10 +19,10 @@ type Output struct {
 
 func NewOutput(data interface{}, errors ...Error) map[string]interface{} {
 
-	if data == nil || reflect.ValueOf(data).IsNil() {
-		data = []interface{}{}
-		log.Info().Msg("Data is nil, setting to empty array")
-	}
+	// if data == nil || reflect.ValueOf(data).IsNil() {
+	// 	data = []interface{}{}
+	// 	log.Info().Msg("Data is nil, setting to empty array")
+	// }
 
 	return map[string]interface{}{
 		"data":  data,
