@@ -66,7 +66,7 @@ func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) erro
 	if err := c.QueryParser(&queryParams); err != nil {
 		s.logger.Error().Err(err).Msg("Error parsing query params")
 		return c.Status(fiber.StatusBadRequest).JSON(
-			models.NewOutput(nil, models.NewError(
+			models.NewOutput([]interface{}{}, models.NewError(
 				"invalid query params",
 				fiber.StatusBadRequest,
 			)),
@@ -75,7 +75,7 @@ func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) erro
 	if err := queryParams.Validate(); err != nil {
 		s.logger.Error().Err(err).Msg("Error validating query params")
 		return c.Status(fiber.StatusBadRequest).JSON(
-			models.NewOutput(nil, models.NewError(err.Error(), fiber.StatusBadRequest)),
+			models.NewOutput([]interface{}{}, models.NewError(err.Error(), fiber.StatusBadRequest)),
 		)
 	}
 
@@ -119,7 +119,7 @@ func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) erro
 	cursor, err := s.collection.Find(context.Background(), query, options)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("Error finding transactions")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -130,7 +130,7 @@ func (s *TransactionsController) GetTransactionsByQueryParams(c *fiber.Ctx) erro
 	err = cursor.All(context.Background(), &transactions)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("Error decoding transactions")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -157,7 +157,7 @@ func (t *TransactionsController) GetTransactionByID(c *fiber.Ctx) error {
 	err := t.collection.FindOne(context.Background(), bson.M{"_id": transaction_id}).Decode(&transaction)
 	if err != nil {
 		t.logger.Error().Err(err).Str("transaction_id", transaction_id).Msg("Error finding transaction by ID")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -206,7 +206,7 @@ func (t *TransactionsController) UpdateTransactionByID(c *fiber.Ctx) error {
 	_, err := t.collection.UpdateOne(context.Background(), query, set)
 	if err != nil {
 		t.logger.Error().Err(err).Str("transaction_id", idx).Msg("Error updating transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -238,7 +238,7 @@ func (t *TransactionsController) DeleteTransactionByID(c *fiber.Ctx) error {
 	_, err := t.collection.DeleteOne(context.Background(), query)
 	if err != nil {
 		t.logger.Error().Err(err).Str("transaction_id", idx).Msg("Error deleting transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
