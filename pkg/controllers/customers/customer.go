@@ -78,13 +78,13 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 	limit := query.Count
 
 	if query.Name != "" {
-		filter["name"] = bson.M{"$regex": "*" + query.Name + "*", "$options": "i"}
+		filter["name"] = bson.M{"$regex": query.Name, "$options": "i"}
 	}
 	if query.Phone != "" {
-		filter["phone"] = bson.M{"$regex": "*" + query.Phone + "*", "$options": "i"}
+		filter["phone"] = bson.M{"$regex": query.Phone, "$options": "i"}
 	}
 	if query.Address != "" {
-		filter["address"] = bson.M{"$regex": "*" + query.Address + "*", "$options": "i"}
+		filter["address"] = bson.M{"$regex": query.Address, "$options": "i"}
 	}
 
 	log.Debug().Interface("filter", filter).Msg("Getting customers with filter")
@@ -363,6 +363,7 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 	err := ctrl.customersCollection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&existingCustomer)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			log.Debug().Str("id", id).Msg("Customer not found")
 			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
 				Message: "Customer not found",
 				Code:    fiber.StatusNotFound,
@@ -377,6 +378,7 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 
 	// Check if customer has active BNPLs
 	if len(existingCustomer.BNPLs) > 0 {
+		log.Debug().Str("id", id).Msg("Customer has active BNPL transactions")
 		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
 			Message: "Cannot delete customer with active BNPL transactions",
 			Code:    fiber.StatusBadRequest,
@@ -394,6 +396,7 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 	}
 
 	if result.DeletedCount == 0 {
+		log.Debug().Str("id", id).Msg("Customer not found")
 		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
 			Message: "Customer not found",
 			Code:    fiber.StatusNotFound,

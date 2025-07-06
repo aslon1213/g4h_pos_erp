@@ -11,7 +11,7 @@ type CustomerBase struct {
 }
 
 type Customer struct {
-	CustomerBase
+	CustomerBase    `bson:",inline"`
 	ID              string         `json:"id" bson:"_id"`
 	BNPLs           []BNPL         `json:"bnpls" bson:"bnpls"`
 	PurchaseHistory []SalesSession `json:"purchase_history" bson:"purchase_history"` // purchase history is updated when a customer a sales session or completes a BNPL session
