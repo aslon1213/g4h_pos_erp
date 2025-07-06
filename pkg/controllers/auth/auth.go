@@ -114,6 +114,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
+	c.Locals("user", user_db.Username)
 
 	equal := bcrypt.CompareHashAndPassword([]byte(user_db.Password), []byte(pass))
 	if equal != nil {
