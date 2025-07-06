@@ -12,7 +12,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type CustomersController struct {
@@ -31,12 +30,34 @@ func New(db *mongo.Database, cache *cache.Cache) *CustomersController {
 	}
 }
 
+type SortByBNPLTotal string
+
+const (
+	SortByBNPLTotalDesc SortByBNPLTotal = "max"
+	SortByBNPLTotalAsc  SortByBNPLTotal = "min"
+	SortByBNPLTotalNone SortByBNPLTotal = "none"
+)
+
 type CustomerQuery struct {
-	Name    string `query:"name"`
-	Phone   string `query:"phone"`
-	Address string `query:"address"`
-	Page    int    `query:"page" default:"1"`
-	Count   int    `query:"count" default:"10"`
+	Name            string          `query:"name"`
+	Phone           string          `query:"phone"`
+	Address         string          `query:"address"`
+	SortByBNPLTotal SortByBNPLTotal `query:"sort_by_bnpl_total"`
+
+	Page  int `query:"page" default:"1"`
+	Count int `query:"count" default:"10"`
+}
+
+func (query *CustomerQuery) SetDefaults() {
+	if query.SortByBNPLTotal == "" {
+		query.SortByBNPLTotal = SortByBNPLTotalDesc
+	}
+	if query.Page <= 0 {
+		query.Page = 1
+	}
+	if query.Count <= 0 {
+		query.Count = 10
+	}
 }
 
 // GetCustomers godoc
@@ -51,6 +72,7 @@ type CustomerQuery struct {
 // @Param address query string false "Customer address"
 // @Param page query int false "Page number"
 // @Param count query int false "Number of customers per page"
+// @Param sort_by_bnpl_total query string false "Sort by BNPL total (max, min, none)"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Output
 // @Router /api/customers [get]
@@ -64,33 +86,64 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 		}))
 	}
 
-	// adjust the page and count
-	if query.Page <= 0 {
-		query.Page = 1
-	}
-	if query.Count <= 0 {
-		query.Count = 10
-	}
+	query.SetDefaults()
 
-	// build filter
-	filter := bson.M{}
-	skip := (query.Page - 1) * query.Count
-	limit := query.Count
+	// build pipeline
+	pipeline := mongo.Pipeline{}
 
+	// Match other filters first if any (e.g., name, phone, address)
+	matchStage := bson.D{}
 	if query.Name != "" {
-		filter["name"] = bson.M{"$regex": query.Name, "$options": "i"}
+		matchStage = append(matchStage, bson.E{Key: "name", Value: bson.M{"$regex": query.Name, "$options": "i"}})
 	}
 	if query.Phone != "" {
-		filter["phone"] = bson.M{"$regex": query.Phone, "$options": "i"}
+		matchStage = append(matchStage, bson.E{Key: "phone", Value: bson.M{"$regex": query.Phone, "$options": "i"}})
 	}
 	if query.Address != "" {
-		filter["address"] = bson.M{"$regex": query.Address, "$options": "i"}
+		matchStage = append(matchStage, bson.E{Key: "address", Value: bson.M{"$regex": query.Address, "$options": "i"}})
+	}
+	if len(matchStage) > 0 {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: matchStage}})
 	}
 
-	log.Debug().Interface("filter", filter).Msg("Getting customers with filter")
+	// Project a computed field: sum of active bnpl total_amount
+	pipeline = append(pipeline, bson.D{{Key: "$addFields", Value: bson.M{
+		"active_bnpl_total": bson.M{
+			"$sum": bson.M{
+				"$map": bson.M{
+					"input": bson.M{
+						"$filter": bson.M{
+							"input": "$bnpls",
+							"as":    "bnpl",
+							"cond": bson.M{
+								"$eq": []interface{}{"$$bnpl.status", "active"},
+							},
+						},
+					},
+					"as": "filtered_bnpl",
+					"in": "$$filtered_bnpl.total_amount",
+				},
+			},
+		},
+	}}})
+
+	// Sort using the computed field
+	if query.SortByBNPLTotal != SortByBNPLTotalNone {
+		sortOrder := 1
+		if query.SortByBNPLTotal == SortByBNPLTotalDesc {
+			sortOrder = -1
+		}
+		pipeline = append(pipeline, bson.D{{Key: "$sort", Value: bson.D{
+			{Key: "active_bnpl_total", Value: sortOrder},
+		}}})
+	}
+
+	// Optional pagination
+	pipeline = append(pipeline, bson.D{{Key: "$skip", Value: (query.Page - 1) * query.Count}})
+	pipeline = append(pipeline, bson.D{{Key: "$limit", Value: query.Count}})
 
 	customers := make([]models.Customer, 0)
-	cursor, err := ctrl.customersCollection.Find(context.Background(), filter, options.Find().SetSkip(int64(skip)).SetLimit(int64(limit)))
+	cursor, err := ctrl.customersCollection.Aggregate(context.Background(), pipeline)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find customers")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
@@ -111,7 +164,7 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 	log.Debug().Int("count", len(customers)).Msg("Successfully retrieved customers")
 
 	// query total customers number from the database
-	total, err := ctrl.customersCollection.CountDocuments(context.Background(), filter)
+	total, err := ctrl.customersCollection.CountDocuments(context.Background(), bson.M{})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to count customers")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
@@ -377,12 +430,15 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 	}
 
 	// Check if customer has active BNPLs
-	if len(existingCustomer.BNPLs) > 0 {
-		log.Debug().Str("id", id).Msg("Customer has active BNPL transactions")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
-			Message: "Cannot delete customer with active BNPL transactions",
-			Code:    fiber.StatusBadRequest,
-		}))
+	for _, bnpl := range existingCustomer.BNPLs {
+		log.Debug().Str("status", string(bnpl.Status)).Msg("Checking BNPL status")
+		if bnpl.Status == models.BNPLStatusActive {
+			log.Debug().Str("id", id).Msg("Customer has active BNPL transactions")
+			return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
+				Message: "Cannot delete customer with active BNPL transactions",
+				Code:    fiber.StatusBadRequest,
+			}))
+		}
 	}
 
 	// Delete customer
