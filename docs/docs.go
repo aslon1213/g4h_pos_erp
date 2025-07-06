@@ -344,6 +344,24 @@ const docTemplate = `{
                         "name": "branch_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Customer name",
+                        "name": "customer_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Customer phone",
+                        "name": "customer_phone",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Customer address",
+                        "name": "customer_address",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -409,6 +427,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Number of customers per page",
                         "name": "count",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by BNPL total (max, min, none)",
+                        "name": "sort_by_bnpl_total",
                         "in": "query"
                     }
                 ],
