@@ -58,7 +58,7 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 	var query CustomerQuery
 	if err := c.QueryParser(&query); err != nil {
 		log.Error().Err(err).Msg("Failed to parse customer query")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -93,7 +93,7 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 	cursor, err := ctrl.customersCollection.Find(context.Background(), filter, options.Find().SetSkip(int64(skip)).SetLimit(int64(limit)))
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find customers")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -102,7 +102,7 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 
 	if err := cursor.All(context.Background(), &customers); err != nil {
 		log.Error().Err(err).Msg("Failed to decode customers")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -114,7 +114,7 @@ func (ctrl *CustomersController) GetCustomers(c *fiber.Ctx) error {
 	total, err := ctrl.customersCollection.CountDocuments(context.Background(), filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to count customers")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -148,13 +148,13 @@ func (ctrl *CustomersController) GetCustomerByID(c *fiber.Ctx) error {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Debug().Str("id", id).Msg("Customer not found")
-			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Customer not found",
 				Code:    fiber.StatusNotFound,
 			}))
 		}
 		log.Error().Err(err).Str("id", id).Msg("Failed to find customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -182,7 +182,7 @@ func (ctrl *CustomersController) CreateCustomer(c *fiber.Ctx) error {
 	var customerBase models.CustomerBase
 	if err := c.BodyParser(&customerBase); err != nil {
 		log.Error().Err(err).Msg("Failed to parse customer data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -190,13 +190,13 @@ func (ctrl *CustomersController) CreateCustomer(c *fiber.Ctx) error {
 
 	// Validate required fields
 	if customerBase.Name == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Customer name is required",
 			Code:    fiber.StatusBadRequest,
 		}))
 	}
 	if customerBase.Phone == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Customer phone is required",
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -206,7 +206,7 @@ func (ctrl *CustomersController) CreateCustomer(c *fiber.Ctx) error {
 	var existingCustomer models.Customer
 	err := ctrl.customersCollection.FindOne(context.Background(), bson.M{"phone": customerBase.Phone}).Decode(&existingCustomer)
 	if err == nil {
-		return c.Status(fiber.StatusConflict).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusConflict).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Customer with this phone number already exists",
 			Code:    fiber.StatusConflict,
 		}))
@@ -225,7 +225,7 @@ func (ctrl *CustomersController) CreateCustomer(c *fiber.Ctx) error {
 	_, err = ctrl.customersCollection.InsertOne(context.Background(), customer)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -256,7 +256,7 @@ func (ctrl *CustomersController) UpdateCustomer(c *fiber.Ctx) error {
 	var customerBase *models.CustomerBase
 	if err := c.BodyParser(&customerBase); err != nil {
 		log.Error().Err(err).Msg("Failed to parse customer data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -267,13 +267,13 @@ func (ctrl *CustomersController) UpdateCustomer(c *fiber.Ctx) error {
 	err := ctrl.customersCollection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&existingCustomer)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Customer not found",
 				Code:    fiber.StatusNotFound,
 			}))
 		}
 		log.Error().Err(err).Str("id", id).Msg("Failed to find customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -284,7 +284,7 @@ func (ctrl *CustomersController) UpdateCustomer(c *fiber.Ctx) error {
 		var phoneConflict models.Customer
 		err := ctrl.customersCollection.FindOne(context.Background(), bson.M{"phone": customerBase.Phone}).Decode(&phoneConflict)
 		if err == nil {
-			return c.Status(fiber.StatusConflict).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusConflict).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Another customer with this phone number already exists",
 				Code:    fiber.StatusConflict,
 			}))
@@ -314,14 +314,14 @@ func (ctrl *CustomersController) UpdateCustomer(c *fiber.Ctx) error {
 	result, err := ctrl.customersCollection.UpdateOne(context.Background(), bson.M{"_id": id}, update)
 	if err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Failed to update customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
 
 	if result.ModifiedCount == 0 {
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Customer not found or no changes made",
 			Code:    fiber.StatusNotFound,
 		}))
@@ -332,7 +332,7 @@ func (ctrl *CustomersController) UpdateCustomer(c *fiber.Ctx) error {
 	err = ctrl.customersCollection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&updatedCustomer)
 	if err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Failed to fetch updated customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -364,13 +364,13 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Debug().Str("id", id).Msg("Customer not found")
-			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Customer not found",
 				Code:    fiber.StatusNotFound,
 			}))
 		}
 		log.Error().Err(err).Str("id", id).Msg("Failed to find customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -379,7 +379,7 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 	// Check if customer has active BNPLs
 	if len(existingCustomer.BNPLs) > 0 {
 		log.Debug().Str("id", id).Msg("Customer has active BNPL transactions")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Cannot delete customer with active BNPL transactions",
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -389,7 +389,7 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 	result, err := ctrl.customersCollection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Failed to delete customer")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -397,7 +397,7 @@ func (ctrl *CustomersController) DeleteCustomer(c *fiber.Ctx) error {
 
 	if result.DeletedCount == 0 {
 		log.Debug().Str("id", id).Msg("Customer not found")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Customer not found",
 			Code:    fiber.StatusNotFound,
 		}))

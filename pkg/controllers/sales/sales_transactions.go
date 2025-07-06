@@ -52,7 +52,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 	transaction_base := models.TransactionBase{}
 	if err := c.BodyParser(&transaction_base); err != nil {
 		log.Error().Err(err).Msg("Failed to parse transaction base")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -66,7 +66,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 	ses, ctx, err := database.StartTransaction(s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -80,7 +80,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 	transaction, err := NewTransaction(ctx, transaction_base, branch_id, s.transactions, s.finances)
 	if err != nil {
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -89,7 +89,7 @@ func (s *SalesTransactionsController) CreateSalesTransaction(c *fiber.Ctx) error
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -161,7 +161,7 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 	ses, ctx, err := database.StartTransaction(s.transactions.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -173,7 +173,7 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 
 	transaction, err := DeleteSalesTransaction(ctx, transaction_id, s.transactions, s.finances)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -181,7 +181,7 @@ func (s *SalesTransactionsController) DeleteSalesTransaction(c *fiber.Ctx) error
 
 	if err := ses.CommitTransaction(ctx); err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
