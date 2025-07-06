@@ -41,7 +41,7 @@ func New(db *mongo.Database, cache *cache.Cache) *BNPLController {
 // @Accept json
 // @Produce json
 // @Param input body models.NewBNPLInput true "BNPL input"
-// @Success 200 {object} models.BNPL
+// @Success 200 {object} models.Output
 // @Failure 400 {object} models.Error
 // @Failure 500 {object} models.Error
 // @Router /api/bnpl [post]
@@ -109,7 +109,7 @@ func (ctrl *BNPLController) NewBNPL(c *fiber.Ctx) error {
 	}
 
 	log.Info().Str("bnpl_id", bnpl.ID).Msg("Successfully created new BNPL")
-	return c.JSON(models.NewOutput(bnpl))
+	return c.JSON(models.NewOutput(nil))
 }
 
 // CreditBNPL godoc
@@ -146,7 +146,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 	session, ctx, err := database.StartTransaction(db.Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -165,7 +165,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Str("bnpl_id", bnpl_id).Msg("Failed to find BNPL")
 		session.AbortTransaction(ctx)
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -182,7 +182,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create transaction")
 		session.AbortTransaction(ctx)
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]string{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -254,7 +254,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 
 	session.CommitTransaction(ctx)
 	log.Info().Str("bnpl_id", bnpl_id).Msg("Successfully processed BNPL payment")
-	return c.JSON(models.NewOutput(bnpl))
+	return c.JSON(models.NewOutput([]*models.BNPL{bnpl}))
 }
 
 // DeleteBNPL godoc
@@ -306,7 +306,7 @@ func (ctrl *BNPLController) DeleteBNPL(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path string true "BNPL ID"
-// @Success 200 {object} models.BNPL
+// @Success 200 {object} models.Output
 // @Failure 500 {object} models.Error
 // @Router /api/bnpl/{id} [get]
 func (ctrl *BNPLController) GetBNPLByID(c *fiber.Ctx) error {
@@ -317,7 +317,7 @@ func (ctrl *BNPLController) GetBNPLByID(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Str("bnpl_id", bnpl_id).Msg("Failed to get BNPL")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
-			Message: "BNPL not found",
+			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
@@ -381,15 +381,21 @@ func GetBNPLByIDFromDB(ctx context.Context, bnpl_id string, customersCollection 
 // @Accept json
 // @Produce json
 // @Param customer_id path string true "Customer ID"
+// @Param branch_id query string false "Branch ID"
 // @Success 200 {object} models.Output
 // @Failure 500 {object} models.Error
 // @Router /api/customers/{customer_id}/bnpls [get]
 func (ctrl *BNPLController) GetBNPLSofCustomer(c *fiber.Ctx) error {
 	log.Info().Msg("Getting customer BNPLs")
+	branch_id := c.Query("branch_id")
 
 	customer_id := c.Params("customer_id")
 	customer := &models.Customer{}
-	err := ctrl.customersCollection.FindOne(context.Background(), bson.M{"_id": customer_id}).Decode(customer)
+	query := bson.M{"_id": customer_id}
+	if branch_id != "" {
+		query["bnpls.branch_id"] = branch_id
+	}
+	err := ctrl.customersCollection.FindOne(context.Background(), query).Decode(customer)
 	if err != nil {
 		log.Error().Err(err).Str("customer_id", customer_id).Msg("Failed to get customer BNPLs")
 		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
@@ -403,3 +409,87 @@ func (ctrl *BNPLController) GetBNPLSofCustomer(c *fiber.Ctx) error {
 }
 
 // Get BNPLs of branch
+// @Summary Get BNPLs of branch
+// @Security BearerAuth
+// @Description Get all BNPL transactions for a specific branch
+// @Tags BNPL
+// @Accept json
+// @Produce json
+// @Param branch_id path string true "Branch ID"
+// @Param customer_name query string false "Customer name"
+// @Param customer_phone query string false "Customer phone"
+// @Param customer_address query string false "Customer address"
+// @Success 200 {object} models.Output
+// @Failure 500 {object} models.Error
+// @Router /api/branches/{branch_id}/bnpls [get]
+func (ctrl *BNPLController) GetBNPLsOfBranch(c *fiber.Ctx) error {
+	log.Info().Msg("Getting BNPLs of branch")
+
+	// customer name
+	// customer phone
+	// customer address
+
+	customer_name := c.Query("customer_name")
+	customer_phone := c.Query("customer_phone")
+	customer_address := c.Query("customer_address")
+
+	branch_id := c.Params("branch_id")
+	query := mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "bnpls.branch_id", Value: branch_id},
+			}},
+		},
+	}
+	if customer_name != "" {
+		query = append(query, bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "name", Value: bson.D{
+					{Key: "$regex", Value: customer_name},
+					{Key: "$options", Value: "i"},
+				}},
+			}},
+		})
+	}
+	if customer_phone != "" {
+		query = append(query, bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "phone", Value: bson.D{
+					{Key: "$regex", Value: customer_phone},
+					{Key: "$options", Value: "i"},
+				}},
+			}},
+		})
+	}
+	if customer_address != "" {
+		query = append(query, bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "address", Value: bson.D{
+					{Key: "$regex", Value: customer_address},
+					{Key: "$options", Value: "i"},
+				}},
+			}},
+		})
+	}
+
+	cursor, err := ctrl.customersCollection.Aggregate(context.Background(), query)
+	var output []models.Customer
+	if err != nil {
+		log.Error().Err(err).Str("branch_id", branch_id).Msg("Failed to get BNPLs of branch")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			Message: err.Error(),
+			Code:    fiber.StatusInternalServerError,
+		}))
+	}
+	err = cursor.All(context.Background(), &output)
+	if err != nil {
+		log.Error().Err(err).Str("branch_id", branch_id).Msg("Failed to get BNPLs of branch")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			Message: err.Error(),
+			Code:    fiber.StatusInternalServerError,
+		}))
+	}
+
+	log.Info().Str("branch_id", branch_id).Msg("Successfully retrieved BNPLs of branch")
+	return c.JSON(models.NewOutput(output))
+}

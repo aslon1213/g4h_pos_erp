@@ -123,4 +123,5 @@ func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middlewa
 	api.Delete("/bnpl/:id", bnplController.DeleteBNPL)                          // delete bnpl
 	api.Get("/bnpl/:id", bnplController.GetBNPLByID)                            // get bnpl by id
 	api.Get("/customers/:customer_id/bnpls", bnplController.GetBNPLSofCustomer) // get bnpls of customer
+	api.Get("/branches/:branch_id/bnpls", bnplController.GetBNPLsOfBranch)      // get bnpls of branch
 }
