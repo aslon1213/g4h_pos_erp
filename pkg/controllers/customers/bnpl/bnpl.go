@@ -51,7 +51,7 @@ func (ctrl *BNPLController) NewBNPL(c *fiber.Ctx) error {
 	new_bnpl_input := &models.NewBNPLInput{}
 	if err := c.BodyParser(new_bnpl_input); err != nil {
 		log.Error().Err(err).Msg("Failed to parse request body")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -59,7 +59,7 @@ func (ctrl *BNPLController) NewBNPL(c *fiber.Ctx) error {
 
 	if err := new_bnpl_input.Validate(); err != nil {
 		log.Error().Err(err).Msg("Invalid input")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -70,7 +70,7 @@ func (ctrl *BNPLController) NewBNPL(c *fiber.Ctx) error {
 	err := ctrl.customersCollection.FindOne(context.Background(), bson.M{"_id": new_bnpl_input.CustomerID}).Decode(customer)
 	if err != nil {
 		log.Error().Err(err).Str("customer_id", new_bnpl_input.CustomerID).Msg("Customer not found")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -102,14 +102,14 @@ func (ctrl *BNPLController) NewBNPL(c *fiber.Ctx) error {
 	_, err = ctrl.customersCollection.UpdateOne(context.Background(), bson.M{"_id": new_bnpl_input.CustomerID}, bson.M{"$push": bson.M{"bnpls": bnpl}})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update customer with new BNPL")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
 	}
 
 	log.Info().Str("bnpl_id", bnpl.ID).Msg("Successfully created new BNPL")
-	return c.JSON(models.NewOutput(nil))
+	return c.JSON(models.NewOutput([]interface{}{}))
 }
 
 // CreditBNPL godoc
@@ -201,7 +201,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update branch finance")
 		session.AbortTransaction(ctx)
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -209,7 +209,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 	if update_res.MatchedCount == 0 {
 		log.Error().Str("branch_id", bnpl.BranchID).Msg("Branch not found")
 		session.AbortTransaction(ctx)
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Branch not found",
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -231,7 +231,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 		if err != nil || update_res.MatchedCount == 0 {
 			log.Error().Err(err).Msg("Failed to update completed BNPL")
 			session.AbortTransaction(ctx)
-			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: err.Error(),
 				Code:    fiber.StatusInternalServerError,
 			}))
@@ -245,7 +245,7 @@ func (ctrl *BNPLController) CreditBNPL(c *fiber.Ctx) error {
 		if err != nil || update_res.MatchedCount == 0 {
 			log.Error().Err(err).Msg("Failed to update BNPL payment")
 			session.AbortTransaction(ctx)
-			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: err.Error(),
 				Code:    fiber.StatusInternalServerError,
 			}))
@@ -286,7 +286,7 @@ func (ctrl *BNPLController) DeleteBNPL(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Error().Err(err).Str("bnpl_id", bnpl_id).Msg("Failed to delete BNPL")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -316,7 +316,7 @@ func (ctrl *BNPLController) GetBNPLByID(c *fiber.Ctx) error {
 	bnpl, err := GetBNPLByIDFromDB(context.Background(), bnpl_id, ctrl.customersCollection)
 	if err != nil {
 		log.Error().Err(err).Str("bnpl_id", bnpl_id).Msg("Failed to get BNPL")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -398,7 +398,7 @@ func (ctrl *BNPLController) GetBNPLSofCustomer(c *fiber.Ctx) error {
 	err := ctrl.customersCollection.FindOne(context.Background(), query).Decode(customer)
 	if err != nil {
 		log.Error().Err(err).Str("customer_id", customer_id).Msg("Failed to get customer BNPLs")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -476,7 +476,7 @@ func (ctrl *BNPLController) GetBNPLsOfBranch(c *fiber.Ctx) error {
 	var output []models.Customer
 	if err != nil {
 		log.Error().Err(err).Str("branch_id", branch_id).Msg("Failed to get BNPLs of branch")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -484,7 +484,7 @@ func (ctrl *BNPLController) GetBNPLsOfBranch(c *fiber.Ctx) error {
 	err = cursor.All(context.Background(), &output)
 	if err != nil {
 		log.Error().Err(err).Str("branch_id", branch_id).Msg("Failed to get BNPLs of branch")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
