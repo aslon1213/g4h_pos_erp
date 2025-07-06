@@ -601,6 +601,18 @@ paths:
         name: branch_id
         required: true
         type: string
+      - description: Customer name
+        in: query
+        name: customer_name
+        type: string
+      - description: Customer phone
+        in: query
+        name: customer_phone
+        type: string
+      - description: Customer address
+        in: query
+        name: customer_address
+        type: string
       produces:
       - application/json
       responses:
@@ -643,6 +655,10 @@ paths:
         in: query
         name: count
         type: integer
+      - description: Sort by BNPL total (max, min, none)
+        in: query
+        name: sort_by_bnpl_total
+        type: string
       produces:
       - application/json
       responses:
