@@ -78,7 +78,13 @@ type Activity struct {
 func LogActivityWithCtx(ctx *fiber.Ctx, action ActivityType, data interface{}, collection *mongo.Collection) {
 	log.Debug().Msg("LogActivityWithCtx called")
 
-	LogActivity(ctx.Locals("user").(string), action, data, ctx.IP(), ctx.Response().StatusCode(), collection)
+	user, ok := ctx.Locals("user").(string)
+	if !ok {
+		log.Error().Msg("User not found in context")
+		user = "unknown"
+	}
+
+	LogActivity(user, action, data, ctx.IP(), ctx.Response().StatusCode(), collection)
 }
 
 func LogActivity(user string, action ActivityType, data interface{}, ip string, status int, collection *mongo.Collection) {
