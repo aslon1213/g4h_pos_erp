@@ -484,7 +484,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.BNPL'
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
@@ -543,7 +543,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.BNPL'
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
@@ -588,6 +588,33 @@ paths:
       security:
       - BearerAuth: []
       summary: Credit BNPL payment
+      tags:
+      - BNPL
+  /api/branches/{branch_id}/bnpls:
+    get:
+      consumes:
+      - application/json
+      description: Get all BNPL transactions for a specific branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Output'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - BearerAuth: []
+      summary: Get BNPLs of branch
       tags:
       - BNPL
   /api/customers:
@@ -673,6 +700,10 @@ paths:
         in: path
         name: customer_id
         required: true
+        type: string
+      - description: Branch ID
+        in: query
+        name: branch_id
         type: string
       produces:
       - application/json
