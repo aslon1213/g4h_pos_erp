@@ -41,7 +41,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	var transactionBase models.TransactionBase
 	if err := c.BodyParser(&transactionBase); err != nil {
 		log.Error().Err(err).Msg("Failed to parse transaction data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -51,7 +51,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	// validate the transaction base
 	if err := models.ValidateTransactionType(transactionBase.Type); err != nil {
 		log.Error().Err(err).Str("transaction_type", string(transactionBase.Type)).Msg("Failed to validate transaction data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -61,7 +61,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	sess, ctx, err := database.StartTransaction(s.transactionsCollection.Database().Client())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to start transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -72,7 +72,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	if err != nil {
 		sess.AbortTransaction(ctx)
 		log.Error().Err(err).Msg("Failed to create new supplier transaction --- aborting")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -81,7 +81,7 @@ func (s *SuppliersController) NewTransaction(c *fiber.Ctx) error {
 	err = sess.CommitTransaction(ctx)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to commit transaction")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
