@@ -56,7 +56,7 @@ func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 
 	if err := c.BodyParser(base); err != nil {
 		log.Error().Err(err).Msg("Failed to parse product body")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -72,7 +72,7 @@ func (p *ProductsController) CreateProduct(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to insert product")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -107,7 +107,7 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 	product := &models.ProductBase{}
 	if err := c.BodyParser(product); err != nil {
 		log.Error().Err(err).Msg("Failed to parse product update body")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -153,7 +153,7 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to update product")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -165,7 +165,7 @@ func (p *ProductsController) EditProduct(c *fiber.Ctx) error {
 
 		log.Error().Err(err).Msg("Failed to fetch updated product")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -206,7 +206,7 @@ func (p *ProductsController) DeleteProduct(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to delete product")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -248,7 +248,7 @@ func (p *ProductsController) GetProductByID(c *fiber.Ctx) error {
 	err := p.ProductsCollection.FindOne(c.Context(), bson.M{"_id": id}).Decode(product)
 	if err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Product not found")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Product not found",
 			Code:    fiber.StatusNotFound,
 		}))
@@ -284,7 +284,7 @@ func (p *ProductsController) QueryProducts(c *fiber.Ctx) error {
 
 	if err := c.QueryParser(&params); err != nil {
 		log.Error().Err(err).Msg("Failed to parse query parameters")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -309,7 +309,7 @@ func (p *ProductsController) QueryProducts(c *fiber.Ctx) error {
 	cursor, err := p.ProductsCollection.Find(c.Context(), pipeline)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to execute Find query")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -318,7 +318,7 @@ func (p *ProductsController) QueryProducts(c *fiber.Ctx) error {
 	products := []models.Product{}
 	if err := cursor.All(c.Context(), &products); err != nil {
 		log.Error().Err(err).Msg("Failed to decode products")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))

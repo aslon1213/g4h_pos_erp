@@ -68,7 +68,7 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 	var query SupplierQuery
 	if err := c.QueryParser(&query); err != nil {
 		log.Error().Err(err).Msg("Failed to parse supplier query")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -97,7 +97,7 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 		err := s.financeCollection.FindOne(context.Background(), bson.M{"$or": []bson.M{{"branch_id": branch}, {"branch_name": branch}}}).Decode(&branch_data)
 		if err != nil {
 			log.Error().Err(err).Str("id or name", branch).Msg("Branch not found")
-			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Branch not found",
 				Code:    fiber.StatusNotFound,
 			}))
@@ -122,7 +122,7 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 	cursor, err := s.suppliersCollection.Find(context.Background(), filter)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find suppliers")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -130,7 +130,7 @@ func (s *SuppliersController) GetSuppliers(c *fiber.Ctx) error {
 
 	if err := cursor.All(context.Background(), &suppliers); err != nil {
 		log.Error().Err(err).Msg("Failed to decode suppliers")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -164,13 +164,13 @@ func (s *SuppliersController) GetSupplierByID(c *fiber.Ctx) error {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Debug().Str("id", id).Msg("Supplier not found")
-			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+			return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 				Message: "Supplier not found",
 				Code:    fiber.StatusNotFound,
 			}))
 		}
 		log.Error().Err(err).Str("id", id).Msg("Failed to find supplier")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -199,7 +199,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	var supplierBase models.SupplierBase
 	if err := c.BodyParser(&supplierBase); err != nil {
 		log.Error().Err(err).Msg("Failed to parse supplier data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -227,7 +227,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Str("id or name", supplierBase.Branch).Msg("Branch not found")
 
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Branch not found",
 			Code:    fiber.StatusNotFound,
 		}))
@@ -239,7 +239,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -252,7 +252,7 @@ func (s *SuppliersController) CreateSupplier(c *fiber.Ctx) error {
 	if err != nil {
 		log.Error().Err(err).Str("id", supplier.ID).Msg("Failed to insert supplier to finance")
 
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -282,7 +282,7 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 	var supplierBase models.SupplierBase
 	if err := c.BodyParser(&supplierBase); err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Failed to parse supplier update data")
-		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusBadRequest).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusBadRequest,
 		}))
@@ -317,7 +317,7 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 	result, err := s.suppliersCollection.UpdateOne(context.Background(), bson.M{"_id": id}, update)
 	if err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Failed to update supplier")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -325,7 +325,7 @@ func (s *SuppliersController) UpdateSupplier(c *fiber.Ctx) error {
 
 	if result.MatchedCount == 0 {
 		log.Debug().Str("id", id).Msg("Supplier not found for update")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Supplier not found",
 			Code:    fiber.StatusNotFound,
 		}))
@@ -354,7 +354,7 @@ func (s *SuppliersController) DeleteSupplier(c *fiber.Ctx) error {
 	result, err := s.suppliersCollection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
 		log.Error().Err(err).Str("id", id).Msg("Failed to delete supplier")
-		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusInternalServerError).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: err.Error(),
 			Code:    fiber.StatusInternalServerError,
 		}))
@@ -362,7 +362,7 @@ func (s *SuppliersController) DeleteSupplier(c *fiber.Ctx) error {
 
 	if result.DeletedCount == 0 {
 		log.Debug().Str("id", id).Msg("Supplier not found for deletion")
-		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput(nil, models.Error{
+		return c.Status(fiber.StatusNotFound).JSON(models.NewOutput([]interface{}{}, models.Error{
 			Message: "Supplier not found",
 			Code:    fiber.StatusNotFound,
 		}))
