@@ -1185,6 +1185,15 @@ paths:
         name: journal_id
         required: true
         type: string
+      - description: Amount
+        in: query
+        name: amount
+        required: true
+        type: integer
+      - description: Description
+        in: query
+        name: description
+        type: string
       produces:
       - application/json
       responses:
