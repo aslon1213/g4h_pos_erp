@@ -67,17 +67,17 @@ func ProductsRoutes(router *fiber.App, productsController *products.ProductsCont
 
 func JournalsRoutes(router *fiber.App, journalsController *journal_handlers.JournalHandlers, operationsController *journal_handlers.OperationHandlers, middleware *middleware.Middlewares) {
 	api := router.Group("/api")
-	api.Get("/journals/:id", journalsController.GetJournalEntryByID)               // get journal entry by id
-	api.Get("/journals/branch/:branch_id", journalsController.QueryJournalEntries) // query journal entries
-	api.Post("/journals", journalsController.NewJournalEntry)                      // create journal entry -- activity logged here if succesfull
-	api.Post("/journals/:id/close", journalsController.CloseJournalEntry)          // close journal entry -- activity logged here if succesfull
-	api.Post("/journals/:id/reopen", journalsController.ReOpenJournalEntry)        // reopen journal entry -- activity logged here if succesfull
+	api.Get("/journals/:id", journalsController.GetJournalEntryByID)                                                  // get journal entry by id
+	api.Get("/journals/branch/:branch_id", journalsController.QueryJournalEntries)                                    // query journal entries
+	api.Post("/journals", journalsController.NewJournalEntry)                                                         // create journal entry -- activity logged here if succesfull
+	api.Post("/journals/:id/close", operationsController.ShiftIsOpenMiddleware, journalsController.CloseJournalEntry) // close journal entry -- activity logged here if succesfull
+	api.Post("/journals/:id/reopen", journalsController.ReOpenJournalEntry)                                           // reopen journal entry -- activity logged here if succesfull
 
 	// operations
-	api.Post("/journals/:id/operations", operationsController.NewOperationTransaction)                        // create operation transaction -- activity logged here if succesfull
-	api.Put("/journals/:id/operations/:operation_id", operationsController.UpdateOperationTransactionByID)    // update operation transaction by id -- activity logged here if succesfull
-	api.Delete("/journals/:id/operations/:operation_id", operationsController.DeleteOperationTransactionByID) // delete operation transaction by id -- activity logged here if succesfull
-	api.Get("/journals/:id/operations/:operation_id", operationsController.GetOperationTransactionByID)       // get operation transaction by id
+	api.Post("/journals/:id/operations", operationsController.ShiftIsOpenMiddleware, operationsController.NewOperationTransaction)                        // create operation transaction -- activity logged here if succesfull
+	api.Put("/journals/:id/operations/:operation_id", operationsController.ShiftIsOpenMiddleware, operationsController.UpdateOperationTransactionByID)    // update operation transaction by id -- activity logged here if succesfull
+	api.Delete("/journals/:id/operations/:operation_id", operationsController.ShiftIsOpenMiddleware, operationsController.DeleteOperationTransactionByID) // delete operation transaction by id -- activity logged here if succesfull
+	api.Get("/journals/:id/operations/:operation_id", operationsController.GetOperationTransactionByID)                                                   // get operation transaction by id
 
 }
 
