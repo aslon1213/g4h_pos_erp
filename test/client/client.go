@@ -85,11 +85,29 @@ func (c *Client) DecodeResponseMultiple(resp *http.Response) (models.BranchFinan
 
 func (c *Client) DecodeResponseSingle(resp *http.Response) (models.BranchFinanceOutputSingle, error) {
 	output := models.BranchFinanceOutputSingle{}
+	if resp.StatusCode != http.StatusOK {
+		var output_ struct {
+			Data  interface{}
+			Error []models.Error
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return output, err
+		}
+		err = json.Unmarshal(body, &output_)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to decode response single")
+			return output, err
+		}
+		output.Error = output_.Error
+		return output, nil
+	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return output, err
 	}
 	err = json.Unmarshal(body, &output)
+
 	if err != nil {
 		log.Error().Str("body", string(body)).Err(err).Msg("Failed to decode response single")
 		return output, err
@@ -103,7 +121,7 @@ func (c *Client) EncodeBody(body interface{}) ([]byte, error) {
 
 // Get all branches
 func (c *Client) GetAllBranches() (resp *http.Response, output models.BranchFinanceOutput, err error) {
-	resp, err = c.MakeRequest("GET", "/api/finance/branches", nil, map[string]string{"Content-Type": "application/json"}, false)
+	resp, err = c.MakeRequest("GET", "/api/finance/branches", nil, map[string]string{"Content-Type": "application/json"}, true)
 	if err != nil {
 		return nil, models.BranchFinanceOutput{}, err
 	}

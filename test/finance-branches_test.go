@@ -3,8 +3,8 @@ package test
 import (
 	"context"
 	"io"
-	logging "log"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -16,12 +16,110 @@ import (
 
 	models "github.com/aslon1213/go-pos-erp/pkg/repository"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
 
+// --- Helper Functions ---
+
+func ChangeLogging() {
+	if os.Getenv("DISABLE_LOGGING") == "true" {
+		zerolog.SetGlobalLevel(zerolog.Disabled)
+		zerolog.New(io.Discard)
+	}
+}
+
+func getConfig(t *testing.T) *configs.Config {
+	configs, err := configs.LoadConfig("../../")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return configs
+}
+
+func getClient(t *testing.T) *client.Client {
+	configs := getConfig(t)
+	return client.NewClient("localhost", configs.Server.Port, "admin", "admin")
+}
+
+func getAllBranches(t *testing.T, c *client.Client) []models.BranchFinance {
+	resp, output, err := c.GetAllBranches()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output.Error, "Expected no error, but got one")
+	return output.Data
+}
+
+func getAllSuppliers(t *testing.T, c *client.Client) []models.Supplier {
+	resp, output, err := c.GetAllSuppliers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output.Error, "Expected no error, but got one")
+	return output.Data
+}
+
+func getFirstOpenJournal(t *testing.T, journals []models.Journal) models.Journal {
+	for _, journal := range journals {
+		if !journal.Shift_is_closed {
+			return journal
+		}
+	}
+	t.Fatal("No open journal found")
+	return models.Journal{}
+}
+
+func getFirstClosedJournal(t *testing.T, journals []models.Journal) models.Journal {
+	for _, journal := range journals {
+		if journal.Shift_is_closed {
+			return journal
+		}
+	}
+	t.Fatal("No closed journal found")
+	return models.Journal{}
+}
+
+func getJournals(t *testing.T, c *client.Client, branchID string, page, pageSize uint8) []models.Journal {
+	resp, journals_output, err := c.QueryJournalEntries(branchID, models.JournalQueryParams{
+		Page:     page,
+		PageSize: pageSize,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, journals_output.Error, "Expected no error, but got one")
+	return journals_output.Data
+}
+
+func getBranchByID(t *testing.T, c *client.Client, branchID string) models.BranchFinance {
+	resp, output, err := c.GetBranchByID(branchID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output.Error, "Expected no error, but got one")
+	return output.Data
+}
+
+func getSupplierByID(t *testing.T, c *client.Client, supplierID string) models.Supplier {
+	resp, output, err := c.GetSupplierByID(supplierID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output.Error, "Expected no error, but got one")
+	return output.Data
+}
+
+// --- TestMain ---
+
 func TestMain(m *testing.M) {
-	logging.SetOutput(io.Discard)
+	ChangeLogging()
 	app := app.New()
 
 	app.DB.Database("magazin").Collection("finance").DeleteMany(context.Background(), bson.M{})
@@ -31,39 +129,27 @@ func TestMain(m *testing.M) {
 
 	go app.Run()
 	m.Run()
-	// delete all records from magazin database
 }
 
-// TestCreateBranches tests the creation of branches in the finance module
+// --- Tests ---
+
 func TestCreateBranches(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	configs := getConfig(t)
 
 	time.Sleep(1 * time.Second)
 
-	// Test data for creating branches
 	branches := []models.NewBranchFinanceInput{
-		{
-			BranchName: "Xonobod",
-			Details:    map[string]interface{}{"location": "Location A"},
-		},
-		{
-			BranchName: "Polevoy",
-			Details:    map[string]interface{}{"location": "Location B"},
-		},
-		{
-			BranchName: "Branch C",
-			Details:    map[string]interface{}{"location": "Location C"},
-		},
+		{BranchName: "Xonobod", Details: map[string]interface{}{"location": "Location A"}},
+		{BranchName: "Polevoy", Details: map[string]interface{}{"location": "Location B"}},
+		{BranchName: "Branch C", Details: map[string]interface{}{"location": "Location C"}},
 	}
 
 	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
 
 	for _, branch := range branches {
 		resp, output, err := client.CreateBranch(branch)
-		assert.Equal(t, resp.StatusCode, http.StatusCreated, "Expected status code 201, but got %d", resp.StatusCode)
+		assert.Equal(t, http.StatusCreated, resp.StatusCode, "Expected status code 201, but got %d", resp.StatusCode)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -72,12 +158,8 @@ func TestCreateBranches(t *testing.T) {
 }
 
 func TestCreateBranchDuplicate(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
+	ChangeLogging()
+	client := getClient(t)
 
 	branch := models.NewBranchFinanceInput{
 		BranchName: "Xonobod",
@@ -92,12 +174,8 @@ func TestCreateBranchDuplicate(t *testing.T) {
 }
 
 func TestGetBranches(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
+	ChangeLogging()
+	client := getClient(t)
 
 	_, output, err := client.GetAllBranches()
 	if err != nil {
@@ -105,30 +183,19 @@ func TestGetBranches(t *testing.T) {
 	}
 
 	log.Info().Interface("output", output).Msg("Output")
-
 	assert.Nil(t, output.Error, "Expected no error, but got one")
 }
 
 func TestGetBranchByID(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-	// get all branches first
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	financeBranches := output.Data
-
-	if len(financeBranches) == 0 {
+	branches := getAllBranches(t, client)
+	if len(branches) == 0 {
 		t.Fatal("No branches found")
 	}
 
-	firstBranch := financeBranches[0]
+	firstBranch := branches[0]
 	branchID := firstBranch.BranchID
 
 	resp, output_, err := client.GetBranchByID(branchID)
@@ -137,94 +204,39 @@ func TestGetBranchByID(t *testing.T) {
 		t.Fatal(err)
 	}
 	log.Info().Interface("resp", resp).Msg("Response")
-	assert.Nil(t, output.Error, "Expected no error, but got one")
+	assert.Nil(t, output_.Error, "Expected no error, but got one")
 }
 
 func TestGetBranchByName(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	financeBranches := output.Data
-
-	branchName := financeBranches[0].BranchName
+	branches := getAllBranches(t, client)
+	branchName := branches[0].BranchName
 
 	resp, output_, err := client.GetBranchByName(branchName)
-
+	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
+	assert.Nil(t, output_.Error, "Expected no error, but got one")
 	assert.Equal(t, output_.Data.BranchName, branchName, "Expected branch name to be %s, but got %s", branchName, output_.Data.BranchName)
-
 }
 
 func TestCreateSupplier(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
+	ChangeLogging()
+	client := getClient(t)
 
 	suppliers := []models.SupplierBase{
-		{
-			Name:    "Supplier One",
-			Email:   "supplier1@example.com",
-			Phone:   "1234567890",
-			Address: "Address One",
-			INN:     "111111111",
-			Notes:   "Notes for Supplier One",
-			Branch:  "Xonobod",
-		},
-		{
-			Name:    "Supplier Two",
-			Email:   "supplier2@example.com",
-			Phone:   "2345678901",
-			Address: "Address Two",
-			INN:     "222222222",
-			Notes:   "Notes for Supplier Two",
-			Branch:  "Xonobod",
-		},
-		{
-			Name:    "Supplier Three",
-			Email:   "supplier3@example.com",
-			Phone:   "3456789012",
-			Address: "Address Three",
-			INN:     "333333333",
-			Notes:   "Notes for Supplier Three",
-			Branch:  "Xonobod",
-		},
-		{
-			Name:    "Supplier Four",
-			Email:   "supplier4@example.com",
-			Phone:   "4567890123",
-			Address: "Address Four",
-			INN:     "444444444",
-			Notes:   "Notes for Supplier Four",
-			Branch:  "Polevoy",
-		},
-		{
-			Name:    "Supplier Five",
-			Email:   "supplier5@example.com",
-			Phone:   "5678901234",
-			Address: "Address Five",
-			INN:     "555555555",
-			Notes:   "Notes for Supplier Five",
-			Branch:  "Polevoy",
-		},
+		{Name: "Supplier One", Email: "supplier1@example.com", Phone: "1234567890", Address: "Address One", INN: "111111111", Notes: "Notes for Supplier One", Branch: "Xonobod"},
+		{Name: "Supplier Two", Email: "supplier2@example.com", Phone: "2345678901", Address: "Address Two", INN: "222222222", Notes: "Notes for Supplier Two", Branch: "Xonobod"},
+		{Name: "Supplier Three", Email: "supplier3@example.com", Phone: "3456789012", Address: "Address Three", INN: "333333333", Notes: "Notes for Supplier Three", Branch: "Xonobod"},
+		{Name: "Supplier Four", Email: "supplier4@example.com", Phone: "4567890123", Address: "Address Four", INN: "444444444", Notes: "Notes for Supplier Four", Branch: "Polevoy"},
+		{Name: "Supplier Five", Email: "supplier5@example.com", Phone: "5678901234", Address: "Address Five", INN: "555555555", Notes: "Notes for Supplier Five", Branch: "Polevoy"},
 	}
 	for _, newSupplier := range suppliers {
 		resp, output, err := client.CreateSupplier(newSupplier)
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		assert.Equal(t, http.StatusCreated, resp.StatusCode, "Expected status code 201, but got %d", resp.StatusCode)
 		assert.Nil(t, output.Error, "Expected no error, but got one")
 		assert.Equal(t, output.Data.Name, newSupplier.Name, "Expected supplier name to be %s, but got %s", newSupplier.Name, output.Data.Name)
@@ -232,35 +244,18 @@ func TestCreateSupplier(t *testing.T) {
 }
 
 func TestGetSuppliers(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-	resp, output, err := client.GetAllSuppliers()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
-	assert.NotEmpty(t, output.Data, "Expected to find suppliers, but got none")
+	suppliers := getAllSuppliers(t, client)
+	assert.NotEmpty(t, suppliers, "Expected to find suppliers, but got none")
 }
 
 func TestGetSupplierByID(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-	resp, output, err := client.GetAllSuppliers()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	suppliers := output.Data
+	suppliers := getAllSuppliers(t, client)
 	if len(suppliers) == 0 {
 		t.Fatal("No suppliers found")
 	}
@@ -268,33 +263,18 @@ func TestGetSupplierByID(t *testing.T) {
 	firstSupplier := suppliers[0]
 	supplierID := firstSupplier.ID
 
-	resp, output_, err := client.GetSupplierByID(supplierID)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output_.Error, "Expected no error, but got one")
-	assert.Equal(t, output_.Data.ID, supplierID, "Expected supplier ID to be %s, but got %s", supplierID, output_.Data.ID)
+	supplier := getSupplierByID(t, client, supplierID)
+	assert.Equal(t, supplier.ID, supplierID, "Expected supplier ID to be %s, but got %s", supplierID, supplier.ID)
 }
 
 func TestNewSupplierTransaction(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-	_, output, err := client.GetAllSuppliers()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	suppliers := output.Data
+	suppliers := getAllSuppliers(t, client)
 	supplierID := ""
 	Branch := ""
 
-	// choose oe supplier which has branch
 	for _, supplier := range suppliers {
 		if supplier.Branch != "" {
 			supplierID = supplier.ID
@@ -304,54 +284,14 @@ func TestNewSupplierTransaction(t *testing.T) {
 	}
 
 	transactions := []models.TransactionBase{
-		{
-			Amount:        10000000,
-			Description:   "Test Transaction 1",        // 10 million
-			Type:          models.TransactionTypeDebit, // we get the money from the supplier
-			PaymentMethod: models.PaymentMethodBank,    // incrase debt section
-		},
-		{
-			Amount:        20000000,
-			Description:   "Test Transaction 2",        // 20 million
-			Type:          models.TransactionTypeDebit, // we get the money from the supplier
-			PaymentMethod: models.PaymentMethodBank,    // increase the debt section
-		},
-		{
-			Amount:        15000000,
-			Description:   "Test Transaction 3",        // 15 million
-			Type:          models.TransactionTypeDebit, // we get the money from the supplier
-			PaymentMethod: models.PaymentMethodBank,    // increase the debt section
-		},
-		{
-			Amount:        5000000,
-			Description:   "Test Transaction 3",         // 5 million
-			Type:          models.TransactionTypeCredit, // we give the money to the supplier
-			PaymentMethod: models.PaymentMethodCash,     // decrease the balance.cash by 5 million
-		},
-		{
-			Amount:        2500000,
-			Description:   "Test Transaction 3",         // 2.5 million
-			Type:          models.TransactionTypeCredit, // we get the money from the supplier
-			PaymentMethod: models.PaymentMethodBank,     // decrease the balance.bank by 2.5 million
-		},
-		{
-			Amount:        3000000,
-			Description:   "Test Transaction 3",         // 3 million
-			Type:          models.TransactionTypeCredit, // we get the money from the supplier
-			PaymentMethod: models.PaymentMethodBank,     // decrease the balance.bank by 3 million
-		},
-		{
-			Amount:        4000000,
-			Description:   "Test Transaction 3",         // 4 million
-			Type:          models.TransactionTypeCredit, // we get the money from the supplier
-			PaymentMethod: models.PaymentMethodCash,     // decrease the balance.cash by 4 million
-		},
-		{
-			Amount:        1000000,
-			Description:   "Test Transaction 3",         // 1 million
-			Type:          models.TransactionTypeCredit, // we get the money from the supplier
-			PaymentMethod: models.OnlineTransfer,        // decrease the balance.mobile_apps by 1 million
-		},
+		{Amount: 10000000, Description: "Test Transaction 1", Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 20000000, Description: "Test Transaction 2", Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 15000000, Description: "Test Transaction 3", Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 5000000, Description: "Test Transaction 3", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash},
+		{Amount: 2500000, Description: "Test Transaction 3", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 3000000, Description: "Test Transaction 3", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 4000000, Description: "Test Transaction 3", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash},
+		{Amount: 1000000, Description: "Test Transaction 3", Type: models.TransactionTypeCredit, PaymentMethod: models.OnlineTransfer},
 	}
 	total_income := 15500000
 	total_expenses := 45000000
@@ -366,55 +306,22 @@ func TestNewSupplierTransaction(t *testing.T) {
 		assert.Nil(t, output.Error, "Expected no error, but got one")
 	}
 
-	// fetch finance and supplier from database and check the balance and total income and total expenses
+	branch_response := getBranchByID(t, client, Branch)
+	assert.Equal(t, int32(-balance), branch_response.Finance.Debt, "Expected balance to be %f, but got %f", -balance, branch_response.Finance.Debt)
+	assert.Equal(t, int32(-5500000), branch_response.Finance.Balance.Bank, "Expected balance to be %f, but got %f", 5500000, branch_response.Finance.Balance.Bank)
+	assert.Equal(t, int32(-9000000), branch_response.Finance.Balance.Cash, "Expected balance to be %f, but got %f", 10000000, branch_response.Finance.Balance.Cash)
+	assert.Equal(t, int32(-1000000), branch_response.Finance.Balance.MobileApps, "Expected balance to be %f, but got %f", 1000000, branch_response.Finance.Balance.MobileApps)
 
-	// get finance by branch name
-	resp, branch_response, err := client.GetBranchByID(Branch)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, branch_response.Error, "Expected no error, but got one")
-
-	// check the balance and total income and total expenses
-	assert.Equal(t, int32(-balance), branch_response.Data.Finance.Debt, "Expected balance to be %f, but got %f", -balance, branch_response.Data.Finance.Debt)
-	assert.Equal(t, int32(-5500000), branch_response.Data.Finance.Balance.Bank, "Expected balance to be %f, but got %f", 5500000, branch_response.Data.Finance.Balance.Bank)
-	assert.Equal(t, int32(-9000000), branch_response.Data.Finance.Balance.Cash, "Expected balance to be %f, but got %f", 10000000, branch_response.Data.Finance.Balance.Cash)
-	assert.Equal(t, int32(-1000000), branch_response.Data.Finance.Balance.MobileApps, "Expected balance to be %f, but got %f", 1000000, branch_response.Data.Finance.Balance.MobileApps)
-	// assert.Equal(t, branch_response.Data.Finance.TotalIncome, total_income, "Expected total income to be %f, but got %f", total_income, branch_response.Data.Finance.TotalIncome)
-	// assert.Equal(t, branch_response.Data.Finance.TotalExpenses, total_expenses, "Expected total expenses to be %f, but got %f", total_expenses, branch_response.Data.Finance.TotalExpenses)
-
-	// get supplier by id
-	resp, supplier_response, err := client.GetSupplierByID(supplierID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, supplier_response.Error, "Expected no error, but got one")
-	assert.Equal(t, supplier_response.Data.ID, supplierID, "Expected supplier ID to be %s, but got %s", supplierID, supplier_response.Data.ID)
-	assert.NotEqual(t, supplier_response.Data.FinancialData.Balance, 0, "Expected balance to be %f, but got %f", balance, supplier_response.Data.FinancialData.Balance)
-
+	supplier_response := getSupplierByID(t, client, supplierID)
+	assert.Equal(t, supplier_response.ID, supplierID, "Expected supplier ID to be %s, but got %s", supplierID, supplier_response.ID)
+	assert.NotEqual(t, supplier_response.FinancialData.Balance, 0, "Expected balance to be %f, but got %f", balance, supplier_response.FinancialData.Balance)
 }
 
-// test get transactions, delete transactions of sales, create sales transaction
 func TestSalesTransaction(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := getClient(t)
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// get all branches
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	branches := output.Data
-
+	branches := getAllBranches(t, client)
 	branchID := ""
-
 	for _, branch := range branches {
 		if branch.BranchName == "Xonobod" {
 			branchID = branch.BranchID
@@ -422,68 +329,19 @@ func TestSalesTransaction(t *testing.T) {
 		}
 	}
 
-	// create sales transaction
-	transactions := []models.TransactionBase{{
-		Amount:        10000000, // 10 million
-		Description:   "Test Transaction 1",
-		Type:          models.TransactionTypeDebit, // transaction are always positive to balance
-		PaymentMethod: models.PaymentMethodBank,    // increase balance.bank by 10 million
-	}, {
-		Amount:        20000000, // 20 million
-		Description:   "Test Transaction 2",
-		Type:          models.TransactionTypeDebit,
-		PaymentMethod: models.PaymentMethodBank, // increase balance.bank by 20 million
-	}, {
-		Amount:        30000000, // 30 million
-		Description:   "Test Transaction 3",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.PaymentMethodBank, // increase balance.bank by 30 million
-	}, {
-		Amount:        40000000, // 40 million
-		Description:   "Test Transaction 4",
-		Type:          models.TransactionTypeDebit,
-		PaymentMethod: models.PaymentMethodCash, // increase balance.cash by 40 million
-	}, {
-		Amount:        50000000, // 50 million
-		Description:   "Test Transaction 5",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.PaymentMethodCash, // increase balance.cash by 50 million
-	}, {
-		Amount:        60000000, // 60 million
-		Description:   "Test Transaction 6",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.PaymentMethodCash, // increase balance.cash by 60 million
-	}, {
-		Amount:        500000, // 500 thousand
-		Description:   "Test Transaction 7",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.OnlineMobileAppPayment, // increase balance.mobile_apps by 500 thousand
-	}, {
-		Amount:        205000, // 205 thousand
-		Description:   "Test Transaction 8",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.OnlineMobileAppPayment, // increase balance.mobile_apps by 205 thousand
-	}, {
-		Amount:        1000000, // 1 million
-		Description:   "Test Transaction 9",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.OnlineTransfer, // increase balance.mobile_apps by 1 million
-	}, {
-		Amount:        1000000, // 1 million
-		Description:   "Test Transaction 10",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.OnlineTransfer, // increase balance.mobile_apps by 1 million
-	}, {
-		Amount:        1000000, // 1 million
-		Description:   "Test Transaction 11",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.PaymentMethodTerminal, // increase balance.terminal by 1 million
-	}, {
-		Amount:        1000000, // 1 million
-		Description:   "Test Transaction 12",
-		Type:          models.TransactionTypeCredit,
-		PaymentMethod: models.PaymentMethodTerminal, // increase balance.terminal by 1 million
-	},
+	transactions := []models.TransactionBase{
+		{Amount: 10000000, Description: "Test Transaction 1", Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 20000000, Description: "Test Transaction 2", Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 30000000, Description: "Test Transaction 3", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodBank},
+		{Amount: 40000000, Description: "Test Transaction 4", Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodCash},
+		{Amount: 50000000, Description: "Test Transaction 5", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash},
+		{Amount: 60000000, Description: "Test Transaction 6", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash},
+		{Amount: 500000, Description: "Test Transaction 7", Type: models.TransactionTypeCredit, PaymentMethod: models.OnlineMobileAppPayment},
+		{Amount: 205000, Description: "Test Transaction 8", Type: models.TransactionTypeCredit, PaymentMethod: models.OnlineMobileAppPayment},
+		{Amount: 1000000, Description: "Test Transaction 9", Type: models.TransactionTypeCredit, PaymentMethod: models.OnlineTransfer},
+		{Amount: 1000000, Description: "Test Transaction 10", Type: models.TransactionTypeCredit, PaymentMethod: models.OnlineTransfer},
+		{Amount: 1000000, Description: "Test Transaction 11", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodTerminal},
+		{Amount: 1000000, Description: "Test Transaction 12", Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodTerminal},
 	}
 
 	for _, transaction := range transactions {
@@ -495,26 +353,20 @@ func TestSalesTransaction(t *testing.T) {
 		assert.Equal(t, output.Data.Amount, transaction.Amount, "Expected amount to be %f, but got %f", transaction.Amount, output.Data.Amount)
 		assert.Nil(t, output.Error, "Expected no error, but got one")
 	}
-	// get transactions
-	// get branch finance info
+
 	cash := -9000000
 	bank := -5500000
 	terminal := 0
 	mobile_apps := -1000000
 	for _, transaction := range transactions {
-		if transaction.PaymentMethod == models.PaymentMethodCash {
+		switch transaction.PaymentMethod {
+		case models.PaymentMethodCash:
 			cash += int(transaction.Amount)
-		}
-		if transaction.PaymentMethod == models.PaymentMethodBank {
+		case models.PaymentMethodBank:
 			bank += int(transaction.Amount)
-		}
-		if transaction.PaymentMethod == models.PaymentMethodTerminal {
+		case models.PaymentMethodTerminal:
 			terminal += int(transaction.Amount)
-		}
-		if transaction.PaymentMethod == models.OnlineMobileAppPayment {
-			mobile_apps += int(transaction.Amount)
-		}
-		if transaction.PaymentMethod == models.OnlineTransfer {
+		case models.OnlineMobileAppPayment, models.OnlineTransfer:
 			mobile_apps += int(transaction.Amount)
 		}
 	}
@@ -524,15 +376,9 @@ func TestSalesTransaction(t *testing.T) {
 		Terminal:   int32(terminal),
 		MobileApps: int32(mobile_apps),
 	}
-	resp, output_branch, err := client.GetBranchByID(branchID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output_branch.Error, "Expected no error, but got one")
-	assert.Equal(t, output_branch.Data.Finance.Balance, balance, "Expected balance to be %f, but got %f", balance, output_branch.Data.Finance.Balance)
+	output_branch := getBranchByID(t, client, branchID)
+	assert.Equal(t, output_branch.Finance.Balance, balance, "Expected balance to be %f, but got %f", balance, output_branch.Finance.Balance)
 
-	// get transactions
 	resp, output_transactions, err := client.GetTransactions(branchID, "", 0, 0, "", "", models.InitiatorTypeSales, time.Time{}, time.Time{}, 1, 100)
 	if err != nil {
 		t.Fatal(err)
@@ -544,15 +390,8 @@ func TestSalesTransaction(t *testing.T) {
 
 func TestOpenJournals(t *testing.T) {
 	loc := utils.GetTimeZone()
+	client := getClient(t)
 
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// number of days to create journals
 	days := 10
 	journals := []models.NewJournalEntryInput{}
 	for i := 0; i < days; i++ {
@@ -571,9 +410,6 @@ func TestOpenJournals(t *testing.T) {
 		assert.Nil(t, output.Error, "Expected no error, but got one")
 	}
 
-	// create once again with the same date
-
-	// create once again with the same date to check if it will be created again --- should not be created again
 	resp, output, err := client.OpenJournal(journals[0])
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to open journal")
@@ -584,155 +420,44 @@ func TestOpenJournals(t *testing.T) {
 }
 
 func TestQueryJournal(t *testing.T) {
-	// loc := utils.GetTimeZone()
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branchID := branches[0].BranchID
 
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	journals := getJournals(t, client, branchID, 1, 10)
+	assert.Equal(t, 10, len(journals), "Expected 1 journal, but got %d", len(journals))
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// get all branches
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
-
-	// choose the first branch
-	branchID := output.Data[0].BranchID
-
-	// get journal entries
-	resp, journals_output, err := client.QueryJournalEntries(branchID, models.JournalQueryParams{
-		Page:     1,
-		PageSize: 10,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, journals_output.Error, "Expected no error, but got one")
-	assert.Equal(t, len(journals_output.Data), 10, "Expected 1 journal, but got %d", len(journals_output.Data))
-
-	// get journal by id
-	resp, output_, err := client.GetJournalByID(journals_output.Data[0].ID.Hex())
+	resp, output_, err := client.GetJournalByID(journals[0].ID.Hex())
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
 	assert.Nil(t, output_.Error, "Expected no error, but got one")
-	assert.Equal(t, journals_output.Data[0].ID, output_.Data.ID, "Expected journal ID to be %s, but got %s", journals_output.Data[0].ID, output_.Data.ID)
+	assert.Equal(t, journals[0].ID, output_.Data.ID, "Expected journal ID to be %s, but got %s", journals[0].ID, output_.Data.ID)
 }
 
 func TestNewOperation(t *testing.T) {
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branch := branches[0]
+	branchID := branch.BranchID
 
-	// query journals
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	journals := getJournals(t, client, branchID, 1, 10)
+	assert.Equal(t, 10, len(journals), "Expected 1 journal, but got %d", len(journals))
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// get all branches
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
-
-	// choose the first branch
-	branch := output.Data[0]
-	branchID := output.Data[0].BranchID
-
-	// get journal entries
-	resp, journals_output, err := client.QueryJournalEntries(branchID, models.JournalQueryParams{
-		Page:     1,
-		PageSize: 10,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, journals_output.Error, "Expected no error, but got one")
-	assert.Equal(t, len(journals_output.Data), 10, "Expected 1 journal, but got %d", len(journals_output.Data))
-
+	journalID := journals[0].ID.Hex()
 	operations := []models.JournalOperationInput{
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 1 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeDebit,
-				PaymentMethod: models.PaymentMethodBank,
-			},
-			SupplierTransaction: false,
-		},
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 2 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeCredit,
-				PaymentMethod: models.PaymentMethodBank,
-			},
-			SupplierTransaction: false,
-		},
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 3 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeDebit,
-				PaymentMethod: models.PaymentMethodCash,
-			},
-			SupplierTransaction: false,
-		},
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 4 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeCredit,
-				PaymentMethod: models.PaymentMethodCash,
-			},
-			SupplierTransaction: false,
-		},
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 5 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeCredit,
-				PaymentMethod: models.PaymentMethodCash,
-			},
-			SupplierTransaction: true,
-			SupplierID:          branch.Suppliers[0],
-		},
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 6 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeCredit,
-				PaymentMethod: models.PaymentMethodCash,
-			},
-			SupplierTransaction: true,
-			SupplierID:          branch.Suppliers[0],
-		},
-		{
-			TransactionBase: models.TransactionBase{
-				Amount:        1000000,
-				Description:   "Test Operation 7 in journal " + journals_output.Data[0].ID.Hex(),
-				Type:          models.TransactionTypeCredit,
-				PaymentMethod: models.PaymentMethodCash,
-			},
-			SupplierTransaction: true,
-			SupplierID:          branch.Suppliers[0],
-		},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 1 in journal " + journalID, Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodBank}, SupplierTransaction: false},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 2 in journal " + journalID, Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodBank}, SupplierTransaction: false},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 3 in journal " + journalID, Type: models.TransactionTypeDebit, PaymentMethod: models.PaymentMethodCash}, SupplierTransaction: false},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 4 in journal " + journalID, Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash}, SupplierTransaction: false},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 5 in journal " + journalID, Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash}, SupplierTransaction: true, SupplierID: branch.Suppliers[0]},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 6 in journal " + journalID, Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash}, SupplierTransaction: true, SupplierID: branch.Suppliers[0]},
+		{TransactionBase: models.TransactionBase{Amount: 1000000, Description: "Test Operation 7 in journal " + journalID, Type: models.TransactionTypeCredit, PaymentMethod: models.PaymentMethodCash}, SupplierTransaction: true, SupplierID: branch.Suppliers[0]},
 	}
 
 	for _, operation := range operations {
-		resp, output, err := client.NewJournalOperation(journals_output.Data[0].ID.Hex(), operation)
+		resp, output, err := client.NewJournalOperation(journalID, operation)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -742,85 +467,78 @@ func TestNewOperation(t *testing.T) {
 }
 
 func TestOperationsGotInserted(t *testing.T) {
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branchID := branches[0].BranchID
 
-	// query journals
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// get all branches
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
-
-	// choose the first branch
-	// branch := output.Data[0]
-	branchID := output.Data[0].BranchID
-
-	// get journal entries
-	resp, journals_output, err := client.QueryJournalEntries(branchID, models.JournalQueryParams{
-		Page:     1,
-		PageSize: 10,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, journals_output.Error, "Expected no error, but got one")
-	// assert.Equal(t, len(journals_output.Data), 10, "Expected 1 journal, but got %d", len(journals_output.Data))
-
-	journal := journals_output.Data[0]
+	journals := getJournals(t, client, branchID, 1, 10)
+	journal := journals[0]
 	assert.Equal(t, journal.Branch.ID, branchID, "Expected branch ID to be %s, but got %s", branchID, journal.Branch.ID)
-	assert.Equal(t, len(journal.Operations), 7, "Expected 7 operations, but got %d", len(journal.Operations))
+	assert.Equal(t, 7, len(journal.Operations), "Expected 7 operations, but got %d", len(journal.Operations))
+}
+
+func TestUpdateOperation(t *testing.T) {
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branchID := branches[0].BranchID
+
+	journals := getJournals(t, client, branchID, 1, 10)
+	journal_ := getFirstOpenJournal(t, journals)
+
+	operation_1 := journal_.Operations[0]
+	operation_2 := journal_.Operations[1]
+
+	resp, output_, err := client.UpdateOperation(journal_.ID.Hex(), operation_1.ID, 1000000, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output_.Error, "Expected no error, but got one")
+	assert.Equal(t, output_.Data.Total, journal_.Total+1000000-operation_1.Amount, "Expected total to be %d, but got %d", journal_.Total+1000000-operation_1.Amount, output_.Data.Total)
+	assert.Equal(t, output_.Data.Operations[0].Amount, uint32(1000000), "Expected amount to be %d, but got %d", 1000000, output_.Data.Operations[0].Amount)
+	assert.Equal(t, output_.Data.Operations[0].Description, operation_1.Description, "Expected description to be %s, but got %s", operation_1.Description, output_.Data.Operations[0].Description)
+
+	resp, output_, err = client.UpdateOperation(journal_.ID.Hex(), operation_2.ID, 1000000, "Test Operation 2 - bla bla bla")
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Info().Interface("output", output_).Msg("Output")
+	log.Info().Interface("journal", journal_).Msg("Journal")
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output_.Error, "Expected no error, but got one")
+	assert.Equal(t, output_.Data.Total, journal_.Total+2000000-operation_1.Amount-operation_2.Amount, "Expected total to be %d, but got %d", journal_.Total+1000000-operation_1.Amount-operation_2.Amount, output_.Data.Total)
+	assert.Equal(t, output_.Data.Operations[1].Amount, uint32(1000000), "Expected amount to be %d, but got %d", 1000000, output_.Data.Operations[1].Amount)
+	assert.Equal(t, output_.Data.Operations[1].Description, "Test Operation 2 - bla bla bla", "Expected description to be %s, but got %s", "Test Operation 2 + bla bla bla", output_.Data.Operations[1].Description)
+}
+
+func TestDeleteOperation(t *testing.T) {
+	ChangeLogging()
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branchID := branches[0].BranchID
+
+	journals := getJournals(t, client, branchID, 1, 10)
+	journal := getFirstOpenJournal(t, journals)
+
+	resp, output_, err := client.DeleteOperation(journal.ID.Hex(), journal.Operations[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
+	assert.Nil(t, output_.Error, "Expected no error, but got one")
+	assert.Equal(t, output_.Data.Total, journal.Total-journal.Operations[0].Amount, "Expected total to be %d, but got %d", journal.Total-journal.Operations[0].Amount, output_.Data.Total)
+	assert.Equal(t, len(output_.Data.Operations), len(journal.Operations)-1, "Expected operations to be %d, but got %d", len(journal.Operations)-1, len(output_.Data.Operations))
 }
 
 func TestCloseJournal(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branchID := branches[0].BranchID
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// get all branches
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
-
-	branchID := output.Data[0].BranchID
-
-	// get journals
-	resp, journals_output, err := client.QueryJournalEntries(branchID, models.JournalQueryParams{
-		Page:     1,
-		PageSize: 10,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, journals_output.Error, "Expected no error, but got one")
-
-	// find first open journal
-
-	journal := models.Journal{}
-	log.Info().Interface("journals", journals_output.Data[0].ID.Hex()).Msg("Journals")
-	for _, journal_ := range journals_output.Data {
-		if !journal_.Shift_is_closed {
-			journal = journal_
-			break
-		}
-	}
+	journals := getJournals(t, client, branchID, 1, 10)
+	journal := getFirstOpenJournal(t, journals)
+	log.Info().Interface("journals", journal.ID.Hex()).Msg("Journals")
 	log.Info().Interface("journal chosen", journal).Msg("Journal")
 
 	input := models.CloseJournalEntryInput{
@@ -836,7 +554,6 @@ func TestCloseJournal(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
 	assert.Nil(t, output_.Error, "Expected no error, but got one")
 
-	// fetch this journal now
 	resp, output_2, err := client.GetJournalByID(journal.ID.Hex())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get journal")
@@ -851,43 +568,13 @@ func TestCloseJournal(t *testing.T) {
 }
 
 func TestReOpenJournal(t *testing.T) {
-	configs, err := configs.LoadConfig("../../")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ChangeLogging()
+	client := getClient(t)
+	branches := getAllBranches(t, client)
+	branchID := branches[0].BranchID
 
-	client := client.NewClient("localhost", configs.Server.Port, "admin", "admin")
-
-	// get all branches
-	resp, output, err := client.GetAllBranches()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, output.Error, "Expected no error, but got one")
-
-	branchID := output.Data[0].BranchID
-
-	// get journals
-	resp, journals_output, err := client.QueryJournalEntries(branchID, models.JournalQueryParams{
-		Page:     1,
-		PageSize: 10,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
-	assert.Nil(t, journals_output.Error, "Expected no error, but got one")
-
-	// find first closed journal
-	journal := models.Journal{}
-	for _, journal_ := range journals_output.Data {
-		if journal_.Shift_is_closed {
-			journal = journal_
-			break
-		}
-	}
+	journals := getJournals(t, client, branchID, 1, 10)
+	journal := getFirstClosedJournal(t, journals)
 	log.Info().Interface("journal chosen", journal.ID.Hex()).Msg("Journal")
 
 	resp, output_, err := client.ReOpenJournal(journal.ID.Hex())
@@ -898,7 +585,6 @@ func TestReOpenJournal(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
 	assert.Nil(t, output_.Error, "Expected no error, but got one")
 
-	// fetch this journal now
 	resp, output_2, err := client.GetJournalByID(journal.ID.Hex())
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get journal")
@@ -907,7 +593,6 @@ func TestReOpenJournal(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode, "Expected status code 200, but got %d", resp.StatusCode)
 	assert.Nil(t, output_2.Error, "Expected no error, but got one")
 	assert.Equal(t, false, output_2.Data.Shift_is_closed, "Expected shift to be open, but got %t", output_2.Data.Shift_is_closed)
-	// assert.Equal(t, output_2.Data.Total, journal.Total)
 	assert.Equal(t, uint32(0), output_2.Data.Cash_left)
 	assert.Equal(t, uint32(0), output_2.Data.Terminal_income)
 }
