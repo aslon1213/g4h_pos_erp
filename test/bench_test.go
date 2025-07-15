@@ -72,7 +72,7 @@ func BenchmarkSessionOperations(b *testing.B) {
 
 	// get session
 	log.Debug().Str("sessionID", session.ID).Msg("Getting session details")
-	session, err = client.GerSalesSession(session.ID)
+	_, err = client.GerSalesSession(session.ID)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get session")
 		b.Fatal(err)
