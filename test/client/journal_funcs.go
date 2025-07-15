@@ -20,8 +20,18 @@ func (c *Client) ParseJournalOutputSingle(resp *http.Response) models.JournalOut
 	err = json.Unmarshal(body, &output)
 	if err != nil {
 
+		var output_ struct {
+			Data  []models.Journal `json:"data"`
+			Error []models.Error   `json:"error"`
+		}
+		err = json.Unmarshal(body, &output_)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed to parse journal output")
+			return models.JournalOutput{}
+		}
+		output.Error = output_.Error
 		log.Error().Err(err).Str("body", string(body)).Msg("Failed to parse journal output")
-		return models.JournalOutput{}
+		return output
 	}
 	return output
 }
@@ -157,6 +167,44 @@ func (c *Client) NewJournalOperation(journal_id string, operation models.Journal
 			"Content-Type": "application/json",
 		},
 		false,
+	)
+	if err != nil {
+		return nil, models.JournalOutput{}, err
+	}
+	return resp, c.ParseJournalOutputSingle(resp), nil
+}
+
+func (c *Client) UpdateOperation(journal_id string, operation_id string, amount int, description string) (*http.Response, models.JournalOutput, error) {
+
+	endpoint := fmt.Sprintf("/api/journals/%s/operations/%s?amount=%d&description=%s", journal_id, operation_id, amount, description)
+
+	resp, err := c.MakeRequest(
+		"PUT",
+		endpoint,
+		nil,
+		map[string]string{
+			"Content-Type": "application/json",
+		},
+		true,
+	)
+	if err != nil {
+		return nil, models.JournalOutput{}, err
+	}
+	return resp, c.ParseJournalOutputSingle(resp), nil
+}
+
+func (c *Client) DeleteOperation(journal_id string, operation_id string) (*http.Response, models.JournalOutput, error) {
+
+	endpoint := fmt.Sprintf("/api/journals/%s/operations/%s", journal_id, operation_id)
+
+	resp, err := c.MakeRequest(
+		"DELETE",
+		endpoint,
+		nil,
+		map[string]string{
+			"Content-Type": "application/json",
+		},
+		true,
 	)
 	if err != nil {
 		return nil, models.JournalOutput{}, err
