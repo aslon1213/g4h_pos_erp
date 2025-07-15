@@ -591,7 +591,7 @@ func FetchJournalByID(ctx context.Context, c *fiber.Ctx, fetchTransactions bool,
 		return nil, err
 	}
 
-	log.Debug().Interface("results", results).Msg("Successfully fetched journal by ID")
+	log.Debug().Msg("Successfully fetched journal by ID")
 	if len(results) == 0 {
 		log.Error().Msg("No journal found")
 		return nil, errors.New("no journal found")
