@@ -27,6 +27,8 @@ services:
       context: ..
       dockerfile: build/Dockerfile
     container_name: api
+    env_file:
+      - .env
     ports:
       - "12000:12000"
     # depends_on:
@@ -42,7 +44,7 @@ services:
     environment:
       - ENVIRONMENT=PRODUCTION
     labels:
-      caddy: api.g4h.uz
+      caddy: ${CADDY_DOMAIN}
       caddy.reverse_proxy: "http://api:12000"
 networks:
   mongoCluster:

@@ -54,6 +54,8 @@ jobs:
         with:
           context: .
           file: ./build/Dockerfile
+          labels: |
+            org.opencontainers.image.source="https://github.com/${{ github.repository }}"
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.ref_name }}
