@@ -78,8 +78,8 @@ type Transaction struct {
 	TransactionBase
 	Type      InitiatorType `json:"type" bson:"type"`
 	ID        string        `json:"id" bson:"_id"`
-	CreatedAt time.Time     `json:"date" bson:"created_at"`
-	UpdatedAt time.Time     `json:"date" bson:"updated_at"`
+	CreatedAt time.Time     `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at" bson:"updated_at"`
 	BranchID  string        `json:"branch_id" bson:"branch_id"`
 }
 
