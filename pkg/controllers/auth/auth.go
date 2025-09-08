@@ -141,7 +141,6 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	payload, err := pasetoware.NewPayload(
 		encryptedToken,
 		time.Duration(config.Server.TokenExpiryHours)*time.Hour,
-	)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create payload")
 
