@@ -85,6 +85,11 @@ func (a *AuthControllers) InfoMe(c *fiber.Ctx) error {
 func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	var user_to_check LoginInput
 
+	config, err := configs.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to load config")
+	}
+
 	if err := c.BodyParser(&user_to_check); err != nil {
 		log.Error().Err(err).Msg("Failed to parse request body")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -103,7 +108,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 
 	// check in the database if the user exists
 	user_db := models.User{}
-	err := a.UserCollection.FindOne(c.Context(), bson.M{"username": user_to_check.Username}).Decode(&user_db)
+	err = a.UserCollection.FindOne(c.Context(), bson.M{"username": user_to_check.Username}).Decode(&user_db)
 
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to find user")
@@ -132,10 +137,10 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+
 	payload, err := pasetoware.NewPayload(
 		encryptedToken,
-		48*time.Hour,
-	)
+		time.Duration(config.Server.TokenExpiryHours)*time.Hour,
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create payload")
 
