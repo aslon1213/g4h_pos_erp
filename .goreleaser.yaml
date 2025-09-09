@@ -45,18 +45,26 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-kos:
-  - repositories: [ghcr.io/aslon1213/mag-test]
-    tags:
-      - "{{.Version}}"
-      - latest
-    bare: true
-    preserve_import_paths: false
-    platforms:
-      - linux/amd64
-      - linux/arm64
-      - darwin/amd64
-      - darwin/arm64
+
+##########################
+##########################
+########################## # Disabled temporarily
+# kos:
+#   - repositories: [ghcr.io/aslon1213/mag-test]
+#     tags:
+#       - "{{.Version}}"
+#       - latest
+#     bare: true
+#     preserve_import_paths: false
+#     platforms:
+#       - linux/amd64
+#       - linux/arm64
+#       - darwin/amd64
+#       - darwin/arm64
+##########################
+##########################
+##########################
+
 release:
   footer: >-
 
