@@ -3,10 +3,10 @@ package products
 import (
 	"context"
 
-	"github.com/aslon1213/go-pos-erp/pkg/controllers/suppliers"
-	"github.com/aslon1213/go-pos-erp/pkg/middleware"
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
-	"github.com/aslon1213/go-pos-erp/platform/database"
+	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/suppliers"
+	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
+	"github.com/aslon1213/g4h_pos_erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"

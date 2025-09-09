@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aslon1213/go-pos-erp/pkg/app"
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
-	"github.com/aslon1213/go-pos-erp/pkg/utils"
-	"github.com/aslon1213/go-pos-erp/test/client"
+	"github.com/aslon1213/g4h_pos_erp/pkg/app"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
+	"github.com/aslon1213/g4h_pos_erp/pkg/utils"
+	"github.com/aslon1213/g4h_pos_erp/test/client"
 	"go.mongodb.org/mongo-driver/bson"
 
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

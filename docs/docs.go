@@ -11,7 +11,7 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "API Support",
-            "url": "https://github.com/aslon1213/go-pos-erp",
+            "url": "https://github.com/aslon1213/g4h_pos_erp",
             "email": "hamidovaslon13@gmail.com"
         },
         "version": "{{.Version}}"
@@ -3595,7 +3595,7 @@ const docTemplate = `{
                 "branch_id": {
                     "type": "string"
                 },
-                "date": {
+                "created_at": {
                     "type": "string"
                 },
                 "description": {
@@ -3609,6 +3609,9 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/models.InitiatorType"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

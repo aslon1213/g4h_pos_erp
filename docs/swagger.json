@@ -5,7 +5,7 @@
         "title": "Magazin ERP/POS API",
         "contact": {
             "name": "API Support",
-            "url": "https://github.com/aslon1213/go-pos-erp",
+            "url": "https://github.com/aslon1213/g4h_pos_erp",
             "email": "hamidovaslon13@gmail.com"
         },
         "version": "1.0"
@@ -3587,7 +3587,7 @@
                 "branch_id": {
                     "type": "string"
                 },
-                "date": {
+                "created_at": {
                     "type": "string"
                 },
                 "description": {
@@ -3601,6 +3601,9 @@
                 },
                 "type": {
                     "$ref": "#/definitions/models.InitiatorType"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

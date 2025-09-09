@@ -1,9 +1,9 @@
-# Go POS ERP System
+# Magazin POS/ERP (Go)
 
-[![Release](https://img.shields.io/github/v/release/aslon1213/g4h_pos_erp?style=flat-square)](https://github.com/aslon1213/g4h_pos_erp/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/g4h_pos_erp/release.yaml?style=flat-square)](https://github.com/aslon1213/g4h_pos_erp/actions/workflows/release.yaml)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/g4h_pos_erp?style=flat-square)](https://golang.org/)
-[![License](https://img.shields.io/github/license/aslon1213/g4h_pos_erp?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/aslon1213/g4h_post_erp?style=flat-square)](https://github.com/aslon1213/g4h_post_erp/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/g4h_post_erp/release.yaml?style=flat-square)](https://github.com/aslon1213/g4h_post_erp/actions/workflows/release.yaml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/g4h_post_erp?style=flat-square)](https://golang.org/)
+[![License](https://img.shields.io/github/license/aslon1213/g4h_post_erp?style=flat-square)](LICENSE)
 
 A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built with Go, designed for retail businesses and stores.
 
@@ -27,7 +27,7 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 - **Database**: MongoDB
 - **Cache**: Redis
 - **Documentation**: Swagger/OpenAPI
-- **Authentication**: JWT/BasicAuthc
+- **Authentication**: JWT/BasicAuth
 - **Observability**: OpenTelemetry
 - **Logging**: Zerolog
 - **Configuration**: Viper (YAML-based)
@@ -46,19 +46,38 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/aslon1213/g4h_pos_erp.git
-   cd g4h_pos_erp
+   git clone https://github.com/aslon1213/g4h_post_erp.git
+   cd g4h_post_erp
    ```
 
-2. **Start the services**
+2. **Prepare configuration**
 
    ```bash
-   docker-compose -f deployments/docker-compose.yml up -d
+   cp example.config.yaml config.yaml
+   # Edit config.yaml to match your MongoDB/Redis/S3 settings
    ```
 
-3. **Run the application**
+3. **Create required docker networks (first run only)**
+
    ```bash
-   go run cmd/main.go
+   docker network create mongoCluster || true
+   docker network create caddy || true
+   ```
+
+4. **Start optional infrastructure (reverse proxy, redis UI)**
+
+   ```bash
+   # Caddy (for domain/HTTPS via labels). Optional for local use
+   docker compose -f deploy/docker-compose-caddy.yaml up -d
+
+   # Redis (redis-stack with UI). Optional
+   docker compose -f deploy/docker-compose-db.yml up -d
+   ```
+
+5. **Start the backend**
+
+   ```bash
+   docker compose -f deploy/docker-compose.yml up -d --build
    ```
 
 ### Manual Setup
@@ -71,11 +90,7 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 
 2. **Setup MongoDB**
 
-   ```bash
-   # Use the provided MongoDB setup script
-   chmod +x deploy/mongo.sh
-   ./deploy/mongo.sh
-   ```
+   - Use an existing MongoDB replica set, or update `config.yaml` to point to your MongoDB URL. Ensure `replica_set` aligns with your cluster if replication is enabled.
 
 3. **Configure the application**
 
@@ -121,8 +136,10 @@ server:
 Once the application is running, access the Swagger documentation at:
 
 ```
-http://localhost:12000/swagger/
+http://localhost:12000/docs/index.html
 ```
+
+Note: Access to `/docs` is protected with BasicAuth. Default credentials are configured in `config.yaml` under `server.admin_docs_users`.
 
 The API provides endpoints for:
 
@@ -159,7 +176,7 @@ The API provides endpoints for:
 │   ├── utils/                      # Utility functions
 │   └── configs/                    # Configuration management
 ├── docs/                           # API documentation
-├── deploy/                         # Deployment configurations - docker-compose.yml
+├── deploy/                         # Deployment configurations - docker-compose*.yml
 ├── test/                           # Test files
 ├── web/                            # Frontend assets (if any)
 └── scripts/                        # Build and deployment scripts
@@ -192,14 +209,14 @@ swag init -g app/app.go --dir pkg
 The project includes Docker Compose configuration for easy deployment:
 
 ```bash
-# Start all services
-docker-compose -f deployments/docker-compose.yml up -d
+# Start backend
+docker compose -f deploy/docker-compose.yml up
 
 # View logs
-docker-compose -f deployments/docker-compose.yml logs -f
+docker compose -f deploy/docker-compose.yml logs -f
 
 # Stop services
-docker-compose -f deployments/docker-compose.yml down
+docker compose -f deploy/docker-compose.yml down
 ```
 
 ## 📦 Releases & CI/CD
@@ -248,7 +265,7 @@ go build -o bin/pos-erp cmd/main.go
 
 ### Download Latest Release
 
-Visit the [Releases page](https://github.com/aslon1213/g4h_pos_erp/releases) to download pre-built binaries for your platform.
+Visit the [Releases page](https://github.com/aslon1213/g4h_post_erp/releases) to download pre-built binaries for your platform.
 
 ## 🤝 Contributing
 
@@ -263,8 +280,8 @@ Visit the [Releases page](https://github.com/aslon1213/g4h_pos_erp/releases) to 
 For support and questions:
 
 - Create an issue in the GitHub repository
-- Contact: support@swagger.io
+- Contact: hamidovaslon13@gmail.com
 
 ## 🚧 Development Status
 
-This project is actively maintained and under development. Please check the [issues](https://github.com/aslon1213/g4h_pos_erp/issues) for current development status and upcoming features.
+This project is actively maintained and under development. Please check the [issues](https://github.com/aslon1213/g4h_post_erp/issues) for current development status and upcoming features.

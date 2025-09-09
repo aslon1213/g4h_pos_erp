@@ -5,10 +5,10 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
-	"github.com/aslon1213/go-pos-erp/platform/cache"
-	"github.com/aslon1213/go-pos-erp/platform/database"
-	"github.com/aslon1213/go-pos-erp/platform/logger"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
+	"github.com/aslon1213/g4h_pos_erp/platform/cache"
+	"github.com/aslon1213/g4h_pos_erp/platform/database"
+	"github.com/aslon1213/g4h_pos_erp/platform/logger"
 
 	"github.com/gofiber/contrib/otelfiber"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -20,7 +20,7 @@ import (
 	"github.com/rs/zerolog"
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
-	_ "github.com/aslon1213/go-pos-erp/docs"
+	_ "github.com/aslon1213/g4h_pos_erp/docs"
 	"github.com/go-playground/validator/v10"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -34,7 +34,7 @@ import (
 // @version 1.0
 // @description This is a ERP/POS API for Magazin.
 // @contact.name API Support
-// @contact.url https://github.com/aslon1213/go-pos-erp
+// @contact.url https://github.com/aslon1213/g4h_pos_erp
 // @contact.email hamidovaslon13@gmail.com
 // @securityDefinitions.apikey BearerAuth
 // @in header

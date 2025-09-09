@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
-	"github.com/aslon1213/go-pos-erp/pkg/middleware"
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
+	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"

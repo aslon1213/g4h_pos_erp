@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/url"
 
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
 
-	"github.com/aslon1213/go-pos-erp/pkg/middleware"
+	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"

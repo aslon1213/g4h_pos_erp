@@ -1,6 +1,6 @@
 package main
 
-import "github.com/aslon1213/go-pos-erp/pkg/app"
+import "github.com/aslon1213/g4h_pos_erp/pkg/app"
 
 // @title Swagger Example API
 // @version 1.0

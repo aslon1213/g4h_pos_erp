@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
 )
 
 type SessionResponse struct {
