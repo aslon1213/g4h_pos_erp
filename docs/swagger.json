@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a ERP/POS API for Magazin.",
-        "title": "Magazin ERP/POS API",
+        "description": "This is a ERP/POS API for G4H.",
+        "title": "G4H ERP/POS API",
         "contact": {
             "name": "API Support",
             "url": "https://github.com/aslon1213/g4h_pos_erp",
