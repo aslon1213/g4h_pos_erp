@@ -5,7 +5,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/aslon1213/go-pos-erp/pkg/utils"
+	"github.com/aslon1213/g4h_pos_erp/pkg/utils"
 
 	"github.com/google/uuid"
 )

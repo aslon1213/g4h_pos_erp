@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 
 	"github.com/go-redis/redis"
 	"github.com/rs/zerolog/log"

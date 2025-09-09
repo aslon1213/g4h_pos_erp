@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"mime/multipart"
 
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/rs/zerolog/log"

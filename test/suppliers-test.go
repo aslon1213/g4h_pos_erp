@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aslon1213/go-pos-erp/pkg/app"
+	"github.com/aslon1213/g4h_pos_erp/pkg/app"
 )
 
 func StartTest(m *testing.M) {

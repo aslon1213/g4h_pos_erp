@@ -3,9 +3,9 @@ package products
 import (
 	"fmt"
 
-	"github.com/aslon1213/go-pos-erp/pkg/middleware"
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
-	s3provider "github.com/aslon1213/go-pos-erp/platform/s3"
+	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
+	s3provider "github.com/aslon1213/g4h_pos_erp/platform/s3"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"

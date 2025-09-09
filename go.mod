@@ -1,4 +1,4 @@
-module github.com/aslon1213/go-pos-erp
+module github.com/aslon1213/g4h_pos_erp
 
 go 1.24.3
 

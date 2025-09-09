@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aslon1213/go-pos-erp/pkg/controllers/sales"
-	"github.com/aslon1213/go-pos-erp/pkg/middleware"
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
-	"github.com/aslon1213/go-pos-erp/pkg/utils"
-	"github.com/aslon1213/go-pos-erp/platform/cache"
-	"github.com/aslon1213/go-pos-erp/platform/database"
+	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/sales"
+	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
+	"github.com/aslon1213/g4h_pos_erp/pkg/utils"
+	"github.com/aslon1213/g4h_pos_erp/platform/cache"
+	"github.com/aslon1213/g4h_pos_erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"

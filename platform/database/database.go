@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/mongo"

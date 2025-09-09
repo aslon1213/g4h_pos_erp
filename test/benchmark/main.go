@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aslon1213/go-pos-erp/pkg/app"
-	"github.com/aslon1213/go-pos-erp/pkg/configs"
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
-	"github.com/aslon1213/go-pos-erp/test/client"
+	"github.com/aslon1213/g4h_pos_erp/pkg/app"
+	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
+	"github.com/aslon1213/g4h_pos_erp/test/client"
 	"github.com/rs/zerolog/log"
 )
 

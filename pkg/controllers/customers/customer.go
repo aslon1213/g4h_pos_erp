@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	models "github.com/aslon1213/go-pos-erp/pkg/repository"
-	"github.com/aslon1213/go-pos-erp/platform/cache"
+	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
+	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
