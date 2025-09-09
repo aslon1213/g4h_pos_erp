@@ -131,7 +131,7 @@ func NewFiberApp() *fiber.App {
 				config.Server.AdminDocsUsers[0].Username: config.Server.AdminDocsUsers[0].Password,
 				config.Server.AdminDocsUsers[1].Username: config.Server.AdminDocsUsers[1].Password,
 			},
-			Realm: "Restricted",
+			Realm: "Restricted", // hello world
 		}),
 	)
 
