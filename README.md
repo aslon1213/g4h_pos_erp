@@ -1,9 +1,9 @@
 # Go POS ERP System
 
-[![Release](https://img.shields.io/github/v/release/aslon1213/go-pos-erp?style=flat-square)](https://github.com/aslon1213/go-pos-erp/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/go-pos-erp/release.yaml?style=flat-square)](https://github.com/aslon1213/go-pos-erp/actions/workflows/release.yaml)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/go-pos-erp?style=flat-square)](https://golang.org/)
-[![License](https://img.shields.io/github/license/aslon1213/go-pos-erp?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/aslon1213/g4h_pos_erp?style=flat-square)](https://github.com/aslon1213/g4h_pos_erp/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/g4h_pos_erp/release.yaml?style=flat-square)](https://github.com/aslon1213/g4h_pos_erp/actions/workflows/release.yaml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/g4h_pos_erp?style=flat-square)](https://golang.org/)
+[![License](https://img.shields.io/github/license/aslon1213/g4h_pos_erp?style=flat-square)](LICENSE)
 
 A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built with Go, designed for retail businesses and stores.
 
@@ -44,12 +44,14 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 ### Using Docker Compose (Recommended)
 
 1. **Clone the repository**
+
    ```bash
-   git clone https://github.com/aslon1213/go-pos-erp.git
-   cd go-pos-erp
+   git clone https://github.com/aslon1213/g4h_pos_erp.git
+   cd g4h_pos_erp
    ```
 
 2. **Start the services**
+
    ```bash
    docker-compose -f deployments/docker-compose.yml up -d
    ```
@@ -62,11 +64,13 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 ### Manual Setup
 
 1. **Install dependencies**
+
    ```bash
    go mod download
    ```
 
 2. **Setup MongoDB**
+
    ```bash
    # Use the provided MongoDB setup script
    chmod +x deploy/mongo.sh
@@ -74,6 +78,7 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
    ```
 
 3. **Configure the application**
+
    ```bash
    cp example.config.yaml config.yaml
    # Edit config.yaml with your database and Redis settings
@@ -114,11 +119,13 @@ server:
 ## 📖 API Documentation
 
 Once the application is running, access the Swagger documentation at:
+
 ```
 http://localhost:12000/swagger/
 ```
 
 The API provides endpoints for:
+
 - `/sales` - Sales transactions
 - `/products` - Product management
 - `/customers` - Customer management
@@ -131,11 +138,12 @@ The API provides endpoints for:
 ## 🔧 Development
 
 ### Project Structure
+
 ```
 .
-├── cmd/                            # Application entry points - main.go    
+├── cmd/                            # Application entry points - main.go
 ├── pkg/                            # Application packages
-│   ├── app/                        # Main application logic 
+│   ├── app/                        # Main application logic
 │   ├── controllers/                # Business logic controllers
 │   │   ├── customers/              # Customer management
 │   │   ├── finance/                # Financial operations
@@ -156,6 +164,7 @@ The API provides endpoints for:
 ├── web/                            # Frontend assets (if any)
 └── scripts/                        # Build and deployment scripts
 ```
+
 ### Building the Application
 
 ```bash
@@ -207,6 +216,7 @@ This project uses GitHub Actions with [GoReleaser](https://goreleaser.com/) for 
 ### Release Workflow
 
 1. **Create and push a tag**:
+
    ```bash
    git tag v1.0.0
    git push origin v1.0.0
@@ -220,15 +230,15 @@ This project uses GitHub Actions with [GoReleaser](https://goreleaser.com/) for 
 
 ### Build Platforms
 
-| OS | Architecture | Status |
-|---|---|---|
-| Linux | amd64, arm64 | ✅ Supported |
-| macOS | amd64, arm64 | ✅ Supported |
-| Windows | amd64 | ✅ Supported |
+| OS      | Architecture | Status       |
+| ------- | ------------ | ------------ |
+| Linux   | amd64, arm64 | ✅ Supported |
+| macOS   | amd64, arm64 | ✅ Supported |
+| Windows | amd64        | ✅ Supported |
 
 ### Local Development Build
 
-```bash 
+```bash
 # Build snapshot for testing (without releasing)
 goreleaser build --snapshot --clean
 
@@ -238,8 +248,7 @@ go build -o bin/pos-erp cmd/main.go
 
 ### Download Latest Release
 
-Visit the [Releases page](https://github.com/aslon1213/go-pos-erp/releases) to download pre-built binaries for your platform.
-
+Visit the [Releases page](https://github.com/aslon1213/g4h_pos_erp/releases) to download pre-built binaries for your platform.
 
 ## 🤝 Contributing
 
@@ -252,9 +261,10 @@ Visit the [Releases page](https://github.com/aslon1213/go-pos-erp/releases) to d
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue in the GitHub repository
 - Contact: support@swagger.io
 
 ## 🚧 Development Status
 
-This project is actively maintained and under development. Please check the [issues](https://github.com/aslon1213/go-pos-erp/issues) for current development status and upcoming features.
+This project is actively maintained and under development. Please check the [issues](https://github.com/aslon1213/g4h_pos_erp/issues) for current development status and upcoming features.
