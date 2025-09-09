@@ -6,8 +6,8 @@ definitions:
       username:
         type: string
     required:
-      - password
-      - username
+    - password
+    - username
     type: object
   models.BNPL:
     properties:
@@ -23,12 +23,12 @@ definitions:
         type: integer
       products:
         additionalProperties:
-          $ref: "#/definitions/models.SalesSessionItem"
+          $ref: '#/definitions/models.SalesSessionItem'
         description: products in the BNPL
         type: object
       status:
         allOf:
-          - $ref: "#/definitions/models.BNPLStatus"
+        - $ref: '#/definitions/models.BNPLStatus'
         description: active, completed, cancelled
       total_amount:
         type: integer
@@ -42,14 +42,14 @@ definitions:
     type: object
   models.BNPLStatus:
     enum:
-      - active
-      - completed
-      - cancelled
+    - active
+    - completed
+    - cancelled
     type: string
     x-enum-varnames:
-      - BNPLStatusActive
-      - BNPLStatusCompleted
-      - BNPLStatusCancelled
+    - BNPLStatusActive
+    - BNPLStatusCompleted
+    - BNPLStatusCancelled
   models.Branch:
     properties:
       id:
@@ -91,28 +91,28 @@ definitions:
     type: object
   models.InitiatorType:
     enum:
-      - salary
-      - rent
-      - utilities
-      - other
-      - sale
-      - supplier
-      - bnpl
+    - salary
+    - rent
+    - utilities
+    - other
+    - sale
+    - supplier
+    - bnpl
     type: string
     x-enum-comments:
       InitiatorTypeBNPL: buy now pay later BNPL transactions
     x-enum-varnames:
-      - InitiatorTypeSalary
-      - InitiatorTypeRent
-      - InitiatorTypeUtilities
-      - InitiatorTypeOther
-      - InitiatorTypeSales
-      - InitiatorTypeSupplier
-      - InitiatorTypeBNPL
+    - InitiatorTypeSalary
+    - InitiatorTypeRent
+    - InitiatorTypeUtilities
+    - InitiatorTypeOther
+    - InitiatorTypeSales
+    - InitiatorTypeSupplier
+    - InitiatorTypeBNPL
   models.Journal:
     properties:
       branch:
-        $ref: "#/definitions/models.Branch"
+        $ref: '#/definitions/models.Branch'
       cash_left:
         type: integer
       date:
@@ -121,7 +121,7 @@ definitions:
         type: string
       operations:
         items:
-          $ref: "#/definitions/models.Transaction"
+          $ref: '#/definitions/models.Transaction'
         type: array
       shift_is_closed:
         type: boolean
@@ -137,13 +137,13 @@ definitions:
       description:
         type: string
       payment_method:
-        $ref: "#/definitions/models.PaymentMethod"
+        $ref: '#/definitions/models.PaymentMethod'
       supplier_id:
         type: string
       supplier_transaction:
         type: boolean
       type:
-        $ref: "#/definitions/models.TransactionType"
+        $ref: '#/definitions/models.TransactionType'
     type: object
   models.ManufacturerInfo:
     properties:
@@ -173,7 +173,7 @@ definitions:
         type: string
       products:
         additionalProperties:
-          $ref: "#/definitions/models.SalesSessionItem"
+          $ref: '#/definitions/models.SalesSessionItem'
         type: object
       total_amount:
         type: integer
@@ -196,27 +196,27 @@ definitions:
       data: {}
       error:
         items:
-          $ref: "#/definitions/models.Error"
+          $ref: '#/definitions/models.Error'
         type: array
     type: object
   models.PaymentMethod:
     enum:
-      - cash
-      - bank
-      - terminal
-      - online_payment
-      - cheque
-      - online_transfer
-      - undefined
+    - cash
+    - bank
+    - terminal
+    - online_payment
+    - cheque
+    - online_transfer
+    - undefined
     type: string
     x-enum-varnames:
-      - PaymentMethodCash
-      - PaymentMethodBank
-      - PaymentMethodTerminal
-      - OnlineMobileAppPayment
-      - Cheque
-      - OnlineTransfer
-      - PaymentMethodUndefined
+    - PaymentMethodCash
+    - PaymentMethodBank
+    - PaymentMethodTerminal
+    - OnlineMobileAppPayment
+    - Cheque
+    - OnlineTransfer
+    - PaymentMethodUndefined
   models.ProductBase:
     properties:
       category:
@@ -229,7 +229,7 @@ definitions:
         type: string
       manufacturer:
         allOf:
-          - $ref: "#/definitions/models.ManufacturerInfo"
+        - $ref: '#/definitions/models.ManufacturerInfo'
         description: Manufacturer details
       minimum_stock_alert:
         description: Minimum stock alert
@@ -248,20 +248,20 @@ definitions:
         type: string
       place_type:
         allOf:
-          - $ref: "#/definitions/models.ProductPlaceType"
+        - $ref: '#/definitions/models.ProductPlaceType'
         description: Type of storage location
     type: object
   models.ProductPlaceType:
     enum:
-      - branch
-      - warehouse
+    - branch
+    - warehouse
     type: string
     x-enum-comments:
       ProductPlaceTypeBranch: Store branch location
       ProductPlaceTypeWarehouse: Central warehouse location
     x-enum-varnames:
-      - ProductPlaceTypeBranch
-      - ProductPlaceTypeWarehouse
+    - ProductPlaceTypeBranch
+    - ProductPlaceTypeWarehouse
   models.SalesSessionItem:
     properties:
       price:
@@ -299,9 +299,9 @@ definitions:
       id:
         type: string
       payment_method:
-        $ref: "#/definitions/models.PaymentMethod"
+        $ref: '#/definitions/models.PaymentMethod'
       type:
-        $ref: "#/definitions/models.InitiatorType"
+        $ref: '#/definitions/models.InitiatorType'
       updated_at:
         type: string
     type: object
@@ -312,45 +312,43 @@ definitions:
       description:
         type: string
       payment_method:
-        $ref: "#/definitions/models.PaymentMethod"
+        $ref: '#/definitions/models.PaymentMethod'
       type:
-        $ref: "#/definitions/models.TransactionType"
+        $ref: '#/definitions/models.TransactionType'
     type: object
   models.TransactionOutput:
     properties:
       data:
         items:
-          $ref: "#/definitions/models.Transaction"
+          $ref: '#/definitions/models.Transaction'
         type: array
       error:
         items:
-          $ref: "#/definitions/models.Error"
+          $ref: '#/definitions/models.Error'
         type: array
     type: object
   models.TransactionOutputSingle:
     properties:
       data:
-        $ref: "#/definitions/models.Transaction"
+        $ref: '#/definitions/models.Transaction'
       error:
         items:
-          $ref: "#/definitions/models.Error"
+          $ref: '#/definitions/models.Error'
         type: array
     type: object
   models.TransactionType:
     enum:
-      - credit
-      - debit
+    - credit
+    - debit
     type: string
     x-enum-comments:
-      TransactionTypeCredit:
-        credit means - income - when money is gained or received
+      TransactionTypeCredit: credit means - income - when money is gained or received
         into an account
-      TransactionTypeDebit:
-        debit means - outcome - when money is lost, spent, or
+      TransactionTypeDebit: debit means - outcome - when money is lost, spent, or
         withdrawn from an account
     x-enum-varnames:
-      - TransactionTypeCredit
-      - TransactionTypeDebit
+    - TransactionTypeCredit
+    - TransactionTypeDebit
   models.User:
     properties:
       branch:
@@ -386,7 +384,7 @@ definitions:
         type: string
       uploaded_to:
         allOf:
-          - $ref: "#/definitions/models.ProductPlace"
+        - $ref: '#/definitions/models.ProductPlace'
         description: Place where the product was uploaded to
     type: object
   sales.AddProductItemToSessionInput:
@@ -401,59 +399,59 @@ info:
     email: hamidovaslon13@gmail.com
     name: API Support
     url: https://github.com/aslon1213/g4h_pos_erp
-  description: This is a ERP/POS API for Magazin.
-  title: Magazin ERP/POS API
+  description: This is a ERP/POS API for G4H.
+  title: G4H ERP/POS API
   version: "1.0"
 paths:
   /api/activities/me:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get the 25 most recent activities for the authenticated user
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get activities of current user
       tags:
-        - auth
+      - auth
   /api/activities/recent:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get the 25 most recent activities across all users
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get recent activities
       tags:
-        - auth
+      - auth
   /api/auth/me:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get user info
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: message
@@ -466,55 +464,55 @@ paths:
           schema:
             type: string
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get user info
       tags:
-        - auth
+      - auth
   /api/bnpl:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new Buy Now Pay Later transaction
       parameters:
-        - description: BNPL input
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/models.NewBNPLInput"
+      - description: BNPL input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewBNPLInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create new BNPL
       tags:
-        - BNPL
+      - BNPL
   /api/bnpl/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete an existing BNPL transaction
       parameters:
-        - description: BNPL ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: BNPL ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -525,992 +523,992 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete BNPL
       tags:
-        - BNPL
+      - BNPL
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get details of a specific BNPL transaction
       parameters:
-        - description: BNPL ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: BNPL ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get BNPL details
       tags:
-        - BNPL
+      - BNPL
   /api/bnpl/{id}/credit:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Add a credit payment to an existing BNPL
       parameters:
-        - description: BNPL ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Payment amount
-          in: query
-          name: amount
-          required: true
-          type: integer
-        - default: cash
-          description: Payment method
-          in: query
-          name: payment_method
-          type: string
+      - description: BNPL ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payment amount
+        in: query
+        name: amount
+        required: true
+        type: integer
+      - default: cash
+        description: Payment method
+        in: query
+        name: payment_method
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.BNPL"
+            $ref: '#/definitions/models.BNPL'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Credit BNPL payment
       tags:
-        - BNPL
+      - BNPL
   /api/branches/{branch_id}/bnpls:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get all BNPL transactions for a specific branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Customer name
-          in: query
-          name: customer_name
-          type: string
-        - description: Customer phone
-          in: query
-          name: customer_phone
-          type: string
-        - description: Customer address
-          in: query
-          name: customer_address
-          type: string
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Customer name
+        in: query
+        name: customer_name
+        type: string
+      - description: Customer phone
+        in: query
+        name: customer_phone
+        type: string
+      - description: Customer address
+        in: query
+        name: customer_address
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get BNPLs of branch
       tags:
-        - BNPL
+      - BNPL
   /api/customers:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get all customers from the database
       parameters:
-        - description: Customer name
-          in: query
-          name: name
-          type: string
-        - description: Customer phone
-          in: query
-          name: phone
-          type: string
-        - description: Customer address
-          in: query
-          name: address
-          type: string
-        - description: Page number
-          in: query
-          name: page
-          type: integer
-        - description: Number of customers per page
-          in: query
-          name: count
-          type: integer
-        - description: Sort by BNPL total (max, min, none)
-          in: query
-          name: sort_by_bnpl_total
-          type: string
+      - description: Customer name
+        in: query
+        name: name
+        type: string
+      - description: Customer phone
+        in: query
+        name: phone
+        type: string
+      - description: Customer address
+        in: query
+        name: address
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of customers per page
+        in: query
+        name: count
+        type: integer
+      - description: Sort by BNPL total (max, min, none)
+        in: query
+        name: sort_by_bnpl_total
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all customers
       tags:
-        - customers
+      - customers
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new customer in the database
       parameters:
-        - description: Customer data
-          in: body
-          name: customer
-          required: true
-          schema:
-            $ref: "#/definitions/models.CustomerBase"
+      - description: Customer data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new customer
       tags:
-        - customers
+      - customers
   /api/customers/{customer_id}/bnpls:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get all BNPL transactions for a specific customer
       parameters:
-        - description: Customer ID
-          in: path
-          name: customer_id
-          required: true
-          type: string
-        - description: Branch ID
-          in: query
-          name: branch_id
-          type: string
+      - description: Customer ID
+        in: path
+        name: customer_id
+        required: true
+        type: string
+      - description: Branch ID
+        in: query
+        name: branch_id
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get customer BNPLs
       tags:
-        - BNPL
+      - BNPL
   /api/customers/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a customer from the database
       parameters:
-        - description: Customer ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a customer
       tags:
-        - customers
+      - customers
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a customer by its ID
       parameters:
-        - description: Customer ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a customer by ID
       tags:
-        - customers
+      - customers
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update an existing customer in the database
       parameters:
-        - description: Customer ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Customer data
-          in: body
-          name: customer
-          required: true
-          schema:
-            $ref: "#/definitions/models.CustomerBase"
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Customer data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/models.CustomerBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Update a customer
       tags:
-        - customers
+      - customers
   /api/finance:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Add new financial records for a branch
       parameters:
-        - description: Branch finance input
-          in: body
-          name: branch
-          required: true
-          schema:
-            $ref: "#/definitions/models.NewBranchFinanceInput"
+      - description: Branch finance input
+        in: body
+        name: branch
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewBranchFinanceInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create new finance for a branch
       tags:
-        - finance
+      - finance
   /api/finance/branch/id/{id}:
     get:
       description: Retrieve a branch using its ID
       parameters:
-        - description: Branch ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Branch ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Fetch branch by ID
       tags:
-        - finance
+      - finance
   /api/finance/branch/name/{branch_name}:
     get:
       description: Retrieve finance details using the branch name
       parameters:
-        - description: Branch Name
-          in: path
-          name: branch_name
-          required: true
-          type: string
+      - description: Branch Name
+        in: path
+        name: branch_name
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Fetch finance by branch name
       tags:
-        - finance
+      - finance
   /api/finance/branches:
     get:
       description: Retrieve all branches from the finance collection
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Fetch all branches
       tags:
-        - finance
+      - finance
   /api/finance/id/{id}:
     get:
       description: Retrieve finance details using its ID --- ObjectID not branch_id
       parameters:
-        - description: Finance ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Finance ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Fetch finance by ID
       tags:
-        - finance
+      - finance
   /api/journals:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new journal entry for a branch
       parameters:
-        - description: New Journal Entry Input
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/models.NewJournalEntryInput"
+      - description: New Journal Entry Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewJournalEntryInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Journal"
+            $ref: '#/definitions/models.Journal'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new journal entry
       tags:
-        - journals
+      - journals
   /api/journals/{journal_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a journal entry by its ID
       parameters:
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Journal"
+            $ref: '#/definitions/models.Journal'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a journal entry by ID
       tags:
-        - journals
+      - journals
   /api/journals/{journal_id}/close:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Close a journal entry by updating its transactions
       parameters:
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
-        - description: Close Journal Entry Input
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/models.CloseJournalEntryInput"
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      - description: Close Journal Entry Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CloseJournalEntryInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             items:
-              $ref: "#/definitions/models.Transaction"
+              $ref: '#/definitions/models.Transaction'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Close a journal entry
       tags:
-        - journals
+      - journals
   /api/journals/{journal_id}/operations:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new transaction and update the journal
       parameters:
-        - description: Transaction data
-          in: body
-          name: transaction
-          required: true
-          schema:
-            $ref: "#/definitions/models.JournalOperationInput"
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.JournalOperationInput'
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new operation transaction
       tags:
-        - journals/operations
+      - journals/operations
   /api/journals/{journal_id}/operations/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete an operation transaction by ID
       parameters:
-        - description: Operation ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete an operation transaction
       tags:
-        - journals/operations
+      - journals/operations
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get an operation transaction by ID
       parameters:
-        - description: Operation ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get an operation transaction by ID
       tags:
-        - journals/operations
+      - journals/operations
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update an operation transaction by ID
       parameters:
-        - description: Operation ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
-        - description: Amount
-          in: query
-          name: amount
-          required: true
-          type: integer
-        - description: Description
-          in: query
-          name: description
-          type: string
+      - description: Operation ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
+      - description: Amount
+        in: query
+        name: amount
+        required: true
+        type: integer
+      - description: Description
+        in: query
+        name: description
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Update an operation transaction
       tags:
-        - journals/operations
+      - journals/operations
   /api/journals/{journal_id}/reopen:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Reopen a journal entry by removing its closing transactions
       parameters:
-        - description: Journal ID
-          in: path
-          name: journal_id
-          required: true
-          type: string
+      - description: Journal ID
+        in: path
+        name: journal_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.Transaction"
+              $ref: '#/definitions/models.Transaction'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Reopen a closed journal entry
       tags:
-        - journals
+      - journals
   /api/journals/branch/{branch_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Query journal entries by branch ID
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Page number
-          in: query
-          name: page
-          type: integer
-        - description: Page size
-          in: query
-          name: page_size
-          type: integer
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.Journal"
+              $ref: '#/definitions/models.Journal'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Query journal entries
       tags:
-        - journals
+      - journals
   /api/journals/report:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a report of journal entries
       produces:
-        - application/json
+      - application/json
       responses: {}
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a report
       tags:
-        - journals
+      - journals
   /api/products:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Query products based on various parameters
       parameters:
-        - description: Branch ID
-          in: query
-          name: branch_id
-          type: string
-        - description: SKU
-          in: query
-          name: sku
-          type: string
-        - description: Minimum price
-          in: query
-          name: price_min
-          type: number
-        - description: Maximum price
-          in: query
-          name: price_max
-          type: number
+      - description: Branch ID
+        in: query
+        name: branch_id
+        type: string
+      - description: SKU
+        in: query
+        name: sku
+        type: string
+      - description: Minimum price
+        in: query
+        name: price_min
+        type: number
+      - description: Maximum price
+        in: query
+        name: price_max
+        type: number
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Query products
       tags:
-        - products
+      - products
     post:
       consumes:
-        - application/json
+      - application/json
       description: Creates a new product with the given details
       parameters:
-        - description: Product details
-          in: body
-          name: product
-          required: true
-          schema:
-            $ref: "#/definitions/models.ProductBase"
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new product
       tags:
-        - products
+      - products
   /api/products/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Deletes a product and its related data
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a product
       tags:
-        - products
+      - products
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieves a product by its ID
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a product by ID
       tags:
-        - products
+      - products
     put:
       consumes:
-        - application/json
+      - application/json
       description: Updates an existing product with the given details
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Product details to update
-          in: body
-          name: product
-          required: true
-          schema:
-            $ref: "#/definitions/models.ProductBase"
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product details to update
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Edit a product
       tags:
-        - products
+      - products
   /api/products/{id}/income:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Adds new income entry for a product with quantity and price updates
       parameters:
-        - description: Product ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Income details
-          in: body
-          name: input
-          required: true
-          schema:
-            $ref: "#/definitions/products.NewIncomeInput"
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Income details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/products.NewIncomeInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Add new income for a product
       tags:
-        - products
+      - products
   /api/products/{product_id}/images:
     get:
       description: Returns a list of image URLs for a given product
       parameters:
-        - description: Product ID
-          in: path
-          name: product_id
-          required: true
-          type: string
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -1525,27 +1523,27 @@ paths:
           schema:
             type: string
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all images of a product
       tags:
-        - products
+      - products
     post:
       consumes:
-        - multipart/form-data
+      - multipart/form-data
       description: Uploads an image file for a product and stores it in S3
       parameters:
-        - description: Product ID
-          in: path
-          name: product_id
-          required: true
-          type: string
-        - description: Image file to upload
-          in: formData
-          name: image
-          required: true
-          type: file
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Image file to upload
+        in: formData
+        name: image
+        required: true
+        type: file
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -1560,26 +1558,26 @@ paths:
           schema:
             type: string
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Upload a product image
       tags:
-        - products
+      - products
   /api/products/{product_id}/images/{key}:
     delete:
       description: Deletes a product image from S3 and removes reference from database
       parameters:
-        - description: Product ID
-          in: path
-          name: product_id
-          required: true
-          type: string
-        - description: Image key to delete
-          in: path
-          name: key
-          required: true
-          type: string
+      - description: Product ID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      - description: Image key to delete
+        in: path
+        name: key
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
@@ -1594,21 +1592,21 @@ paths:
           schema:
             type: string
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a product image
       tags:
-        - products
+      - products
   /api/products/images/{key}:
     get:
       description: Returns the image file for a given image key
       parameters:
-        - description: Image key
-          in: path
-          name: key
-          required: true
-          type: string
+      - description: Image key
+        in: path
+        name: key
+        required: true
+        type: string
       produces:
-        - application/octet-stream
+      - application/octet-stream
       responses:
         "200":
           description: OK
@@ -1623,519 +1621,519 @@ paths:
           schema:
             type: string
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a single product image
       tags:
-        - products
+      - products
   /api/products/transfer:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Transfers product quantity from one location to another
       produces:
-        - application/json
+      - application/json
       responses: {}
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Transfer product between locations
       tags:
-        - products
+      - products
   /api/sales/session/{session_id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Deletes a sales session by ID
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a sales session
       tags:
-        - sales/session
+      - sales/session
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieves details of a specific sales session
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a sales session by ID
       tags:
-        - sales/session
+      - sales/session
   /api/sales/session/{session_id}/close:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Closes an existing sales session and processes the transaction
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Close a sales session
       tags:
-        - sales/session
+      - sales/session
   /api/sales/session/{session_id}/product:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Adds a product item to an existing sales session
       parameters:
-        - description: Session ID
-          in: path
-          name: session_id
-          required: true
-          type: string
-        - description: Product details
-          in: body
-          name: product
-          required: true
-          schema:
-            $ref: "#/definitions/sales.AddProductItemToSessionInput"
+      - description: Session ID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      - description: Product details
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/sales.AddProductItemToSessionInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Add product to sales session
       tags:
-        - sales/session
+      - sales/session
   /api/sales/session/branch/{branch_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieves all sales sessions associated with a branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all sales sessions for a branch
       tags:
-        - sales/session
+      - sales/session
     post:
       consumes:
-        - application/json
+      - application/json
       description: Creates a new sales session for a branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Open a new sales session
       tags:
-        - sales/session
+      - sales/session
   /api/sales/transactions/{branch_id}:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new sales transaction for a branch
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Transaction details
-          in: body
-          name: transaction
-          required: true
-          schema:
-            $ref: "#/definitions/models.TransactionBase"
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Transaction details
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransactionBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new sales transaction
       tags:
-        - sales/transactions
+      - sales/transactions
   /api/sales/transactions/{transaction_id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a sales transaction by ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: transaction_id
-          required: true
-          type: string
+      - description: Transaction ID
+        in: path
+        name: transaction_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a sales transaction
       tags:
-        - sales/transactions
+      - sales/transactions
   /api/suppliers:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get all suppliers from the database
       parameters:
-        - description: Supplier name
-          in: query
-          name: name
-          type: string
-        - description: Supplier INN
-          in: query
-          name: inn
-          type: string
-        - description: Supplier branch
-          in: query
-          name: branch
-          type: string
-        - description: Supplier email
-          in: query
-          name: email
-          type: string
-        - description: Supplier phone
-          in: query
-          name: phone
-          type: string
-        - description: Supplier address
-          in: query
-          name: address
-          type: string
-        - description: Supplier notes
-          in: query
-          name: notes
-          type: string
+      - description: Supplier name
+        in: query
+        name: name
+        type: string
+      - description: Supplier INN
+        in: query
+        name: inn
+        type: string
+      - description: Supplier branch
+        in: query
+        name: branch
+        type: string
+      - description: Supplier email
+        in: query
+        name: email
+        type: string
+      - description: Supplier phone
+        in: query
+        name: phone
+        type: string
+      - description: Supplier address
+        in: query
+        name: address
+        type: string
+      - description: Supplier notes
+        in: query
+        name: notes
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all suppliers
       tags:
-        - suppliers
+      - suppliers
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new supplier in the database
       parameters:
-        - description: Supplier data
-          in: body
-          name: supplier
-          required: true
-          schema:
-            $ref: "#/definitions/models.SupplierBase"
+      - description: Supplier data
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/models.SupplierBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new supplier
       tags:
-        - suppliers
+      - suppliers
   /api/suppliers/{branch_id}/{supplier_id}/transactions:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new transaction for a supplier and update financial records
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Supplier ID
-          in: path
-          name: supplier_id
-          required: true
-          type: string
-        - description: Transaction data
-          in: body
-          name: transaction
-          required: true
-          schema:
-            $ref: "#/definitions/models.TransactionBase"
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Supplier ID
+        in: path
+        name: supplier_id
+        required: true
+        type: string
+      - description: Transaction data
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransactionBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Create a new transaction for a supplier
       tags:
-        - suppliers
-        - transactions
+      - suppliers
+      - transactions
   /api/suppliers/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a supplier from the database
       parameters:
-        - description: Supplier ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a supplier
       tags:
-        - suppliers
+      - suppliers
     get:
       consumes:
-        - application/json
+      - application/json
       description: Get a supplier by its ID
       parameters:
-        - description: Supplier ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a supplier by ID
       tags:
-        - suppliers
+      - suppliers
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update a supplier's information
       parameters:
-        - description: Supplier ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Supplier data
-          in: body
-          name: supplier
-          required: true
-          schema:
-            $ref: "#/definitions/models.SupplierBase"
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Supplier data
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/models.SupplierBase'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "404":
           description: Not Found
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Output"
+            $ref: '#/definitions/models.Output'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Update a supplier
       tags:
-        - suppliers
+      - suppliers
   /api/transactions/{id}:
     delete:
       consumes:
-        - application/json
+      - application/json
       description: Delete a transaction from the database by its ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: 'message" : "transaction was succesfully deleted'
@@ -2146,36 +2144,36 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Delete a transaction by ID
       tags:
-        - transactions
+      - transactions
     put:
       consumes:
-        - application/json
+      - application/json
       description: Update transaction details by its ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Transaction amount
-          in: query
-          name: amount
-          type: string
-        - description: Transaction description
-          in: query
-          name: description
-          type: string
-        - description: Type of transaction
-          in: query
-          name: type
-          type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Transaction amount
+        in: query
+        name: amount
+        type: string
+      - description: Transaction description
+        in: query
+        name: description
+        type: string
+      - description: Type of transaction
+        in: query
+        name: type
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: 'message" : "transaction was succesfully updated'
@@ -2186,181 +2184,181 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Update a transaction by ID
       tags:
-        - transactions
+      - transactions
   /api/transactions/{transaction_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a single transaction by its ID
       parameters:
-        - description: Transaction ID
-          in: path
-          name: transaction_id
-          required: true
-          type: string
+      - description: Transaction ID
+        in: path
+        name: transaction_id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.TransactionOutputSingle"
+            $ref: '#/definitions/models.TransactionOutputSingle'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get a transaction by ID
       tags:
-        - transactions
+      - transactions
   /api/transactions/branch/{branch_id}:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve transactions based on various query parameters
       parameters:
-        - description: Branch ID
-          in: path
-          name: branch_id
-          required: true
-          type: string
-        - description: Transaction description
-          in: query
-          name: description
-          type: string
-        - description: Minimum transaction amount
-          in: query
-          name: amount_min
-          type: integer
-        - description: Maximum transaction amount
-          in: query
-          name: amount_max
-          type: integer
-        - description: Payment method
-          in: query
-          name: payment_method
-          type: string
-        - description: Type of transaction
-          in: query
-          name: type_of_transaction
-          type: string
-        - description: Initiator type
-          in: query
-          name: initiator_type
-          type: string
-        - description: Minimum date
-          in: query
-          name: date_min
-          type: string
-        - description: Maximum date
-          in: query
-          name: date_max
-          type: string
-        - description: Page number
-          in: query
-          name: page
-          type: integer
-        - description: Number of transactions per page
-          in: query
-          name: count
-          type: integer
+      - description: Branch ID
+        in: path
+        name: branch_id
+        required: true
+        type: string
+      - description: Transaction description
+        in: query
+        name: description
+        type: string
+      - description: Minimum transaction amount
+        in: query
+        name: amount_min
+        type: integer
+      - description: Maximum transaction amount
+        in: query
+        name: amount_max
+        type: integer
+      - description: Payment method
+        in: query
+        name: payment_method
+        type: string
+      - description: Type of transaction
+        in: query
+        name: type_of_transaction
+        type: string
+      - description: Initiator type
+        in: query
+        name: initiator_type
+        type: string
+      - description: Minimum date
+        in: query
+        name: date_min
+        type: string
+      - description: Maximum date
+        in: query
+        name: date_max
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of transactions per page
+        in: query
+        name: count
+        type: integer
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/models.TransactionOutput"
+            $ref: '#/definitions/models.TransactionOutput'
         "400":
           description: Bad Request
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: "#/definitions/models.Error"
+            $ref: '#/definitions/models.Error'
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get transactions by query parameters
       tags:
-        - transactions
+      - transactions
   /api/transactions/docs/initiator_type:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a list of all possible initiator types for transactions
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.InitiatorType"
+              $ref: '#/definitions/models.InitiatorType'
             type: array
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all initiator types
       tags:
-        - transactions
+      - transactions
   /api/transactions/docs/payment_method:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a list of all possible payment methods
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.PaymentMethod"
+              $ref: '#/definitions/models.PaymentMethod'
             type: array
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all payment methods
       tags:
-        - transactions
+      - transactions
   /api/transactions/docs/type:
     get:
       consumes:
-        - application/json
+      - application/json
       description: Retrieve a list of all possible transaction types
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/models.TransactionType"
+              $ref: '#/definitions/models.TransactionType'
             type: array
       security:
-        - BearerAuth: []
+      - BearerAuth: []
       summary: Get all transaction types
       tags:
-        - transactions
+      - transactions
   /auth/login:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Authenticate user and return a token
       parameters:
-        - description: User credentials
-          in: body
-          name: user
-          required: true
-          schema:
-            $ref: "#/definitions/auth.LoginInput"
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: token
@@ -2378,21 +2376,21 @@ paths:
             type: string
       summary: Login a user
       tags:
-        - auth
+      - auth
   /auth/register:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new user account
       parameters:
-        - description: User credentials
-          in: body
-          name: user
-          required: true
-          schema:
-            $ref: "#/definitions/models.User"
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
@@ -2404,7 +2402,7 @@ paths:
             type: string
       summary: Register a new user
       tags:
-        - auth
+      - auth
 securityDefinitions:
   BearerAuth:
     in: header
