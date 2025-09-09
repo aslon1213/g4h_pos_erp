@@ -1,9 +1,9 @@
 # Magazin POS/ERP (Go)
 
-[![Release](https://img.shields.io/github/v/release/aslon1213/g4h_post_erp?style=flat-square)](https://github.com/aslon1213/g4h_post_erp/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/g4h_post_erp/release.yaml?style=flat-square)](https://github.com/aslon1213/g4h_post_erp/actions/workflows/release.yaml)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/g4h_post_erp?style=flat-square)](https://golang.org/)
-[![License](https://img.shields.io/github/license/aslon1213/g4h_post_erp?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/aslon1213/g4h_pos_erp?style=flat-square)](https://github.com/aslon1213/g4h_pos_erp/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aslon1213/g4h_pos_erp/release.yaml?style=flat-square)](https://github.com/aslon1213/g4h_pos_erp/actions/workflows/release.yaml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/aslon1213/g4h_pos_erp?style=flat-square)](https://golang.org/)
+[![License](https://img.shields.io/github/license/aslon1213/g4h_pos_erp?style=flat-square)](LICENSE)
 
 A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built with Go, designed for retail businesses and stores.
 
@@ -46,8 +46,8 @@ A modern Point of Sale (POS) and Enterprise Resource Planning (ERP) system built
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/aslon1213/g4h_post_erp.git
-   cd g4h_post_erp
+   git clone https://github.com/aslon1213/g4h_pos_erp.git
+   cd g4h_pos_erp
    ```
 
 2. **Prepare configuration**
@@ -265,7 +265,7 @@ go build -o bin/pos-erp cmd/main.go
 
 ### Download Latest Release
 
-Visit the [Releases page](https://github.com/aslon1213/g4h_post_erp/releases) to download pre-built binaries for your platform.
+Visit the [Releases page](https://github.com/aslon1213/g4h_pos_erp/releases) to download pre-built binaries for your platform.
 
 ## 🤝 Contributing
 
@@ -284,4 +284,4 @@ For support and questions:
 
 ## 🚧 Development Status
 
-This project is actively maintained and under development. Please check the [issues](https://github.com/aslon1213/g4h_post_erp/issues) for current development status and upcoming features.
+This project is actively maintained and under development. Please check the [issues](https://github.com/aslon1213/g4h_pos_erp/issues) for current development status and upcoming features.
