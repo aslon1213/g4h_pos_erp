@@ -1,4 +1,4 @@
-name: Release with GoReleaser
+name: Release with Docker and GoReleaser
 
 on:
   push:
