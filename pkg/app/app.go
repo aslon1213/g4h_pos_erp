@@ -30,9 +30,9 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
-// @title Magazin ERP/POS API
+// @title G4H ERP/POS API
 // @version 1.0
-// @description This is a ERP/POS API for Magazin.
+// @description This is a ERP/POS API for G4H.
 // @contact.name API Support
 // @contact.url https://github.com/aslon1213/g4h_pos_erp
 // @contact.email hamidovaslon13@gmail.com
