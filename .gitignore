@@ -20,6 +20,7 @@ profile.cov
 
 # Dependency directories (remove the comment below to include it)
 vendor/
+invoce-generator/
 
 # Go workspace file
 go.work
@@ -46,3 +47,5 @@ mongo-keyfile
 CaddyFile
 dump/
 caddy_data/
+tmp
+notebooks/
