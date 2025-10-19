@@ -1,4 +1,6 @@
 api.example.com {
+	@parser path /parser* 
+    reverse_proxy @parser http://invoices:12000
 	reverse_proxy http://api:12000
 }
 www.example.com {
