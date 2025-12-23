@@ -291,6 +291,9 @@ func (p *ProductsController) QueryProducts(c *fiber.Ctx) error {
 	}
 
 	pipeline := bson.D{}
+	if params.Name != "" {
+		pipeline = append(pipeline, bson.E{Key: "name", Value: bson.M{"$regex": params.Name, "$options": "i"}})
+	}
 
 	if params.BranchID != "" {
 		pipeline = append(pipeline, bson.E{Key: "quantity_distribution.place.id", Value: params.BranchID})

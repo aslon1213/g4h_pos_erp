@@ -70,6 +70,7 @@ type ProductBase struct {
 	Category          []string         `json:"category" bson:"category"`                       // Product categories
 	SKU               string           `json:"sku" bson:"sku"`                                 // Stock Keeping Unit
 	MinimumStockAlert int32            `json:"minimum_stock_alert" bson:"minimum_stock_alert"` // Minimum stock alert
+	GeneralIncomePrice float32            `json:"general_income_price" bson:"general_income_price"` // General income price of the product --- the price generally this item is bought from supplier
 }
 
 // Product represents a complete product entity with all its details
@@ -102,6 +103,7 @@ type ProductOutput struct {
 
 // ProductQueryParams defines the available search parameters for products
 type ProductQueryParams struct {
+	Name string `query:"name"` // Filter by name
 	BranchID string  `query:"branch_id"` // Filter by branch
 	Category string  `query:"category"`  // Filter by category
 	SKU      string  `query:"sku"`       // Filter by SKU
