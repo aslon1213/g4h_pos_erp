@@ -9,10 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
+        "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "url": "https://github.com/aslon1213/g4h_pos_erp",
-            "email": "hamidovaslon13@gmail.com"
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "{{.Version}}"
     },
@@ -3162,6 +3167,60 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/proposals": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Configures proxy routes based on server configuration to forward requests to external services",
+                "tags": [
+                    "proxy"
+                ],
+                "summary": "Setup proxy routes",
+                "responses": {}
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Configures proxy routes based on server configuration to forward requests to external services",
+                "tags": [
+                    "proxy"
+                ],
+                "summary": "Setup proxy routes",
+                "responses": {}
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Configures proxy routes based on server configuration to forward requests to external services",
+                "tags": [
+                    "proxy"
+                ],
+                "summary": "Setup proxy routes",
+                "responses": {}
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Configures proxy routes based on server configuration to forward requests to external services",
+                "tags": [
+                    "proxy"
+                ],
+                "summary": "Setup proxy routes",
+                "responses": {}
+            }
         }
     },
     "definitions": {
@@ -3495,6 +3554,10 @@ const docTemplate = `{
                     "description": "Product description",
                     "type": "string"
                 },
+                "general_income_price": {
+                    "description": "General income price of the product --- the price generally this item is bought from supplier",
+                    "type": "number"
+                },
                 "manufacturer": {
                     "description": "Manufacturer details",
                     "allOf": [
@@ -3747,24 +3810,17 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "BearerAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "",
-	BasePath:         "",
+	Host:             "petstore.swagger.io",
+	BasePath:         "/v2",
 	Schemes:          []string{},
-	Title:            "G4H ERP/POS API",
-	Description:      "This is a ERP/POS API for G4H.",
+	Title:            "Swagger Example API",
+	Description:      "This is a sample server Petstore server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
