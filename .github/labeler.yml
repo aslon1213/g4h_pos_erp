@@ -1,0 +1,42 @@
+backend/core:
+  - "cmd/**"
+  - "**/*.go"
+  - "go.mod"
+  - "go.sum"
+
+backend/api:
+  - "pkg/**"
+  - "api/**"
+  - "handlers/**"
+  - "controllers/**"
+
+backend/platform:
+  - "platform/**"
+  - "internal/**"
+
+backend/business-logic:
+  - "models/**"
+  - "services/**"
+  - "repositories/**"
+
+backend/infrastructure:
+  - "middleware/**"
+  - "utils/**"
+  - "configs/**"
+
+docs:
+  - "docs/**"
+  - "README.md"
+
+config:
+  - "*.yaml"
+  - "*.yml"
+  - "deploy/**"
+
+tests:
+  - "test/**"
+
+docker:
+  - "build/**"
+  - "deploy/**"
+  - "Dockerfile"

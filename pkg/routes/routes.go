@@ -14,8 +14,10 @@ import (
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/transactions"
 	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 
+	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
+	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/rs/zerolog/log"
 )
 
@@ -150,4 +152,37 @@ func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middlewa
 	api.Get("/bnpl/:id", bnplController.GetBNPLByID)                            // get bnpl by id
 	api.Get("/customers/:customer_id/bnpls", bnplController.GetBNPLSofCustomer) // get bnpls of customer
 	api.Get("/branches/:branch_id/bnpls", bnplController.GetBNPLsOfBranch)      // get bnpls of branch
+}
+
+
+
+
+// ProxyRoutes sets up proxy routes for forwarding requests to external services
+// @Summary Setup proxy routes
+// @Description Configures proxy routes based on server configuration to forward requests to external services
+// @Tags proxy
+// @Security BearerAuth
+// @Router /proposals [get]
+// @Router /proposals [post]
+// @Router /proposals [put]
+// @Router /proposals [delete]
+func ProxyRoutes(router *fiber.App, middleware *middleware.Middlewares) {
+
+
+	config, err := configs.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to load config")
+	}
+
+	proxyConfig:= config.Server.Proxy[0]
+
+	zayavka := router.Group(proxyConfig.Path)
+	zayavka.Use(pasetoware.New(
+		pasetoware.Config{
+			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			// TokenPrefix:    "Bearer",
+			SuccessHandler: middleware.AuthMiddleware,
+		},
+	))
+	zayavka.Use(proxy.Forward(proxyConfig.Addr))
 }
