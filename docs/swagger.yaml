@@ -1,3 +1,4 @@
+basePath: /v2
 definitions:
   auth.LoginInput:
     properties:
@@ -227,6 +228,10 @@ definitions:
       description:
         description: Product description
         type: string
+      general_income_price:
+        description: General income price of the product --- the price generally this
+          item is bought from supplier
+        type: number
       manufacturer:
         allOf:
         - $ref: '#/definitions/models.ManufacturerInfo'
@@ -394,13 +399,18 @@ definitions:
       quantity:
         type: integer
     type: object
+host: petstore.swagger.io
 info:
   contact:
-    email: hamidovaslon13@gmail.com
+    email: support@swagger.io
     name: API Support
-    url: https://github.com/aslon1213/g4h_pos_erp
-  description: This is a ERP/POS API for G4H.
-  title: G4H ERP/POS API
+    url: http://www.swagger.io/support
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
   version: "1.0"
 paths:
   /api/activities/me:
@@ -2403,9 +2413,41 @@ paths:
       summary: Register a new user
       tags:
       - auth
-securityDefinitions:
-  BearerAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+  /proposals:
+    delete:
+      description: Configures proxy routes based on server configuration to forward
+        requests to external services
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Setup proxy routes
+      tags:
+      - proxy
+    get:
+      description: Configures proxy routes based on server configuration to forward
+        requests to external services
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Setup proxy routes
+      tags:
+      - proxy
+    post:
+      description: Configures proxy routes based on server configuration to forward
+        requests to external services
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Setup proxy routes
+      tags:
+      - proxy
+    put:
+      description: Configures proxy routes based on server configuration to forward
+        requests to external services
+      responses: {}
+      security:
+      - BearerAuth: []
+      summary: Setup proxy routes
+      tags:
+      - proxy
 swagger: "2.0"
