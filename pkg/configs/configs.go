@@ -38,12 +38,19 @@ type RedisConfig struct {
 	Database int    `mapstructure:"database"`
 }
 
+type ProxyConfig struct {
+	Type string `mapstructure:"type"`
+	Path string `mapstructure:"path"`
+	Addr string `mapstructure:"addr"`
+}
+
 type ServerConfig struct {
 	Host               string          `mapstructure:"host"`
 	Port               string          `mapstructure:"port"`
 	SecretSymmetricKey string          `mapstructure:"secret_symmetric_key"`
 	TokenExpiryHours   int             `mapstructure:"token_expiry_hours"`
 	AdminDocsUsers     []AdminDocsUser `mapstructure:"admin_docs_users"`
+	Proxy              []ProxyConfig   `mapstructure:"proxy"`
 }
 
 type S3Config struct {
