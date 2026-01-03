@@ -91,5 +91,7 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	log.Debug().Msg("BNPL routes set up successfully")
 	routes.DashboardRoutes(app, controllers.Dashboard, controllers.Middlewares)
 	log.Debug().Msg("Dashboard routes set up successfully")
+	routes.ProxyRoutes(app, controllers.Middlewares)
+	log.Debug().Msg("Proxy routes set up successfully")
 	log.Debug().Msg("All routes set up successfully")
 }
