@@ -136,9 +136,17 @@ func NewFiberApp() *fiber.App {
 	)
 
 	app.Get("/docs/*", fiberSwagger.WrapHandler)
+
+
+
+
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Redirect("/docs/index.html")
 	})
+
+
+
 	return app
 }
 

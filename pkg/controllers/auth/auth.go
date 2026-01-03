@@ -22,6 +22,7 @@ type AuthControllers struct {
 	UserCollection       *mongo.Collection
 	ActivitiesCollection *mongo.Collection
 	SecretSymmetricKey   string
+	TokenExpiryHours     int
 }
 
 // New initializes a new AuthControllers instance
@@ -46,6 +47,7 @@ func New(db *mongo.Database) *AuthControllers {
 		UserCollection:       users_collection,
 		ActivitiesCollection: db.Collection("activities"),
 		SecretSymmetricKey:   config.Server.SecretSymmetricKey,
+		TokenExpiryHours:     config.Server.TokenExpiryHours,
 	}
 }
 
@@ -131,7 +133,7 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	}
 
 	// Create token and encrypt it
-	encryptedToken, err := pasetoware.CreateToken([]byte(a.SecretSymmetricKey), user_to_check.Username, 48*time.Hour, pasetoware.PurposeLocal)
+	encryptedToken, err := pasetoware.CreateToken([]byte(a.SecretSymmetricKey), user_to_check.Username, time.Duration(a.TokenExpiryHours) * time.Hour, pasetoware.PurposeLocal)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create token")
 
