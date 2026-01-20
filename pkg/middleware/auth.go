@@ -24,7 +24,7 @@ func New(db *mongo.Database) *Middlewares {
 func (m *Middlewares) AuthMiddleware(c *fiber.Ctx) error {
 
 	values := c.Locals(
-		pasetoware.DefaultContextKey, "",
+		pasetoware.DefaultContextKey,
 	).(string)
 
 	// got username

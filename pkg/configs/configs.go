@@ -42,6 +42,7 @@ type ProxyConfig struct {
 	Type string `mapstructure:"type"`
 	Path string `mapstructure:"path"`
 	Addr string `mapstructure:"addr"`
+	APIKey string `mapstructure:"api_key"`
 }
 
 type ServerConfig struct {
