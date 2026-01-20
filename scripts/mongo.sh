@@ -29,7 +29,8 @@ docker run -d  \
   --label "caddy.reverse_proxy:http://$DATABASE_HOST:27017" \
   -v ./mongo-keyfile:/data/keyfile \
   -v mongodata:/data/db \
-  mongo:5 \
+  --restart always \
+  mongo:latest \
   mongod --bind_ip_all --replSet myReplicaSet --auth --keyFile /data/keyfile
 
 echo "Waiting for MongoDB to start (10 seconds)..."
@@ -52,5 +53,5 @@ echo "MongoDB setup complete!"
 
 # run redis container as well
 echo "Starting Redis container..."  
-docker run  -d --name redis --net mongoCluster -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
+docker run  -d --name redis --restart always --net mongoCluster -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 echo "Redis setup complete!"
