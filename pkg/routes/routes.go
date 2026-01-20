@@ -1,6 +1,10 @@
 package routes
 
 import (
+	"bytes"
+	"io"
+	"net/http"
+
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/analytics"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/auth"
@@ -17,7 +21,6 @@ import (
 	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
-	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"github.com/rs/zerolog/log"
 )
 
@@ -156,6 +159,84 @@ func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middlewa
 
 
 
+func ForwardProxy(c *fiber.Ctx) error {
+	log.Info().
+		Str("method", c.Method()).
+		Str("original_url", c.OriginalURL()).
+		Msg("Starting proxy request")
+
+	config, err := configs.LoadConfig(".")
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to load config")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	proxyConfig := config.Server.Proxy[0]
+
+	// Create target URL
+	targetURL := proxyConfig.Addr + c.OriginalURL()
+	log.Debug().Str("target_url", targetURL).Msg("Created target URL")
+	
+	// Create HTTP client
+	client := &http.Client{}
+	
+	// Create request with same method and body
+	req, err := http.NewRequest(c.Method(), targetURL, bytes.NewReader(c.Body()))
+	if err != nil {
+		log.Error().Err(err).Str("target_url", targetURL).Msg("Failed to create HTTP request")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	
+	// Copy headers from original request
+	for key, values := range c.GetReqHeaders() {
+		for _, value := range values {
+			req.Header.Add(key, value)
+		}
+	}
+
+	// set x-api-key to header
+	req.Header.Set("x-api-key", config.Server.Proxy[0].APIKey)
+	log.Debug().Interface("headers", req.Header).Msg("Copied headers to proxy request")
+	
+	// Make the request
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error().Err(err).Str("target_url", targetURL).Msg("Failed to make proxy request")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	defer resp.Body.Close()
+	
+	log.Info().
+		Int("status_code", resp.StatusCode).
+		Str("target_url", targetURL).
+		Msg("Received response from proxy target")
+	
+	// Copy response headers
+	for key, values := range resp.Header {
+		for _, value := range values {
+			c.Set(key, value)
+		}
+	}
+	
+	// Copy response status and body
+	c.Status(resp.StatusCode)
+	log.Debug().Int("status_code", resp.StatusCode).Msg("Forwarding response to client")
+	// read the body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to read response body")
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	log.Debug().Str("body", string(body)).Msg("Response body")
+	return c.Send(body)
+}
 
 // ProxyRoutes sets up proxy routes for forwarding requests to external services
 // @Summary Setup proxy routes
@@ -184,5 +265,5 @@ func ProxyRoutes(router *fiber.App, middleware *middleware.Middlewares) {
 			SuccessHandler: middleware.AuthMiddleware,
 		},
 	))
-	zayavka.Use(proxy.Forward(proxyConfig.Addr))
+	zayavka.Use(ForwardProxy)
 }

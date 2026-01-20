@@ -43,6 +43,7 @@ services:
       # - ../docs:/app/docs
     environment:
       - ENVIRONMENT=PRODUCTION
+    restart: always
     labels:
       caddy: api.g4h.uz
       caddy.reverse_proxy: "{{upstreams 12000}}"

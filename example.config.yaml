@@ -33,3 +33,11 @@ server:
       password: "admin"
     - username: "hello"
       password: "world"
+
+  proxy:
+    - type: "Forward" # type of proxy
+      path: "/proposals" # source domain
+      addr: "http://localhost:11000" # target domain
+      api_key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+
