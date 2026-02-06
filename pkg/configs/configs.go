@@ -104,6 +104,14 @@ func loadConfigFromEnv(path string) (*Config, error) {
 		{
 			Username: os.Getenv("ADMIN_DOCS_USERNAME"),
 			Password: os.Getenv("ADMIN_DOCS_PASSWORD"),
+
+
+		},
+		{
+			Username: os.Getenv("ADMIN_DOCS_USERNAME_2"),
+			Password: os.Getenv("ADMIN_DOCS_PASSWORD_2"),
+			
+
 		},
 	}
 
