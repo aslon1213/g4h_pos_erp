@@ -6,7 +6,6 @@ import (
 
 	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	"github.com/aslon1213/g4h_pos_erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,17 +19,15 @@ type SalesTransactionsController struct {
 	finances     *mongo.Collection
 	products     *mongo.Collection
 	activities   *mongo.Collection
-	cache        *cache.Cache
 }
 
-func New(db *mongo.Database, cache *cache.Cache) *SalesTransactionsController {
+func New(db *mongo.Database) *SalesTransactionsController {
 	log.Info().Msg("Initializing SalesTransactionsController")
 	return &SalesTransactionsController{
 		transactions: db.Collection("transactions"),
 		finances:     db.Collection("finance"),
 		products:     db.Collection("products"),
 		activities:   db.Collection("activities"),
-		cache:        cache,
 	}
 }
 

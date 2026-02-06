@@ -10,7 +10,6 @@ import (
 	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
 	"github.com/aslon1213/g4h_pos_erp/pkg/utils"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	"github.com/aslon1213/g4h_pos_erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,11 +28,10 @@ type JournalHandlers struct {
 	FinanceCollection      *mongo.Collection
 	TransactionsCollection *mongo.Collection
 	ActivitiesCollection   *mongo.Collection
-	RedisClient            *cache.Cache
 	Tracer                 trace.Tracer
 }
 
-func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
+func New(db *mongo.Database) *JournalHandlers {
 	ctx := context.Background()
 	journalCollection := db.Collection("journals")
 	index_model := mongo.IndexModel{
@@ -61,7 +59,6 @@ func New(db *mongo.Database, cache *cache.Cache) *JournalHandlers {
 		TransactionsCollection: transactionsCollection,
 		ActivitiesCollection:   activitiesCollection,
 		Tracer:                 tracer,
-		RedisClient:            cache,
 	}
 }
 

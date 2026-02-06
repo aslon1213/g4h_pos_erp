@@ -67,12 +67,12 @@ func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsCont
 	api.Post("/sales/transactions/:branch_id", salesController.CreateSalesTransaction)        // create sales transaction -- activity logged here if succesfull
 	api.Delete("/sales/transactions/:transaction_id", salesController.DeleteSalesTransaction) // delete sales transaction -- activity logged here if succesfull
 	// sales session routes
-	api.Post("/sales/session/branch/:branch_id", salesController.OpenSalesSession)          // open sales session
-	api.Post("/sales/session/:session_id/product", salesController.AddProductItemToSession) // add product to session
-	api.Post("/sales/session/:session_id/close", salesController.CloseSalesSession)         // close sales session
-	api.Get("/sales/session/:session_id", salesController.GetSalesSession)                  // get sales session
-	api.Delete("/sales/session/:session_id", salesController.DeleteSalesSession)            // delete sales session
-	api.Get("/sales/session/branch/:branch_id", salesController.GetSalesSessionsOfBranch)   // get sales of session
+	// api.Post("/sales/session/branch/:branch_id", salesController.OpenSalesSession)          // open sales session
+	// api.Post("/sales/session/:session_id/product", salesController.AddProductItemToSession) // add product to session
+	// api.Post("/sales/session/:session_id/close", salesController.CloseSalesSession)         // close sales session
+	// api.Get("/sales/session/:session_id", salesController.GetSalesSession)                  // get sales session
+	// api.Delete("/sales/session/:session_id", salesController.DeleteSalesSession)            // delete sales session
+	// api.Get("/sales/session/branch/:branch_id", salesController.GetSalesSessionsOfBranch)   // get sales of session
 	// router.Get("/sales/branch/:branch_id/sessions", salesController.GetSalesOfSession)
 
 }

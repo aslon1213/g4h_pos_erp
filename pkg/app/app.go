@@ -6,7 +6,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	"github.com/aslon1213/g4h_pos_erp/platform/database"
 	"github.com/aslon1213/g4h_pos_erp/platform/logger"
 
@@ -42,7 +41,7 @@ import (
 
 type App struct {
 	Logger *zerolog.Logger
-	Cache  *cache.Cache
+	// Cache  *cache.Cache
 	DB     *mongo.Client
 	Config *configs.Config
 	Router *fiber.App
@@ -158,7 +157,7 @@ func New() *App {
 
 	return &App{
 		Logger: logger.SetupLogger(),
-		Cache:  cache.New(),
+		// Cache:  cache.New(),
 		DB:     database.NewDB(),
 		Router: NewFiberApp(),
 		Config: config,
@@ -185,7 +184,7 @@ func initTracer() *sdktrace.TracerProvider {
 }
 
 func (a *App) Run() {
-	controllers := NewControllers(a.DB.Database(a.Config.DB.Database), a.Cache)
+	controllers := NewControllers(a.DB.Database(a.Config.DB.Database))
 	SetupRoutes(a.Router, controllers)
 	a.Router.Listen(a.Config.Server.Port)
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/transactions"
 	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	"github.com/aslon1213/g4h_pos_erp/platform/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -16,16 +15,14 @@ import (
 )
 
 type BNPLController struct {
-	cache                  *cache.Cache
 	activitiesCollection   *mongo.Collection
 	customersCollection    *mongo.Collection
 	transactionsCollection *mongo.Collection
 	financeCollection      *mongo.Collection
 }
 
-func New(db *mongo.Database, cache *cache.Cache) *BNPLController {
+func New(db *mongo.Database) *BNPLController {
 	return &BNPLController{
-		cache:                  cache,
 		activitiesCollection:   db.Collection("activities"),
 		customersCollection:    db.Collection("customers"),
 		transactionsCollection: db.Collection("transactions"),
