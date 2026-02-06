@@ -98,6 +98,16 @@ func loadConfigFromEnv(path string) (*Config, error) {
 
 	log.Info().Str("DATABASE_HOST", os.Getenv("DATABASE_HOST")).Str("DATABASE_PORT", os.Getenv("DATABASE_PORT")).Str("DATABASE_NAME", os.Getenv("DATABASE_NAME")).Str("DATABASE_MAX_CONNECTIONS", os.Getenv("DATABASE_MAX_CONNECTIONS")).Str("DATABASE_MIN_POOL_SIZE", os.Getenv("DATABASE_MIN_POOL_SIZE")).Str("DATABASE_AUTH", os.Getenv("DATABASE_AUTH")).Str("DATABASE_REPLICA_SET", os.Getenv("DATABASE_REPLICA_SET")).Str("DATABASE_URL", os.Getenv("DATABASE_URL")).Str("REDIS_HOST", os.Getenv("REDIS_HOST")).Str("REDIS_PORT", os.Getenv("REDIS_PORT")).Str("REDIS_DATABASE", os.Getenv("REDIS_DATABASE")).Str("SERVER_TOKEN_EXPIRY_HOURS", os.Getenv("SERVER_TOKEN_EXPIRY_HOURS")).Msg("Loading config from environment variables")
 
+
+
+	adminDocsUsers := []AdminDocsUser{
+		{
+			Username: os.Getenv("ADMIN_DOCS_USERNAME"),
+			Password: os.Getenv("ADMIN_DOCS_PASSWORD"),
+		},
+	}
+
+
 	config := &Config{
 		DB: DBConfig{
 			Host:           os.Getenv("DATABASE_HOST"),
@@ -122,6 +132,7 @@ func loadConfigFromEnv(path string) (*Config, error) {
 			Port:              os.Getenv("SERVER_PORT"),
 			SecretSymmetricKey: os.Getenv("SERVER_SECRET_SYMMETRIC_KEY"),
 			TokenExpiryHours:   tokenExpiryHours,
+			AdminDocsUsers:     adminDocsUsers,
 		},
 		S3: S3Config{
 			Region:          os.Getenv("S3_REGION"),
