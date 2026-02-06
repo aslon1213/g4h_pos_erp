@@ -11,9 +11,9 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "name": "G4H ERP/POS API",
+            "url": "https://github.com/aslon1213/g4h_pos_erp",
+            "email": "hamidovaslon1@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -3374,6 +3374,15 @@ const docTemplate = `{
             "x-enum-comments": {
                 "InitiatorTypeBNPL": "buy now pay later BNPL transactions"
             },
+            "x-enum-descriptions": [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "buy now pay later BNPL transactions"
+            ],
             "x-enum-varnames": [
                 "InitiatorTypeSalary",
                 "InitiatorTypeRent",
@@ -3607,6 +3616,10 @@ const docTemplate = `{
                 "ProductPlaceTypeBranch": "Store branch location",
                 "ProductPlaceTypeWarehouse": "Central warehouse location"
             },
+            "x-enum-descriptions": [
+                "Store branch location",
+                "Central warehouse location"
+            ],
             "x-enum-varnames": [
                 "ProductPlaceTypeBranch",
                 "ProductPlaceTypeWarehouse"
@@ -3736,6 +3749,10 @@ const docTemplate = `{
                 "TransactionTypeCredit": "credit means - income - when money is gained or received into an account",
                 "TransactionTypeDebit": "debit means - outcome - when money is lost, spent, or withdrawn from an account"
             },
+            "x-enum-descriptions": [
+                "credit means - income - when money is gained or received into an account",
+                "debit means - outcome - when money is lost, spent, or withdrawn from an account"
+            ],
             "x-enum-varnames": [
                 "TransactionTypeCredit",
                 "TransactionTypeDebit"
@@ -3816,11 +3833,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "petstore.swagger.io",
-	BasePath:         "/v2",
+	Host:             "g4h.com",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Swagger Example API",
-	Description:      "This is a sample server Petstore server.",
+	Title:            "G4H ERP/POS API",
+	Description:      "This is a ERP/POS API for G4H.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

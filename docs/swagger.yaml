@@ -1,4 +1,3 @@
-basePath: /v2
 definitions:
   auth.LoginInput:
     properties:
@@ -102,6 +101,14 @@ definitions:
     type: string
     x-enum-comments:
       InitiatorTypeBNPL: buy now pay later BNPL transactions
+    x-enum-descriptions:
+    - ""
+    - ""
+    - ""
+    - ""
+    - ""
+    - ""
+    - buy now pay later BNPL transactions
     x-enum-varnames:
     - InitiatorTypeSalary
     - InitiatorTypeRent
@@ -264,6 +271,9 @@ definitions:
     x-enum-comments:
       ProductPlaceTypeBranch: Store branch location
       ProductPlaceTypeWarehouse: Central warehouse location
+    x-enum-descriptions:
+    - Store branch location
+    - Central warehouse location
     x-enum-varnames:
     - ProductPlaceTypeBranch
     - ProductPlaceTypeWarehouse
@@ -351,6 +361,9 @@ definitions:
         into an account
       TransactionTypeDebit: debit means - outcome - when money is lost, spent, or
         withdrawn from an account
+    x-enum-descriptions:
+    - credit means - income - when money is gained or received into an account
+    - debit means - outcome - when money is lost, spent, or withdrawn from an account
     x-enum-varnames:
     - TransactionTypeCredit
     - TransactionTypeDebit
@@ -399,18 +412,18 @@ definitions:
       quantity:
         type: integer
     type: object
-host: petstore.swagger.io
+host: g4h.com
 info:
   contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server Petstore server.
+    email: hamidovaslon1@gmail.com
+    name: G4H ERP/POS API
+    url: https://github.com/aslon1213/g4h_pos_erp
+  description: This is a ERP/POS API for G4H.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: G4H ERP/POS API
   version: "1.0"
 paths:
   /api/activities/me:

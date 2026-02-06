@@ -1,13 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server Petstore server.",
-        "title": "Swagger Example API",
+        "description": "This is a ERP/POS API for G4H.",
+        "title": "G4H ERP/POS API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "name": "G4H ERP/POS API",
+            "url": "https://github.com/aslon1213/g4h_pos_erp",
+            "email": "hamidovaslon1@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -15,8 +15,7 @@
         },
         "version": "1.0"
     },
-    "host": "petstore.swagger.io",
-    "basePath": "/v2",
+    "host": "g4h.com",
     "paths": {
         "/api/activities/me": {
             "get": {
@@ -3368,6 +3367,15 @@
             "x-enum-comments": {
                 "InitiatorTypeBNPL": "buy now pay later BNPL transactions"
             },
+            "x-enum-descriptions": [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "buy now pay later BNPL transactions"
+            ],
             "x-enum-varnames": [
                 "InitiatorTypeSalary",
                 "InitiatorTypeRent",
@@ -3601,6 +3609,10 @@
                 "ProductPlaceTypeBranch": "Store branch location",
                 "ProductPlaceTypeWarehouse": "Central warehouse location"
             },
+            "x-enum-descriptions": [
+                "Store branch location",
+                "Central warehouse location"
+            ],
             "x-enum-varnames": [
                 "ProductPlaceTypeBranch",
                 "ProductPlaceTypeWarehouse"
@@ -3730,6 +3742,10 @@
                 "TransactionTypeCredit": "credit means - income - when money is gained or received into an account",
                 "TransactionTypeDebit": "debit means - outcome - when money is lost, spent, or withdrawn from an account"
             },
+            "x-enum-descriptions": [
+                "credit means - income - when money is gained or received into an account",
+                "debit means - outcome - when money is lost, spent, or withdrawn from an account"
+            ],
             "x-enum-varnames": [
                 "TransactionTypeCredit",
                 "TransactionTypeDebit"
