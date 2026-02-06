@@ -14,7 +14,6 @@ import (
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/transactions"
 	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 	"github.com/aslon1213/g4h_pos_erp/pkg/routes"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -36,20 +35,20 @@ type Controllers struct {
 	Dashboard    *analytics.DashboardHandler
 }
 
-func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
+func NewControllers(db *mongo.Database) *Controllers {
 	log.Debug().Msg("Initializing new controllers")
 	middleware := middleware.New(db)
 	controllers := &Controllers{
 		Finance:      finance.New(db),
 		Suppliers:    suppliers.New(db),
 		Transactions: transactions.New(db),
-		Sales:        sales.New(db, cache),
-		Journals:     journal_handlers.New(db, cache),
-		Operations:   journal_handlers.NewOperationsHandler(db, cache),
+		Sales:        sales.New(db),
+		Journals:     journal_handlers.New(db),
+		Operations:   journal_handlers.NewOperationsHandler(db),
 		Products:     products.New(db),
 		Auth:         auth.New(db),
-		Customers:    customers.New(db, cache),
-		BNPL:         bnpl.New(db, cache),
+		Customers:    customers.New(db),
+		BNPL:         bnpl.New(db),
 		Middlewares:  middleware,
 		Dashboard:    analytics.New(db),
 	}
