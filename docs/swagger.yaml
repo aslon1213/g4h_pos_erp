@@ -1,4 +1,3 @@
-basePath: /v2
 definitions:
   auth.LoginInput:
     properties:
@@ -102,6 +101,14 @@ definitions:
     type: string
     x-enum-comments:
       InitiatorTypeBNPL: buy now pay later BNPL transactions
+    x-enum-descriptions:
+    - ""
+    - ""
+    - ""
+    - ""
+    - ""
+    - ""
+    - buy now pay later BNPL transactions
     x-enum-varnames:
     - InitiatorTypeSalary
     - InitiatorTypeRent
@@ -264,6 +271,9 @@ definitions:
     x-enum-comments:
       ProductPlaceTypeBranch: Store branch location
       ProductPlaceTypeWarehouse: Central warehouse location
+    x-enum-descriptions:
+    - Store branch location
+    - Central warehouse location
     x-enum-varnames:
     - ProductPlaceTypeBranch
     - ProductPlaceTypeWarehouse
@@ -351,6 +361,9 @@ definitions:
         into an account
       TransactionTypeDebit: debit means - outcome - when money is lost, spent, or
         withdrawn from an account
+    x-enum-descriptions:
+    - credit means - income - when money is gained or received into an account
+    - debit means - outcome - when money is lost, spent, or withdrawn from an account
     x-enum-varnames:
     - TransactionTypeCredit
     - TransactionTypeDebit
@@ -392,25 +405,18 @@ definitions:
         - $ref: '#/definitions/models.ProductPlace'
         description: Place where the product was uploaded to
     type: object
-  sales.AddProductItemToSessionInput:
-    properties:
-      id:
-        type: string
-      quantity:
-        type: integer
-    type: object
-host: petstore.swagger.io
+host: g4h.com
 info:
   contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server Petstore server.
+    email: hamidovaslon1@gmail.com
+    name: G4H ERP/POS API
+    url: https://github.com/aslon1213/g4h_pos_erp
+  description: This is a ERP/POS API for G4H.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: G4H ERP/POS API
   version: "1.0"
 paths:
   /api/activities/me:
@@ -1648,196 +1654,6 @@ paths:
       summary: Transfer product between locations
       tags:
       - products
-  /api/sales/session/{session_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Deletes a sales session by ID
-      parameters:
-      - description: Session ID
-        in: path
-        name: session_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Output'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Output'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Output'
-      security:
-      - BearerAuth: []
-      summary: Delete a sales session
-      tags:
-      - sales/session
-    get:
-      consumes:
-      - application/json
-      description: Retrieves details of a specific sales session
-      parameters:
-      - description: Session ID
-        in: path
-        name: session_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Output'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Output'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Output'
-      security:
-      - BearerAuth: []
-      summary: Get a sales session by ID
-      tags:
-      - sales/session
-  /api/sales/session/{session_id}/close:
-    post:
-      consumes:
-      - application/json
-      description: Closes an existing sales session and processes the transaction
-      parameters:
-      - description: Session ID
-        in: path
-        name: session_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Output'
-      security:
-      - BearerAuth: []
-      summary: Close a sales session
-      tags:
-      - sales/session
-  /api/sales/session/{session_id}/product:
-    post:
-      consumes:
-      - application/json
-      description: Adds a product item to an existing sales session
-      parameters:
-      - description: Session ID
-        in: path
-        name: session_id
-        required: true
-        type: string
-      - description: Product details
-        in: body
-        name: product
-        required: true
-        schema:
-          $ref: '#/definitions/sales.AddProductItemToSessionInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Output'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Output'
-      security:
-      - BearerAuth: []
-      summary: Add product to sales session
-      tags:
-      - sales/session
-  /api/sales/session/branch/{branch_id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves all sales sessions associated with a branch
-      parameters:
-      - description: Branch ID
-        in: path
-        name: branch_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Output'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Output'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Output'
-      security:
-      - BearerAuth: []
-      summary: Get all sales sessions for a branch
-      tags:
-      - sales/session
-    post:
-      consumes:
-      - application/json
-      description: Creates a new sales session for a branch
-      parameters:
-      - description: Branch ID
-        in: path
-        name: branch_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Output'
-      security:
-      - BearerAuth: []
-      summary: Open a new sales session
-      tags:
-      - sales/session
   /api/sales/transactions/{branch_id}:
     post:
       consumes:
