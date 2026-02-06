@@ -115,6 +115,15 @@ func loadConfigFromEnv(path string) (*Config, error) {
 		},
 	}
 
+	proxyConfig := []ProxyConfig{
+		{
+			Type: "Forward",
+			Path: "/proposals",
+			Addr: "http://localhost:11000",
+			APIKey: "a43459f3-532f-4704-818c-b380e15f27a3",
+		},
+	}
+	
 
 	config := &Config{
 		DB: DBConfig{
@@ -141,6 +150,7 @@ func loadConfigFromEnv(path string) (*Config, error) {
 			SecretSymmetricKey: os.Getenv("SERVER_SECRET_SYMMETRIC_KEY"),
 			TokenExpiryHours:   tokenExpiryHours,
 			AdminDocsUsers:     adminDocsUsers,
+			Proxy: proxyConfig,
 		},
 		S3: S3Config{
 			Region:          os.Getenv("S3_REGION"),
