@@ -209,17 +209,17 @@ func SetupLogger() *zerolog.Logger {
 
 	// Set up output to file
 
-	logFile, err := os.OpenFile("./tmp/application.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		if err == os.ErrNotExist {
-			logfile, err := os.Create("./tmp/application.log")
-			if err != nil {
-				log.Fatal().Err(err).Msg("Failed to create log file")
-			}
-			logFile = logfile
-		}
-		// log.Fatal().Err(err).Msg("Failed to open log file")
-	}
+	// logFile, err := os.OpenFile("./tmp/application.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// if err != nil {
+	// 	if err == os.ErrNotExist {
+	// 		logfile, err := os.Create("./tmp/application.log")
+	// 		if err != nil {
+	// 			log.Fatal().Err(err).Msg("Failed to create log file")
+	// 		}
+	// 		logFile = logfile
+	// 	}
+	// 	// log.Fatal().Err(err).Msg("Failed to open log file")
+	// }
 
 	// set up log output to telegraf
 
@@ -232,7 +232,7 @@ func SetupLogger() *zerolog.Logger {
 	// Use multi-writer for both console and file
 	// loki_writer := LokiLogsWriter{}
 	// go lokiClient.Bgrun()
-	multi := zerolog.MultiLevelWriter(consoler_logger, logFile)
+	multi := zerolog.MultiLevelWriter(consoler_logger)
 	logger := zerolog.New(multi).With().Timestamp().Caller().Logger()
 
 	log.Logger = logger
