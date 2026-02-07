@@ -14,7 +14,10 @@ import "github.com/aslon1213/g4h_pos_erp/pkg/app"
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host g4h.com
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 func main() {
 
 	app := app.New()
