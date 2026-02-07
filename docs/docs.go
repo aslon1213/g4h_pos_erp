@@ -3993,6 +3993,15 @@ const docTemplate = `{
             "x-enum-comments": {
                 "InitiatorTypeBNPL": "buy now pay later BNPL transactions"
             },
+            "x-enum-descriptions": [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "buy now pay later BNPL transactions"
+            ],
             "x-enum-varnames": [
                 "InitiatorTypeSalary",
                 "InitiatorTypeRent",
@@ -4226,6 +4235,10 @@ const docTemplate = `{
                 "ProductPlaceTypeBranch": "Store branch location",
                 "ProductPlaceTypeWarehouse": "Central warehouse location"
             },
+            "x-enum-descriptions": [
+                "Store branch location",
+                "Central warehouse location"
+            ],
             "x-enum-varnames": [
                 "ProductPlaceTypeBranch",
                 "ProductPlaceTypeWarehouse"
@@ -4355,6 +4368,10 @@ const docTemplate = `{
                 "TransactionTypeCredit": "credit means - income - when money is gained or received into an account",
                 "TransactionTypeDebit": "debit means - outcome - when money is lost, spent, or withdrawn from an account"
             },
+            "x-enum-descriptions": [
+                "credit means - income - when money is gained or received into an account",
+                "debit means - outcome - when money is lost, spent, or withdrawn from an account"
+            ],
             "x-enum-varnames": [
                 "TransactionTypeCredit",
                 "TransactionTypeDebit"
@@ -4415,17 +4432,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.ProductPlace"
                         }
                     ]
-                }
-            }
-        },
-        "sales.AddProductItemToSessionInput": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
                 }
             }
         }

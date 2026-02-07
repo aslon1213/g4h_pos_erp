@@ -36,7 +36,6 @@ go.work.sum
 # Added by goreleaser init:
 dist/
 env*
-config.yaml
 bin/main
 *.log
 migrate.ipynb

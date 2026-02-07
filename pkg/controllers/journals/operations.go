@@ -9,7 +9,6 @@ import (
 	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
 	"github.com/aslon1213/g4h_pos_erp/pkg/utils"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	"github.com/aslon1213/g4h_pos_erp/platform/database"
 
 	"github.com/gofiber/fiber/v2"
@@ -25,10 +24,9 @@ type OperationHandlers struct {
 	SuppliersCollections   *mongo.Collection
 	TransactionsCollection *mongo.Collection
 	ActivitiesCollection   *mongo.Collection
-	RedisClient            *cache.Cache
 }
 
-func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHandlers {
+func NewOperationsHandler(db *mongo.Database) *OperationHandlers {
 	ctx := context.Background()
 	journalsCollection := db.Collection("journals")
 	suppliersCollections := db.Collection("suppliers")
@@ -41,7 +39,6 @@ func NewOperationsHandler(db *mongo.Database, cache *cache.Cache) *OperationHand
 		FinancesCollection:     financesCollection,
 		SuppliersCollections:   suppliersCollections,
 		TransactionsCollection: transactionsCollection,
-		RedisClient:            cache,
 		ActivitiesCollection:   activitiesCollection,
 	}
 }
