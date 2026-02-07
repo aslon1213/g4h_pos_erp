@@ -21,18 +21,35 @@ import (
 
 var branches = []string{"xonobod", "polevoy"}
 
-type ArrivalsHandlers struct {
-	ctx                context.Context
-	ArrivalsCollection *mongo.Collection
+type ProposalsHandlers struct {
+	ctx                 context.Context
+	ProposalsCollection *mongo.Collection
 }
 
-// GetImage handles GET /images/{image_name}
-func (h *ArrivalsHandlers) GetImage(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
+func New(db *mongo.Database) *ProposalsHandlers {
+	return &ProposalsHandlers{
+		ctx:                 context.Background(),
+		ProposalsCollection: db.Collection("proposals"),
+	}
+}
+
+// GetImage handles GET /api/proposals/images
+// @Summary Get image by name
+// @Description Retrieves an image file by its name
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce octet-stream
+// @Param image_name query string true "Image name"
+// @Success 200 {file} file "Image file"
+// @Failure 404 {object} map[string]string "Image not found"
+// @Router /api/proposals/images [get]
+func (h *ProposalsHandlers) GetImage(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
 	_, span := tracer.Start(h.ctx, "GetImage")
 	defer span.End()
 
-	imageName := c.Params("image_name")
+	imageName := c.Query("image_name", c.Params("image_name"))
 	imagePath := filepath.Join("images", imageName)
 
 	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
@@ -45,150 +62,186 @@ func (h *ArrivalsHandlers) GetImage(c *fiber.Ctx) error {
 	return c.SendFile(imagePath)
 }
 
-// GetImageByArrivalsID handles GET /{arrivals_id}/image
-func (h *ArrivalsHandlers) GetImageByArrivalsID(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "GetImageByArrivalsID")
+// GetImageByProposalID handles GET /api/proposals/image
+// @Summary Get image upload page by proposal ID
+// @Description Retrieves the image upload page for a specific proposal record
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce html
+// @Param proposal_id query string true "Proposal ID"
+// @Success 200 {string} string "HTML page"
+// @Failure 400 {object} map[string]string "Invalid proposal ID"
+// @Failure 404 {object} map[string]string "Proposal not found"
+// @Router /api/proposals/image [get]
+func (h *ProposalsHandlers) GetImageByProposalID(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "GetImageByProposalID")
 	defer span.End()
 
-	arrivalsID := c.Params("arrivals_id")
-	objectID, err := bson.ObjectIDFromHex(arrivalsID)
+	proposalID := c.Query("proposal_id", c.Params("proposal_id"))
+	objectID, err := bson.ObjectIDFromHex(proposalID)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("get_image_by_arrivals_id.invalid_id")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("get_image_by_proposal_id.invalid_id")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid arrivals ID",
+			"error": "Invalid proposal ID",
 		})
 	}
 
-	var arrivals models.Arrivals
-	err = h.ArrivalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&arrivals)
+	var proposal models.ProductProposal
+	err = h.ProposalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&proposal)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("get_image_by_arrivals_id.not_found")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("get_image_by_proposal_id.not_found")
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-			"error": "Arrivals not found",
+			"error": "Proposal not found",
 		})
 	}
 
 	return c.Render("image_upload", fiber.Map{
-		"arrivals_id": arrivalsID,
-		"image":       arrivals.ImageFile,
-		"url":         fmt.Sprintf("/arrivals/%s/image", arrivalsID),
+		"proposal_id": proposalID,
+		"image":       proposal.ImageFile,
+		"url":         fmt.Sprintf("/proposals/%s/image", proposalID),
 	})
 }
 
-// UploadImage handles POST /{arrivals_id}/image
-func (h *ArrivalsHandlers) UploadImage(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
+// UploadImage handles POST /api/proposals/image
+// @Summary Upload image for proposal
+// @Description Uploads an image file for a specific proposal record
+// @Tags proposals
+// @Security BearerAuth
+// @Accept multipart/form-data
+// @Produce json
+// @Param proposal_id query string true "Proposal ID"
+// @Param file formData file true "Image file to upload"
+// @Success 303 {string} string "Redirect to proposals list"
+// @Failure 400 {object} map[string]string "Invalid proposal ID or no file uploaded"
+// @Failure 404 {object} map[string]string "Proposal not found"
+// @Failure 500 {object} map[string]string "Failed to save file or update proposal"
+// @Router /api/proposals/image [post]
+func (h *ProposalsHandlers) UploadImage(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
 	ctx, span := tracer.Start(h.ctx, "UploadImage")
 	defer span.End()
 
-	arrivalsID := c.Params("arrivals_id")
-	objectID, err := bson.ObjectIDFromHex(arrivalsID)
+	proposalID := c.Query("proposal_id", c.Params("proposal_id"))
+	objectID, err := bson.ObjectIDFromHex(proposalID)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("upload_image.invalid_id")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("upload_image.invalid_id")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid arrivals ID",
+			"error": "Invalid proposal ID",
 		})
 	}
 
 	// Get the uploaded file
 	file, err := c.FormFile("file")
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("upload_image.no_file")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("upload_image.no_file")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"error": "No file uploaded",
 		})
 	}
 
-	// Check if arrivals exists
-	var arrivals models.Arrivals
-	err = h.ArrivalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&arrivals)
+	// Check if proposal exists
+	var proposal models.ProductProposal
+	err = h.ProposalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&proposal)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("upload_image.arrivals_not_found")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("upload_image.proposal_not_found")
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-			"error": "Arrivals not found",
+			"error": "Proposal not found",
 		})
 	}
 
 	// Delete old file if exists
-	if arrivals.ImageFile != nil && *arrivals.ImageFile != "" {
-		oldFilePath := filepath.Join(".", *arrivals.ImageFile)
+	if proposal.ImageFile != nil && *proposal.ImageFile != "" {
+		oldFilePath := filepath.Join(".", *proposal.ImageFile)
 		if _, err := os.Stat(oldFilePath); err == nil {
 			if err := os.Remove(oldFilePath); err != nil {
-				log.Warn().Err(err).Str("arrivals_id", arrivalsID).Msg("upload_image.delete_old_file_failed")
+				log.Warn().Err(err).Str("proposal_id", proposalID).Msg("upload_image.delete_old_file_failed")
 			}
 		}
 	}
 
 	// Save new file
-	newFileName := fmt.Sprintf("%s_%s", arrivalsID, file.Filename)
+	newFileName := fmt.Sprintf("%s_%s", proposalID, file.Filename)
 	newFilePath := filepath.Join("images", newFileName)
 
 	if err := c.SaveFile(file, newFilePath); err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("upload_image.save_failed")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("upload_image.save_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to save file",
 		})
 	}
 
-	// Update arrivals with new image path
-	_, err = h.ArrivalsCollection.UpdateOne(
+	// Update proposal with new image path
+	_, err = h.ProposalsCollection.UpdateOne(
 		ctx,
 		bson.M{"_id": objectID},
 		bson.M{"$set": bson.M{"image_file": newFilePath}},
 	)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("upload_image.update_failed")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("upload_image.update_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to update arrivals",
+			"error": "Failed to update proposal",
 		})
 	}
 
-	log.Info().Str("arrivals_id", arrivalsID).Str("filename", file.Filename).Msg("upload_image.success")
-	return c.Redirect("/arrivals/", http.StatusSeeOther)
+	log.Info().Str("proposal_id", proposalID).Str("filename", file.Filename).Msg("upload_image.success")
+	return c.Redirect("/proposals/", http.StatusSeeOther)
 }
 
-// NewArrivals handles POST /{branch}/new
-func (h *ArrivalsHandlers) NewArrivals(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "NewArrivals")
+// NewProposals handles POST /api/proposals/new
+// @Summary Create new proposals
+// @Description Creates new proposal records for a specific branch
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param branch query string true "Branch name"
+// @Param body body []string true "List of proposal names"
+// @Success 200 {object} map[string]interface{} "Proposals created successfully"
+// @Failure 400 {object} map[string]string "Invalid branch or request body"
+// @Failure 500 {object} map[string]string "Failed to create proposals"
+// @Router /api/proposals/new [post]
+func (h *ProposalsHandlers) NewProposals(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "NewProposals")
 	defer span.End()
 
-	branch := c.Params("branch")
+	branch := c.Query("branch", c.Params("branch"))
 	if !h.checkBranch(branch) {
-		log.Error().Str("branch", branch).Msg("new_arrivals.invalid_branch")
+		log.Error().Str("branch", branch).Msg("new_proposals.invalid_branch")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid branch",
 		})
 	}
 
-	var arrivalsNames []string
-	if err := c.BodyParser(&arrivalsNames); err != nil {
-		log.Error().Err(err).Str("branch", branch).Msg("new_arrivals.parse_error")
+	var proposalNames []string
+	if err := c.BodyParser(&proposalNames); err != nil {
+		log.Error().Err(err).Str("branch", branch).Msg("new_proposals.parse_error")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
 		})
 	}
 
-	var arrivalsToInsert []interface{}
+	var proposalsToInsert []interface{}
 	now := time.Now()
 
-	for _, name := range arrivalsNames {
-		arrivals := models.Arrivals{
+	for _, name := range proposalNames {
+		proposal := models.ProductProposal{
 			ID:        bson.NewObjectID(),
 			Name:      name,
 			Date:      now,
 			Branch:    branch,
 			Fulfilled: false,
 		}
-		arrivalsToInsert = append(arrivalsToInsert, arrivals)
+		proposalsToInsert = append(proposalsToInsert, proposal)
 	}
 
-	result, err := h.ArrivalsCollection.InsertMany(ctx, arrivalsToInsert)
+	result, err := h.ProposalsCollection.InsertMany(ctx, proposalsToInsert)
 	if err != nil {
-		log.Error().Err(err).Str("branch", branch).Msg("new_arrivals.insert_failed")
+		log.Error().Err(err).Str("branch", branch).Msg("new_proposals.insert_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create arrivals",
+			"error": "Failed to create proposals",
 		})
 	}
 
@@ -197,17 +250,32 @@ func (h *ArrivalsHandlers) NewArrivals(c *fiber.Ctx) error {
 		outputIDs = append(outputIDs, id.(bson.ObjectID).Hex())
 	}
 
-	log.Info().Str("branch", branch).Int("count", len(arrivalsNames)).Msg("new_arrivals.success")
+	log.Info().Str("branch", branch).Int("count", len(proposalNames)).Msg("new_proposals.success")
 	return c.JSON(fiber.Map{
-		"message":     "Arrivals created successfully",
-		"arrivals_id": outputIDs,
+		"message":      "Proposals created successfully",
+		"proposal_ids": outputIDs,
 	})
 }
 
-// GetArrivals handles GET ""
-func (h *ArrivalsHandlers) GetArrivals(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "GetArrivals")
+// GetProposals handles GET /api/proposals
+// @Summary Get all proposals
+// @Description Retrieves all proposals with optional filters
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param name query string false "Filter by name (case-insensitive)"
+// @Param branch query string false "Filter by branch (case-insensitive)"
+// @Param fulfilled query string false "Filter by fulfilled status (true/false)" default(false)
+// @Param date_from query string false "Filter by start date (YYYY-MM-DD)"
+// @Param date_to query string false "Filter by end date (YYYY-MM-DD)"
+// @Success 200 {array} map[string]interface{} "List of proposals"
+// @Failure 400 {object} map[string]string "Invalid date format"
+// @Failure 500 {object} map[string]string "Failed to fetch or decode proposals"
+// @Router /api/proposals [get]
+func (h *ProposalsHandlers) GetProposals(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "GetProposals")
 	defer span.End()
 
 	filter := bson.M{}
@@ -235,18 +303,20 @@ func (h *ArrivalsHandlers) GetArrivals(c *fiber.Ctx) error {
 	if dateFrom := c.Query("date_from"); dateFrom != "" {
 		parsedDate, err := time.Parse("2006-01-02", dateFrom)
 		if err != nil {
-			log.Error().Str("date_from", dateFrom).Msg("get_arrivals.invalid_date_from")
+			log.Error().Str("date_from", dateFrom).Msg("get_proposals.invalid_date_from")
 			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid date_from format. Use YYYY-MM-DD.",
 			})
 		}
 		filter["date"] = bson.M{"$gte": parsedDate}
+	} else {
+		filter["date"] = bson.M{"$gte": time.Now().Add(-30 * 24 * time.Hour)}
 	}
 
 	if dateTo := c.Query("date_to"); dateTo != "" {
 		parsedDate, err := time.Parse("2006-01-02", dateTo)
 		if err != nil {
-			log.Error().Str("date_to", dateTo).Msg("get_arrivals.invalid_date_to")
+			log.Error().Str("date_to", dateTo).Msg("get_proposals.invalid_date_to")
 			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid date_to format. Use YYYY-MM-DD.",
 			})
@@ -257,199 +327,245 @@ func (h *ArrivalsHandlers) GetArrivals(c *fiber.Ctx) error {
 		} else {
 			filter["date"] = bson.M{"$lte": parsedDate}
 		}
+	} else {
+
+		
+		if _, exists := filter["date"]; exists {
+			filter["date"].(bson.M)["$lte"] = time.Now()
+		} else {
+			filter["date"] = bson.M{"$lte": time.Now()}
+		}
+		
 	}
 
-	cursor, err := h.ArrivalsCollection.Find(ctx, filter)
+	cursor, err := h.ProposalsCollection.Find(ctx, filter)
 	if err != nil {
-		log.Error().Err(err).Msg("get_arrivals.find_failed")
+		log.Error().Err(err).Msg("get_proposals.find_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to fetch arrivals",
+			"error": "Failed to fetch proposals",
 		})
 	}
 	defer cursor.Close(ctx)
 
-	var arrivals []models.Arrivals
-	if err := cursor.All(ctx, &arrivals); err != nil {
-		log.Error().Err(err).Msg("get_arrivals.decode_failed")
+	var proposals []models.ProductProposal
+	if err := cursor.All(ctx, &proposals); err != nil {
+		log.Error().Err(err).Msg("get_proposals.decode_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to decode arrivals",
+			"error": "Failed to decode proposals",
 		})
 	}
 
 	// Format dates for response
-	var response []fiber.Map
-	for _, arrival := range arrivals {
+	response := []fiber.Map{}
+	for _, proposal := range proposals {
 		response = append(response, fiber.Map{
-			"_id":       arrival.ID.Hex(),
-			"name":      arrival.Name,
-			"date":      arrival.Date.Format("02-01-2006"),
-			"branch":    arrival.Branch,
-			"fulfilled": arrival.Fulfilled,
+			"_id":       proposal.ID.Hex(),
+			"name":      proposal.Name,
+			"date":      proposal.Date.Format("02-01-2006"),
+			"branch":    proposal.Branch,
+			"fulfilled": proposal.Fulfilled,
 		})
 	}
 
-	log.Info().Interface("filter", filter).Int("count", len(arrivals)).Msg("get_arrivals.success")
+	log.Info().Interface("filter", filter).Int("count", len(proposals)).Msg("get_proposals.success")
 	return c.JSON(response)
 }
 
-// GetArrivals handles GET /{arrivals_id}
-func (h *ArrivalsHandlers) GetArrivalsDetail(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "GetArrivalsDetail")
+// GetProposalDetail handles GET /api/proposals/detail
+// @Summary Get proposal detail
+// @Description Retrieves detailed information for a specific proposal record
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce html
+// @Param proposal_id query string true "Proposal ID"
+// @Success 200 {string} string "HTML page with proposal details"
+// @Failure 400 {object} map[string]string "Invalid proposal ID"
+// @Failure 404 {object} map[string]string "Proposal not found"
+// @Router /api/proposals/detail [get]
+func (h *ProposalsHandlers) GetProposalDetail(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "GetProposalDetail")
 	defer span.End()
 
-	arrivalsID := c.Params("arrivals_id")
-	objectID, err := bson.ObjectIDFromHex(arrivalsID)
+	proposalID := c.Query("proposal_id", c.Params("proposal_id"))
+	objectID, err := bson.ObjectIDFromHex(proposalID)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("get_arrivals_detail.invalid_id")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("get_proposal_detail.invalid_id")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid arrivals ID",
+			"error": "Invalid proposal ID",
 		})
 	}
 
-	var arrivals models.Arrivals
-	err = h.ArrivalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&arrivals)
+	var proposal models.ProductProposal
+	err = h.ProposalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&proposal)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("get_arrivals_detail.not_found")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("get_proposal_detail.not_found")
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-			"error": "Arrivals not found",
+			"error": "Proposal not found",
 		})
 	}
 
-	log.Info().Str("arrivals_id", arrivalsID).Msg("get_arrivals_detail.success")
-	return c.Render("arrivals", fiber.Map{
-		"arrivals": fiber.Map{
-			"_id":       arrivals.ID.Hex(),
-			"name":      arrivals.Name,
-			"date":      arrivals.Date.Format("02-01-2006"),
-			"branch":    arrivals.Branch,
-			"fulfilled": arrivals.Fulfilled,
+	log.Info().Str("proposal_id", proposalID).Msg("get_proposal_detail.success")
+	return c.Render("proposal", fiber.Map{
+		"proposal": fiber.Map{
+			"_id":       proposal.ID.Hex(),
+			"name":      proposal.Name,
+			"date":      proposal.Date.Format("02-01-2006"),
+			"branch":    proposal.Branch,
+			"fulfilled": proposal.Fulfilled,
 		},
 		"action": "view",
 	})
 }
 
-// EditArrivals handles POST /{arrivals_id}/edit
-func (h *ArrivalsHandlers) EditArrivals(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "EditArrivals")
+// EditProposalRequest represents the request body for editing a proposal
+type EditProposalRequest struct {
+	Name      string `json:"name" form:"name"`
+	Branch    string `json:"branch" form:"branch"`
+	Fulfilled *bool  `json:"fulfilled" form:"fulfilled"`
+}
+
+// EditProposal handles put /api/proposals/edit
+// @Summary Edit proposal
+// @Description Updates an existing proposal record
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json,application/x-www-form-urlencoded
+// @Produce json 
+// @Param proposal_id query string true "Proposal ID"
+// @Param body body EditProposalRequest false "Proposal update data"
+// @Success 302 {string} string "Redirect to proposals list"
+// @Failure 400 {object} map[string]string "Invalid proposal ID or request data"
+// @Failure 500 {object} map[string]string "Failed to update proposal"
+// @Router /api/proposals/edit [put]
+func (h *ProposalsHandlers) EditProposal(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "EditProposal")
 	defer span.End()
 
-	arrivalsID := c.Params("arrivals_id")
-	objectID, err := bson.ObjectIDFromHex(arrivalsID)
+	proposalID := c.Query("proposal_id", c.Params("proposal_id"))
+	objectID, err := bson.ObjectIDFromHex(proposalID)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("edit_arrivals.invalid_id")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("edit_proposal.invalid_id")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid arrivals ID",
+			"error": "Invalid proposal ID",
+		})
+	}
+
+	var req EditProposalRequest
+	if err := c.BodyParser(&req); err != nil {
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("edit_proposal.parse_error")
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request data",
 		})
 	}
 
 	update := bson.M{"$set": bson.M{}}
 
-	contentType := c.Get("Content-Type")
-	if strings.Contains(contentType, "application/json") {
-		var data map[string]interface{}
-		if err := c.BodyParser(&data); err != nil {
-			log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("edit_arrivals.parse_json_error")
-			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid JSON data",
-			})
-		}
-
-		if name, ok := data["name"].(string); ok && name != "" {
-			update["$set"].(bson.M)["name"] = name
-		}
-		if branch, ok := data["branch"].(string); ok && branch != "" {
-			update["$set"].(bson.M)["branch"] = branch
-		}
-		if fulfilled, ok := data["fulfilled"]; ok {
-			if fulfilledStr, ok := fulfilled.(string); ok {
-				update["$set"].(bson.M)["fulfilled"] = strings.ToLower(fulfilledStr) == "true"
-			} else if fulfilledBool, ok := fulfilled.(bool); ok {
-				update["$set"].(bson.M)["fulfilled"] = fulfilledBool
-			}
-		}
-	} else {
-		if name := c.FormValue("name"); name != "" {
-			update["$set"].(bson.M)["name"] = name
-		}
-		if branch := c.FormValue("branch"); branch != "" {
-			update["$set"].(bson.M)["branch"] = branch
-		}
-		if fulfilled := c.FormValue("fulfilled"); fulfilled != "" {
-			update["$set"].(bson.M)["fulfilled"] = strings.ToLower(fulfilled) == "true"
-		}
+	if req.Name != "" {
+		update["$set"].(bson.M)["name"] = req.Name
+	}
+	if req.Branch != "" {
+		update["$set"].(bson.M)["branch"] = req.Branch
+	}
+	if req.Fulfilled != nil {
+		update["$set"].(bson.M)["fulfilled"] = *req.Fulfilled
 	}
 
-	_, err = h.ArrivalsCollection.UpdateOne(ctx, bson.M{"_id": objectID}, update)
+	_, err = h.ProposalsCollection.UpdateOne(ctx, bson.M{"_id": objectID}, update)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("edit_arrivals.update_failed")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("edit_proposal.update_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to update arrivals",
+			"error": "Failed to update proposal",
 		})
 	}
 
-	log.Info().Str("arrivals_id", arrivalsID).Interface("updates", update["$set"]).Msg("edit_arrivals.success")
-	return c.Redirect("/arrivals", http.StatusFound)
+	log.Info().Str("proposal_id", proposalID).Interface("updates", update["$set"]).Msg("edit_proposal.success")
+	return c.Redirect("/proposals", http.StatusFound)
 }
 
-// DeleteArrivals handles POST /{arrivals_id}/delete
-func (h *ArrivalsHandlers) DeleteArrivals(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "DeleteArrivals")
+// DeleteProposal handles DELETE /api/proposals/delete
+// @Summary Delete proposal
+// @Description Deletes a proposal record and its associated image file
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param proposal_id query string true "Proposal ID"
+// @Success 302 {string} string "Redirect to proposals list"
+// @Failure 400 {object} map[string]string "Invalid proposal ID"
+// @Failure 404 {object} map[string]string "Proposal not found"
+// @Failure 500 {object} map[string]string "Failed to delete proposal"
+// @Router /api/proposals/delete [delete]
+func (h *ProposalsHandlers) DeleteProposal(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "DeleteProposal")
 	defer span.End()
 
-	arrivalsID := c.Params("arrivals_id")
-	objectID, err := bson.ObjectIDFromHex(arrivalsID)
+	proposalID := c.Query("proposal_id", c.Params("proposal_id"))
+	objectID, err := bson.ObjectIDFromHex(proposalID)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("delete_arrivals.invalid_id")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("delete_proposal.invalid_id")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid arrivals ID",
+			"error": "Invalid proposal ID",
 		})
 	}
 
-	// Get the arrivals first to check for image file
-	var arrivals models.Arrivals
-	err = h.ArrivalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&arrivals)
+	// Get the proposal first to check for image file
+	var proposal models.ProductProposal
+	err = h.ProposalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&proposal)
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("delete_arrivals.not_found")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("delete_proposal.not_found")
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-			"error": "Arrivals not found",
+			"error": "Proposal not found",
 		})
 	}
 
-	// Delete the arrivals
-	_, err = h.ArrivalsCollection.DeleteOne(ctx, bson.M{"_id": objectID})
+	// Delete the proposal
+	_, err = h.ProposalsCollection.DeleteOne(ctx, bson.M{"_id": objectID})
 	if err != nil {
-		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("delete_arrivals.delete_failed")
+		log.Error().Err(err).Str("proposal_id", proposalID).Msg("delete_proposal.delete_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to delete arrivals",
+			"error": "Failed to delete proposal",
 		})
 	}
 
 	// Delete the image file if it exists
-	if arrivals.ImageFile != nil && *arrivals.ImageFile != "" {
-		imageFilePath := filepath.Join(".", *arrivals.ImageFile)
+	if proposal.ImageFile != nil && *proposal.ImageFile != "" {
+		imageFilePath := filepath.Join(".", *proposal.ImageFile)
 		if _, err := os.Stat(imageFilePath); err == nil {
 			if err := os.Remove(imageFilePath); err != nil {
-				log.Warn().Err(err).Str("arrivals_id", arrivalsID).Msg("delete_arrivals.image_delete_failed")
+				log.Warn().Err(err).Str("proposal_id", proposalID).Msg("delete_proposal.image_delete_failed")
 			}
 		}
 	}
 
-	log.Info().Str("arrivals_id", arrivalsID).Msg("delete_arrivals.success")
-	return c.Redirect("/arrivals", http.StatusFound)
+	log.Info().Str("proposal_id", proposalID).Msg("delete_proposal.success")
+	return c.Redirect("/proposals", http.StatusFound)
 }
 
-// FulfillArrivals handles GET /{branch}/fulfill
-func (h *ArrivalsHandlers) FulfillArrivals(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
-	ctx, span := tracer.Start(h.ctx, "FulfillArrivals")
+// FulfillProposals handles GET /api/proposals/fulfill
+// @Summary Fulfill proposals
+// @Description Marks multiple proposals as fulfilled for a specific branch
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param branch query string true "Branch name"
+// @Param ids query string true "Comma-separated list of proposal IDs"
+// @Success 200 {object} map[string]interface{} "Fulfillment result"
+// @Failure 400 {object} map[string]string "Invalid branch or no valid IDs provided"
+// @Failure 500 {object} map[string]string "Failed to fulfill proposals"
+// @Router /api/proposals/fulfill [get]
+func (h *ProposalsHandlers) FulfillProposals(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
+	ctx, span := tracer.Start(h.ctx, "FulfillProposals")
 	defer span.End()
 
-	branch := c.Params("branch")
+	branch := c.Query("branch", c.Params("branch"))
 	if !h.checkBranch(branch) {
-		log.Error().Str("branch", branch).Msg("fulfill_arrivals.invalid_branch")
+		log.Error().Str("branch", branch).Msg("fulfill_proposals.invalid_branch")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid branch",
 		})
@@ -457,32 +573,32 @@ func (h *ArrivalsHandlers) FulfillArrivals(c *fiber.Ctx) error {
 
 	idsParam := c.Query("ids", "")
 	if idsParam == "" {
-		log.Error().Str("branch", branch).Msg("fulfill_arrivals.no_ids")
+		log.Error().Str("branch", branch).Msg("fulfill_proposals.no_ids")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "No arrivals IDs provided",
+			"error": "No proposal IDs provided",
 		})
 	}
 
-	arrivalsIDs := strings.Split(idsParam, ",")
+	proposalIDs := strings.Split(idsParam, ",")
 	var objectIDs []bson.ObjectID
 
-	for _, id := range arrivalsIDs {
+	for _, id := range proposalIDs {
 		objectID, err := bson.ObjectIDFromHex(strings.TrimSpace(id))
 		if err != nil {
-			log.Error().Err(err).Str("id", id).Msg("fulfill_arrivals.invalid_id")
+			log.Error().Err(err).Str("id", id).Msg("fulfill_proposals.invalid_id")
 			continue
 		}
 		objectIDs = append(objectIDs, objectID)
 	}
 
 	if len(objectIDs) == 0 {
-		log.Error().Str("branch", branch).Msg("fulfill_arrivals.no_valid_ids")
+		log.Error().Str("branch", branch).Msg("fulfill_proposals.no_valid_ids")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"error": "No valid arrivals IDs provided",
+			"error": "No valid proposal IDs provided",
 		})
 	}
 
-	result, err := h.ArrivalsCollection.UpdateMany(
+	result, err := h.ProposalsCollection.UpdateMany(
 		ctx,
 		bson.M{
 			"_id":    bson.M{"$in": objectIDs},
@@ -491,83 +607,92 @@ func (h *ArrivalsHandlers) FulfillArrivals(c *fiber.Ctx) error {
 		bson.M{"$set": bson.M{"fulfilled": true}},
 	)
 	if err != nil {
-		log.Error().Err(err).Str("branch", branch).Msg("fulfill_arrivals.update_failed")
+		log.Error().Err(err).Str("branch", branch).Msg("fulfill_proposals.update_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to fulfill arrivals",
+			"error": "Failed to fulfill proposals",
 		})
 	}
 
 	log.Info().
 		Str("branch", branch).
-		Strs("arrivals_ids", arrivalsIDs).
+		Strs("proposal_ids", proposalIDs).
 		Int64("matched_count", result.MatchedCount).
 		Int64("modified_count", result.ModifiedCount).
-		Msg("fulfill_arrivals.success")
+		Msg("fulfill_proposals.success")
 
 	return c.JSON(fiber.Map{
 		"acknowledged":        true,
-		"total_number_of_ids": len(arrivalsIDs),
+		"total_number_of_ids": len(proposalIDs),
 		"matched_count":       result.MatchedCount,
 		"modified_count":      result.ModifiedCount,
 		"upserted_id":         nil,
 	})
 }
 
-// GeneratePDF handles GET /pdf/pdf
-func (h *ArrivalsHandlers) GeneratePDF(c *fiber.Ctx) error {
-	tracer := otel.Tracer("arrivals-handlers")
+// GeneratePDF handles GET /api/proposals/pdf/pdf
+// @Summary Generate PDF
+// @Description Generates a PDF document with unfulfilled proposals
+// @Tags proposals
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{} "PDF generation result with proposals data"
+// @Failure 500 {object} map[string]string "Failed to fetch or decode proposals"
+// @Router /api/proposals/pdf/pdf [get]
+func (h *ProposalsHandlers) GeneratePDF(c *fiber.Ctx) error {
+	tracer := otel.Tracer("proposals-handlers")
 	ctx, span := tracer.Start(h.ctx, "GeneratePDF")
 	defer span.End()
 
 	filter := bson.M{"fulfilled": false}
-	cursor, err := h.ArrivalsCollection.Find(ctx, filter)
+	cursor, err := h.ProposalsCollection.Find(ctx, filter)
 	if err != nil {
 		log.Error().Err(err).Msg("generate_pdf.find_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to fetch arrivals",
+			"error": "Failed to fetch proposals",
 		})
 	}
 	defer cursor.Close(ctx)
 
-	var arrivals []models.Arrivals
-	if err := cursor.All(ctx, &arrivals); err != nil {
+	var proposals []models.ProductProposal
+	if err := cursor.All(ctx, &proposals); err != nil {
 		log.Error().Err(err).Msg("generate_pdf.decode_failed")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to decode arrivals",
+			"error": "Failed to decode proposals",
 		})
 	}
 
-	// Format arrivals for PDF
-	var formattedArrivals []fiber.Map
-	baseURL := os.Getenv("ARRIVALS_BASE_URL")
-	for _, arrival := range arrivals {
+	// Format proposals for PDF
+	var formattedProposals []fiber.Map
+	baseURL := os.Getenv("PROPOSALS_BASE_URL")
+	for _, proposal := range proposals {
 		imageFile := ""
-		if arrival.ImageFile != nil && *arrival.ImageFile != "" && baseURL != "" {
-			imageFile = baseURL + *arrival.ImageFile
+		if proposal.ImageFile != nil && *proposal.ImageFile != "" && baseURL != "" {
+			imageFile = baseURL + *proposal.ImageFile
 		}
 
-		formattedArrivals = append(formattedArrivals, fiber.Map{
-			"_id":        arrival.ID.Hex(),
-			"name":       arrival.Name,
-			"date":       arrival.Date.Format("02-01-2006"),
-			"branch":     arrival.Branch,
-			"fulfilled":  arrival.Fulfilled,
+		formattedProposals = append(formattedProposals, fiber.Map{
+			"_id":        proposal.ID.Hex(),
+			"name":       proposal.Name,
+			"date":       proposal.Date.Format("02-01-2006"),
+			"branch":     proposal.Branch,
+			"fulfilled":  proposal.Fulfilled,
 			"image_file": imageFile,
 		})
 	}
 
 	// Render PDF template (this would need to be implemented with a PDF library)
 	// For now, returning JSON response
-	log.Info().Int("arrivals_count", len(arrivals)).Msg("generate_pdf.success")
+	log.Info().Int("proposals_count", len(proposals)).Msg("generate_pdf.success")
 
 	return c.JSON(fiber.Map{
-		"message":  "PDF generation not implemented yet",
-		"arrivals": formattedArrivals,
+		"message":   "PDF generation not implemented yet",
+		"proposals": formattedProposals,
 	})
 }
 
 // Helper function to check branch validity
-func (h *ArrivalsHandlers) checkBranch(branch string) bool {
+func (h *ProposalsHandlers) checkBranch(branch string) bool {
 
 	// Implement branch validation logic here
 	// This is a placeholder implementation
@@ -579,103 +704,3 @@ func (h *ArrivalsHandlers) checkBranch(branch string) bool {
 	}
 	return false
 }
-
-// ##########################################################################################################################################
-// ##########################################################################################################################################
-// ##########################################################################################################################################
-// NewArrivalsTemplate handles GET /{branch}/new
-// func (h *ArrivalsHandlers) NewArrivalsTemplate(c *fiber.Ctx) error {
-// 	tracer := otel.Tracer("arrivals-handlers")
-// 	_, span := tracer.Start(h.ctx, "NewArrivalsTemplate")
-// 	defer span.End()
-
-// 	branch := c.Params("branch")
-// 	if branch == "" {
-// 		log.Error().Str("branch", branch).Msg("new_arrivals_template.invalid_branch")
-// 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "Invalid branch",
-// 		})
-// 	}
-
-// 	// Check branch validity (implement check_branch logic)
-// 	if !h.checkBranch(branch) {
-// 		log.Error().Str("branch", branch).Msg("new_arrivals_template.invalid_branch_check")
-// 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "Invalid branch",
-// 		})
-// 	}
-
-// 	return c.Render("new_arrivals", fiber.Map{
-// 		"branch": branch,
-// 	})
-// }
-
-// // DeleteArrivalsTemplate handles GET /{arrivals_id}/delete
-// func (h *ArrivalsHandlers) DeleteArrivalsTemplate(c *fiber.Ctx) error {
-// 	tracer := otel.Tracer("arrivals-handlers")
-// 	ctx, span := tracer.Start(h.ctx, "DeleteArrivalsTemplate")
-// 	defer span.End()
-
-// 	arrivalsID := c.Params("arrivals_id")
-// 	objectID, err := bson.ObjectIDFromHex(arrivalsID)
-// 	if err != nil {
-// 		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("delete_arrivals_template.invalid_id")
-// 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "Invalid arrivals ID",
-// 		})
-// 	}
-
-// 	var arrivals models.Arrivals
-// 	err = h.ArrivalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&arrivals)
-// 	if err != nil {
-// 		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("delete_arrivals_template.not_found")
-// 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-// 			"error": "Arrivals not found",
-// 		})
-// 	}
-
-// 	log.Info().Str("arrivals_id", arrivalsID).Msg("delete_arrivals_template.success")
-// 	return c.Render("arrivals", fiber.Map{
-// 		"arrivals": fiber.Map{
-// 			"_id": arrivals.ID.Hex(),
-// 		},
-// 		"action": "delete",
-// 	})
-// }
-
-// // EditArrivalsTemplate handles GET /{arrivals_id}/edit
-// func (h *ArrivalsHandlers) EditArrivalsTemplate(c *fiber.Ctx) error {
-// 	tracer := otel.Tracer("arrivals-handlers")
-// 	ctx, span := tracer.Start(h.ctx, "EditArrivalsTemplate")
-// 	defer span.End()
-
-// 	arrivalsID := c.Params("arrivals_id")
-// 	objectID, err := bson.ObjectIDFromHex(arrivalsID)
-// 	if err != nil {
-// 		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("edit_arrivals_template.invalid_id")
-// 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-// 			"error": "Invalid arrivals ID",
-// 		})
-// 	}
-
-// 	var arrivals models.Arrivals
-// 	err = h.ArrivalsCollection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&arrivals)
-// 	if err != nil {
-// 		log.Error().Err(err).Str("arrivals_id", arrivalsID).Msg("edit_arrivals_template.not_found")
-// 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
-// 			"error": "Arrivals not found",
-// 		})
-// 	}
-
-// 	log.Info().Str("arrivals_id", arrivalsID).Msg("edit_arrivals_template.success")
-// 	return c.Render("arrivals", fiber.Map{
-// 		"arrivals": fiber.Map{
-// 			"_id":       arrivals.ID.Hex(),
-// 			"name":      arrivals.Name,
-// 			"date":      arrivals.Date.Format("2006-01-02"),
-// 			"branch":    arrivals.Branch,
-// 			"fulfilled": arrivals.Fulfilled,
-// 		},
-// 		"action": "edit",
-// 	})
-// }
