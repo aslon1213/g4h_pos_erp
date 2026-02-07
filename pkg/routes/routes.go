@@ -7,6 +7,7 @@ import (
 
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/analytics"
+	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/arrivals"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/auth"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers/bnpl"
@@ -155,6 +156,18 @@ func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middlewa
 	api.Get("/bnpl/:id", bnplController.GetBNPLByID)                            // get bnpl by id
 	api.Get("/customers/:customer_id/bnpls", bnplController.GetBNPLSofCustomer) // get bnpls of customer
 	api.Get("/branches/:branch_id/bnpls", bnplController.GetBNPLsOfBranch)      // get bnpls of branch
+}
+
+func ProposalsRoutes(router *fiber.App, proposalsController *arrivals.ProposalsHandlers, middleware *middleware.Middlewares) {
+	api := router.Group("/api")
+	api.Get("/proposals", proposalsController.GetProposals) // get proposals
+	api.Get("/proposals/detail", proposalsController.GetProposalDetail) // get proposal by id
+	api.Post("/proposals/new", proposalsController.NewProposals) // create proposal
+	api.Put("/proposals/edit", proposalsController.EditProposal) // update proposal
+	api.Delete("/proposals/delete", proposalsController.DeleteProposal) // delete proposal
+	api.Get("/proposals/image", proposalsController.GetImageByProposalID) // get image by proposal id
+	api.Post("/proposals/image", proposalsController.UploadImage) // upload image
+	api.Get("/proposals/pdf/pdf", proposalsController.GeneratePDF) // generate pdf
 }
 
 

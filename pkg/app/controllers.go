@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/analytics"
+	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/arrivals"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/auth"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers/bnpl"
@@ -34,6 +35,7 @@ type Controllers struct {
 	Customers    *customers.CustomersController
 	Middlewares  *middleware.Middlewares
 	Dashboard    *analytics.DashboardHandler
+	Proposals    *arrivals.ProposalsHandlers
 }
 
 func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
@@ -52,6 +54,7 @@ func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
 		BNPL:         bnpl.New(db, cache),
 		Middlewares:  middleware,
 		Dashboard:    analytics.New(db),
+		Proposals:    arrivals.New(db),
 	}
 	log.Debug().Msg("Controllers initialized successfully")
 	return controllers
@@ -93,5 +96,7 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	log.Debug().Msg("Dashboard routes set up successfully")
 	routes.ProxyRoutes(app, controllers.Middlewares)
 	log.Debug().Msg("Proxy routes set up successfully")
+	routes.ProposalsRoutes(app, controllers.Proposals, controllers.Middlewares)
+	log.Debug().Msg("Proposals routes set up successfully")
 	log.Debug().Msg("All routes set up successfully")
 }

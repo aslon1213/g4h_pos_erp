@@ -70,7 +70,12 @@ type AdminDocsUser struct {
 func LoadConfig(path string) (*Config, error) {
 	filename := "config"
 	if strings.ToLower(os.Getenv("ENVIRONMENT")) != "production" {
-		filename = "config.local"
+		if os.Getenv("CONFIG_FILE") == "" {
+			filename = "config.local"
+		} else {
+			filename = os.Getenv("CONFIG_FILE")
+		}
+		
 	}
 	if !ENVT_TYPE_LOGGED {
 		log.Info().Str("ENVIRONMENT", os.Getenv("ENVIRONMENT")).Str("filename", filename).Msg("ENVIRONMENT")

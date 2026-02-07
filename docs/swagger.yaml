@@ -1,5 +1,13 @@
-basePath: /v2
 definitions:
+  arrivals.EditProposalRequest:
+    properties:
+      branch:
+        type: string
+      fulfilled:
+        type: boolean
+      name:
+        type: string
+    type: object
   auth.LoginInput:
     properties:
       password:
@@ -399,18 +407,17 @@ definitions:
       quantity:
         type: integer
     type: object
-host: petstore.swagger.io
 info:
   contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server Petstore server.
+    email: hamidovaslon1@gmail.com
+    name: G4H ERP/POS API
+    url: https://github.com/aslon1213/g4h_pos_erp
+  description: This is a ERP/POS API for G4H.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+  title: G4H ERP/POS API
   version: "1.0"
 paths:
   /api/activities/me:
@@ -1648,6 +1655,395 @@ paths:
       summary: Transfer product between locations
       tags:
       - products
+  /api/proposals:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all proposals with optional filters
+      parameters:
+      - description: Filter by name (case-insensitive)
+        in: query
+        name: name
+        type: string
+      - description: Filter by branch (case-insensitive)
+        in: query
+        name: branch
+        type: string
+      - default: "false"
+        description: Filter by fulfilled status (true/false)
+        in: query
+        name: fulfilled
+        type: string
+      - description: Filter by start date (YYYY-MM-DD)
+        in: query
+        name: date_from
+        type: string
+      - description: Filter by end date (YYYY-MM-DD)
+        in: query
+        name: date_to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of proposals
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Invalid date format
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to fetch or decode proposals
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all proposals
+      tags:
+      - proposals
+  /api/proposals/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a proposal record and its associated image file
+      parameters:
+      - description: Proposal ID
+        in: query
+        name: proposal_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to proposals list
+          schema:
+            type: string
+        "400":
+          description: Invalid proposal ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Proposal not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to delete proposal
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete proposal
+      tags:
+      - proposals
+  /api/proposals/detail:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves detailed information for a specific proposal record
+      parameters:
+      - description: Proposal ID
+        in: query
+        name: proposal_id
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page with proposal details
+          schema:
+            type: string
+        "400":
+          description: Invalid proposal ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Proposal not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get proposal detail
+      tags:
+      - proposals
+  /api/proposals/edit:
+    put:
+      consumes:
+      - application/json
+      - application/x-www-form-urlencoded
+      description: Updates an existing proposal record
+      parameters:
+      - description: Proposal ID
+        in: query
+        name: proposal_id
+        required: true
+        type: string
+      - description: Proposal update data
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/arrivals.EditProposalRequest'
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Redirect to proposals list
+          schema:
+            type: string
+        "400":
+          description: Invalid proposal ID or request data
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to update proposal
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Edit proposal
+      tags:
+      - proposals
+  /api/proposals/fulfill:
+    get:
+      consumes:
+      - application/json
+      description: Marks multiple proposals as fulfilled for a specific branch
+      parameters:
+      - description: Branch name
+        in: query
+        name: branch
+        required: true
+        type: string
+      - description: Comma-separated list of proposal IDs
+        in: query
+        name: ids
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Fulfillment result
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid branch or no valid IDs provided
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to fulfill proposals
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Fulfill proposals
+      tags:
+      - proposals
+  /api/proposals/image:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the image upload page for a specific proposal record
+      parameters:
+      - description: Proposal ID
+        in: query
+        name: proposal_id
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML page
+          schema:
+            type: string
+        "400":
+          description: Invalid proposal ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Proposal not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get image upload page by proposal ID
+      tags:
+      - proposals
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads an image file for a specific proposal record
+      parameters:
+      - description: Proposal ID
+        in: query
+        name: proposal_id
+        required: true
+        type: string
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "303":
+          description: Redirect to proposals list
+          schema:
+            type: string
+        "400":
+          description: Invalid proposal ID or no file uploaded
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Proposal not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to save file or update proposal
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Upload image for proposal
+      tags:
+      - proposals
+  /api/proposals/images:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an image file by its name
+      parameters:
+      - description: Image name
+        in: query
+        name: image_name
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: Image file
+          schema:
+            type: file
+        "404":
+          description: Image not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get image by name
+      tags:
+      - proposals
+  /api/proposals/new:
+    post:
+      consumes:
+      - application/json
+      description: Creates new proposal records for a specific branch
+      parameters:
+      - description: Branch name
+        in: query
+        name: branch
+        required: true
+        type: string
+      - description: List of proposal names
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Proposals created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid branch or request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to create proposals
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new proposals
+      tags:
+      - proposals
+  /api/proposals/pdf/pdf:
+    get:
+      consumes:
+      - application/json
+      description: Generates a PDF document with unfulfilled proposals
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PDF generation result with proposals data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to fetch or decode proposals
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Generate PDF
+      tags:
+      - proposals
   /api/sales/session/{session_id}:
     delete:
       consumes:
@@ -2450,4 +2846,9 @@ paths:
       summary: Setup proxy routes
       tags:
       - proxy
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
