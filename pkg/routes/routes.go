@@ -168,6 +168,7 @@ func ProposalsRoutes(router *fiber.App, proposalsController *arrivals.ProposalsH
 	api.Get("/proposals/image", proposalsController.GetImageByProposalID) // get image by proposal id
 	api.Post("/proposals/image", proposalsController.UploadImage) // upload image
 	api.Get("/proposals/pdf/pdf", proposalsController.GeneratePDF) // generate pdf
+	api.Get("/proposals/fulfill", proposalsController.FulfillProposals) // fulfill proposals
 }
 
 
