@@ -5,7 +5,6 @@ import (
 	"time"
 
 	models "github.com/aslon1213/g4h_pos_erp/pkg/repository"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -21,7 +20,7 @@ type CustomersController struct {
 	DB                  *mongo.Database
 }
 
-func New(db *mongo.Database, cache *cache.Cache) *CustomersController {
+func New(db *mongo.Database) *CustomersController {
 	return &CustomersController{
 		customersCollection: db.Collection("customers"),
 		salesCollection:     db.Collection("sales"),
