@@ -42,6 +42,7 @@ migrate.ipynb
 journal_api.journals.json
 data/
 config.local.yaml
+config.yaml
 mongo-keyfile
 CaddyFile
 dump/
