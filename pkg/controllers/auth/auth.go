@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/base64"
 	"time"
 
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
@@ -133,7 +134,8 @@ func (a *AuthControllers) Login(c *fiber.Ctx) error {
 	}
 
 	// Create token and encrypt it
-	encryptedToken, err := pasetoware.CreateToken([]byte(a.SecretSymmetricKey), user_to_check.Username, time.Duration(a.TokenExpiryHours) * time.Hour, pasetoware.PurposeLocal)
+	keyBytes, err := base64.StdEncoding.DecodeString(a.SecretSymmetricKey)
+	encryptedToken, err := pasetoware.CreateToken(keyBytes, user_to_check.Username, time.Duration(a.TokenExpiryHours)*time.Hour, pasetoware.PurposeLocal)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create token")
 
