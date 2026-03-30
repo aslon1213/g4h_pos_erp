@@ -1,6 +1,8 @@
 package app
 
 import (
+	"encoding/base64"
+
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/analytics"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/arrivals"
@@ -64,9 +66,14 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
+
+	keyBytes, err := base64.StdEncoding.DecodeString(config.Server.SecretSymmetricKey)
+	if err != nil {
+		log.Fatal().Err(err).Msg("invalid symmetric key")
+	}
 	app.Group("/api", pasetoware.New(
 		pasetoware.Config{
-			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			SymmetricKey: keyBytes,
 			// TokenPrefix:    "Bearer",
 			SuccessHandler: controllers.Middlewares.AuthMiddleware,
 		},

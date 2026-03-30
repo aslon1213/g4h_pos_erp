@@ -3,9 +3,9 @@ package configs
 import (
 	"crypto/rand"
 	"os"
-	"strconv"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -40,9 +40,9 @@ type RedisConfig struct {
 }
 
 type ProxyConfig struct {
-	Type string `mapstructure:"type"`
-	Path string `mapstructure:"path"`
-	Addr string `mapstructure:"addr"`
+	Type   string `mapstructure:"type"`
+	Path   string `mapstructure:"path"`
+	Addr   string `mapstructure:"addr"`
 	APIKey string `mapstructure:"api_key"`
 }
 
@@ -69,106 +69,6 @@ type AdminDocsUser struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	envFrom := strings.ToLower(os.Getenv("ENV_FROM"))
-
-	if envFrom == ".env" {
-		return loadConfigFromEnv(path)
-	}
-	return loadConfigFromYaml(path)
-}
-
-func loadConfigFromEnv(path string) (*Config, error) {
-	if !ENVT_TYPE_LOGGED {
-		log.Info().Str("ENV_FROM", ".env").Msg("Loading config from environment variables")
-		ENVT_TYPE_LOGGED = true
-	}
-
-
-
-
-
-	
-
-	maxConnections, _ := strconv.ParseUint(os.Getenv("DATABASE_MAX_CONNECTIONS"), 10, 64)
-	minPoolSize, _ := strconv.ParseUint(os.Getenv("DATABASE_MIN_POOL_SIZE"), 10, 64)
-	dbAuth, _ := strconv.ParseBool(os.Getenv("DATABASE_AUTH"))
-	redisDB, _ := strconv.Atoi(os.Getenv("REDIS_DATABASE"))
-	redisPort, _ := strconv.Atoi(os.Getenv("REDIS_PORT"))
-	tokenExpiryHours, _ := strconv.Atoi(os.Getenv("SERVER_TOKEN_EXPIRY_HOURS"))
-
-	log.Info().Str("DATABASE_HOST", os.Getenv("DATABASE_HOST")).Str("DATABASE_PORT", os.Getenv("DATABASE_PORT")).Str("DATABASE_NAME", os.Getenv("DATABASE_NAME")).Str("DATABASE_MAX_CONNECTIONS", os.Getenv("DATABASE_MAX_CONNECTIONS")).Str("DATABASE_MIN_POOL_SIZE", os.Getenv("DATABASE_MIN_POOL_SIZE")).Str("DATABASE_AUTH", os.Getenv("DATABASE_AUTH")).Str("DATABASE_REPLICA_SET", os.Getenv("DATABASE_REPLICA_SET")).Str("DATABASE_URL", os.Getenv("DATABASE_URL")).Str("REDIS_HOST", os.Getenv("REDIS_HOST")).Str("REDIS_PORT", os.Getenv("REDIS_PORT")).Str("REDIS_DATABASE", os.Getenv("REDIS_DATABASE")).Str("SERVER_TOKEN_EXPIRY_HOURS", os.Getenv("SERVER_TOKEN_EXPIRY_HOURS")).Msg("Loading config from environment variables")
-
-
-
-	adminDocsUsers := []AdminDocsUser{
-		{
-			Username: os.Getenv("ADMIN_DOCS_USERNAME"),
-			Password: os.Getenv("ADMIN_DOCS_PASSWORD"),
-
-
-		},
-		{
-			Username: os.Getenv("ADMIN_DOCS_USERNAME_2"),
-			Password: os.Getenv("ADMIN_DOCS_PASSWORD_2"),
-			
-
-		},
-	}
-
-	proxyConfig := []ProxyConfig{
-		{
-			Type: "Forward",
-			Path: "/proposals",
-			Addr: "http://localhost:11000",
-			APIKey: "a43459f3-532f-4704-818c-b380e15f27a3",
-		},
-	}
-	
-
-	config := &Config{
-		DB: DBConfig{
-			Host:           os.Getenv("DATABASE_HOST"),
-			Port:           os.Getenv("DATABASE_PORT"),
-			Username:       os.Getenv("MONGO_INITDB_ROOT_USERNAME"),
-			Password:       os.Getenv("MONGO_INITDB_ROOT_PASSWORD"),
-			Database:       os.Getenv("DATABASE_NAME"),
-			MaxConnections: maxConnections,
-			MinPoolSize:    minPoolSize,
-			Auth:           dbAuth,
-			ReplicaSet:     os.Getenv("DATABASE_REPLICA_SET"),
-			URL:            os.Getenv("DATABASE_URL"),
-		},
-		Redis: RedisConfig{
-			Host:     os.Getenv("REDIS_HOST"),
-			Port:     strconv.Itoa(redisPort),
-			Password: os.Getenv("REDIS_PASSWORD"),
-			Database: redisDB,
-		},
-		Server: ServerConfig{
-			Host:               os.Getenv("SERVER_HOST"),
-			Port:              os.Getenv("SERVER_PORT"),
-			SecretSymmetricKey: os.Getenv("SERVER_SECRET_SYMMETRIC_KEY"),
-			TokenExpiryHours:   tokenExpiryHours,
-			AdminDocsUsers:     adminDocsUsers,
-			Proxy: proxyConfig,
-		},
-		S3: S3Config{
-			Region:          os.Getenv("S3_REGION"),
-			Endpoint:        os.Getenv("S3_ENDPOINT"),
-			AccessKeyID:     os.Getenv("S3_ACCESS_KEY_ID"),
-			SecretAccessKey: os.Getenv("S3_SECRET_ACCESS_KEY"),
-			ImageBucket:     os.Getenv("S3_IMAGE_BUCKET"),
-		},
-	}
-
-	if strings.ToLower(os.Getenv("LOG_ENV")) == "true" {
-		log.Info().Interface("config", config).Msg("Config loaded from env")
-	}
-
-	return config, nil
-}
-
-func loadConfigFromYaml(path string) (*Config, error) {
 	filename := "config"
 	if strings.ToLower(os.Getenv("ENVIRONMENT")) != "production" {
 		if os.Getenv("CONFIG_FILE") == "" {
@@ -176,17 +76,58 @@ func loadConfigFromYaml(path string) (*Config, error) {
 		} else {
 			filename = os.Getenv("CONFIG_FILE")
 		}
-		
+
 	}
 	if !ENVT_TYPE_LOGGED {
 		log.Info().Str("ENVIRONMENT", os.Getenv("ENVIRONMENT")).Str("filename", filename).Msg("Loading config from YAML")
 		ENVT_TYPE_LOGGED = true
 	}
+
+	if os.Getenv("LOAD_DOT_ENV") != "" {
+		godotenv.Load()
+
+	}
+
+	log.Info().Msg("Loading Config from " + filename)
+
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // to pass env variables with
 	viper.SetConfigName(filename)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path)
 	viper.AddConfigPath("../")
 	viper.AddConfigPath("../../")
+
+	// Explicit env bindings — this is the only reliable way
+	bindings := map[string]string{
+		"database.host":               "DATABASE_HOST",
+		"database.port":               "DATABASE_PORT",
+		"database.username":           "DATABASE_USERNAME",
+		"database.password":           "DATABASE_PASSWORD",
+		"database.database":           "DATABASE_NAME",
+		"database.max_connections":    "DATABASE_MAX_CONNECTIONS",
+		"database.min_pool_size":      "DATABASE_MIN_POOL_SIZE",
+		"database.auth":               "DATABASE_AUTH",
+		"database.replica_set":        "DATABASE_REPLICA_SET",
+		"database.url":                "DATABASE_URL",
+		"s3.region":                   "S3_REGION",
+		"s3.endpoint":                 "S3_ENDPOINT",
+		"s3.access_key_id":            "S3_ACCESS_KEY_ID",
+		"s3.secret_access_key":        "S3_SECRET_ACCESS_KEY",
+		"s3.image_bucket":             "S3_IMAGE_BUCKET",
+		"redis.host":                  "REDIS_HOST",
+		"redis.port":                  "REDIS_PORT",
+		"redis.password":              "REDIS_PASSWORD",
+		"redis.database":              "REDIS_DATABASE",
+		"server.host":                 "SERVER_HOST",
+		"server.port":                 "SERVER_PORT",
+		"server.secret_symmetric_key": "SERVER_SECRET_SYMMETRIC_KEY",
+		"server.token_expiry_hours":   "SERVER_TOKEN_EXPIRY_HOURS",
+	}
+
+	for key, env := range bindings {
+		viper.BindEnv(key, env)
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
