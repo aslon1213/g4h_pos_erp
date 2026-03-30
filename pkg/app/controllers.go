@@ -1,8 +1,11 @@
 package app
 
 import (
+	"encoding/base64"
+
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/analytics"
+	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/arrivals"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/auth"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers/bnpl"
@@ -14,7 +17,6 @@ import (
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/transactions"
 	"github.com/aslon1213/g4h_pos_erp/pkg/middleware"
 	"github.com/aslon1213/g4h_pos_erp/pkg/routes"
-	"github.com/aslon1213/g4h_pos_erp/platform/cache"
 	pasetoware "github.com/gofiber/contrib/paseto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
@@ -34,24 +36,26 @@ type Controllers struct {
 	Customers    *customers.CustomersController
 	Middlewares  *middleware.Middlewares
 	Dashboard    *analytics.DashboardHandler
+	Proposals    *arrivals.ProposalsHandlers
 }
 
-func NewControllers(db *mongo.Database, cache *cache.Cache) *Controllers {
+func NewControllers(db *mongo.Database) *Controllers {
 	log.Debug().Msg("Initializing new controllers")
 	middleware := middleware.New(db)
 	controllers := &Controllers{
 		Finance:      finance.New(db),
 		Suppliers:    suppliers.New(db),
 		Transactions: transactions.New(db),
-		Sales:        sales.New(db, cache),
-		Journals:     journal_handlers.New(db, cache),
-		Operations:   journal_handlers.NewOperationsHandler(db, cache),
+		Sales:        sales.New(db),
+		Journals:     journal_handlers.New(db),
+		Operations:   journal_handlers.NewOperationsHandler(db),
 		Products:     products.New(db),
 		Auth:         auth.New(db),
-		Customers:    customers.New(db, cache),
-		BNPL:         bnpl.New(db, cache),
+		Customers:    customers.New(db),
+		BNPL:         bnpl.New(db),
 		Middlewares:  middleware,
 		Dashboard:    analytics.New(db),
+		Proposals:    arrivals.New(db),
 	}
 	log.Debug().Msg("Controllers initialized successfully")
 	return controllers
@@ -62,9 +66,14 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
+
+	keyBytes, err := base64.StdEncoding.DecodeString(config.Server.SecretSymmetricKey)
+	if err != nil {
+		log.Fatal().Err(err).Msg("invalid symmetric key")
+	}
 	app.Group("/api", pasetoware.New(
 		pasetoware.Config{
-			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			SymmetricKey: keyBytes,
 			// TokenPrefix:    "Bearer",
 			SuccessHandler: controllers.Middlewares.AuthMiddleware,
 		},
@@ -93,5 +102,7 @@ func SetupRoutes(app *fiber.App, controllers *Controllers) {
 	log.Debug().Msg("Dashboard routes set up successfully")
 	routes.ProxyRoutes(app, controllers.Middlewares)
 	log.Debug().Msg("Proxy routes set up successfully")
+	routes.ProposalsRoutes(app, controllers.Proposals, controllers.Middlewares)
+	log.Debug().Msg("Proposals routes set up successfully")
 	log.Debug().Msg("All routes set up successfully")
 }

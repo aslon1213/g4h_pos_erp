@@ -2,11 +2,13 @@ package routes
 
 import (
 	"bytes"
+	"encoding/base64"
 	"io"
 	"net/http"
 
 	"github.com/aslon1213/g4h_pos_erp/pkg/configs"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/analytics"
+	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/arrivals"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/auth"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers"
 	"github.com/aslon1213/g4h_pos_erp/pkg/controllers/customers/bnpl"
@@ -70,12 +72,12 @@ func SalesRoutes(router *fiber.App, salesController *sales.SalesTransactionsCont
 	api.Post("/sales/transactions/:branch_id", salesController.CreateSalesTransaction)        // create sales transaction -- activity logged here if succesfull
 	api.Delete("/sales/transactions/:transaction_id", salesController.DeleteSalesTransaction) // delete sales transaction -- activity logged here if succesfull
 	// sales session routes
-	api.Post("/sales/session/branch/:branch_id", salesController.OpenSalesSession)          // open sales session
-	api.Post("/sales/session/:session_id/product", salesController.AddProductItemToSession) // add product to session
-	api.Post("/sales/session/:session_id/close", salesController.CloseSalesSession)         // close sales session
-	api.Get("/sales/session/:session_id", salesController.GetSalesSession)                  // get sales session
-	api.Delete("/sales/session/:session_id", salesController.DeleteSalesSession)            // delete sales session
-	api.Get("/sales/session/branch/:branch_id", salesController.GetSalesSessionsOfBranch)   // get sales of session
+	// api.Post("/sales/session/branch/:branch_id", salesController.OpenSalesSession)          // open sales session
+	// api.Post("/sales/session/:session_id/product", salesController.AddProductItemToSession) // add product to session
+	// api.Post("/sales/session/:session_id/close", salesController.CloseSalesSession)         // close sales session
+	// api.Get("/sales/session/:session_id", salesController.GetSalesSession)                  // get sales session
+	// api.Delete("/sales/session/:session_id", salesController.DeleteSalesSession)            // delete sales session
+	// api.Get("/sales/session/branch/:branch_id", salesController.GetSalesSessionsOfBranch)   // get sales of session
 	// router.Get("/sales/branch/:branch_id/sessions", salesController.GetSalesOfSession)
 
 }
@@ -157,7 +159,18 @@ func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middlewa
 	api.Get("/branches/:branch_id/bnpls", bnplController.GetBNPLsOfBranch)      // get bnpls of branch
 }
 
-
+func ProposalsRoutes(router *fiber.App, proposalsController *arrivals.ProposalsHandlers, middleware *middleware.Middlewares) {
+	api := router.Group("/api")
+	api.Get("/proposals", proposalsController.GetProposals)               // get proposals
+	api.Get("/proposals/detail", proposalsController.GetProposalDetail)   // get proposal by id
+	api.Post("/proposals/new", proposalsController.NewProposals)          // create proposal
+	api.Put("/proposals/edit", proposalsController.EditProposal)          // update proposal
+	api.Delete("/proposals/delete", proposalsController.DeleteProposal)   // delete proposal
+	api.Get("/proposals/image", proposalsController.GetImageByProposalID) // get image by proposal id
+	api.Post("/proposals/image", proposalsController.UploadImage)         // upload image
+	api.Get("/proposals/pdf/pdf", proposalsController.GeneratePDF)        // generate pdf
+	api.Get("/proposals/fulfill", proposalsController.FulfillProposals)   // fulfill proposals
+}
 
 func ForwardProxy(c *fiber.Ctx) error {
 	log.Info().
@@ -177,10 +190,10 @@ func ForwardProxy(c *fiber.Ctx) error {
 	// Create target URL
 	targetURL := proxyConfig.Addr + c.OriginalURL()
 	log.Debug().Str("target_url", targetURL).Msg("Created target URL")
-	
+
 	// Create HTTP client
 	client := &http.Client{}
-	
+
 	// Create request with same method and body
 	req, err := http.NewRequest(c.Method(), targetURL, bytes.NewReader(c.Body()))
 	if err != nil {
@@ -189,7 +202,7 @@ func ForwardProxy(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	
+
 	// Copy headers from original request
 	for key, values := range c.GetReqHeaders() {
 		for _, value := range values {
@@ -200,7 +213,7 @@ func ForwardProxy(c *fiber.Ctx) error {
 	// set x-api-key to header
 	req.Header.Set("x-api-key", config.Server.Proxy[0].APIKey)
 	log.Debug().Interface("headers", req.Header).Msg("Copied headers to proxy request")
-	
+
 	// Make the request
 	resp, err := client.Do(req)
 	if err != nil {
@@ -210,19 +223,19 @@ func ForwardProxy(c *fiber.Ctx) error {
 		})
 	}
 	defer resp.Body.Close()
-	
+
 	log.Info().
 		Int("status_code", resp.StatusCode).
 		Str("target_url", targetURL).
 		Msg("Received response from proxy target")
-	
+
 	// Copy response headers
 	for key, values := range resp.Header {
 		for _, value := range values {
 			c.Set(key, value)
 		}
 	}
-	
+
 	// Copy response status and body
 	c.Status(resp.StatusCode)
 	log.Debug().Int("status_code", resp.StatusCode).Msg("Forwarding response to client")
@@ -249,18 +262,21 @@ func ForwardProxy(c *fiber.Ctx) error {
 // @Router /proposals [delete]
 func ProxyRoutes(router *fiber.App, middleware *middleware.Middlewares) {
 
-
 	config, err := configs.LoadConfig(".")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 
-	proxyConfig:= config.Server.Proxy[0]
+	proxyConfig := config.Server.Proxy[0]
 
 	zayavka := router.Group(proxyConfig.Path)
+	keyBytes, err := base64.StdEncoding.DecodeString(config.Server.SecretSymmetricKey)
+	if err != nil {
+		log.Fatal().Err(err).Msg("invalid symmetric key")
+	}
 	zayavka.Use(pasetoware.New(
 		pasetoware.Config{
-			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			SymmetricKey: keyBytes,
 			// TokenPrefix:    "Bearer",
 			SuccessHandler: middleware.AuthMiddleware,
 		},

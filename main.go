@@ -2,22 +2,20 @@ package main
 
 import "github.com/aslon1213/g4h_pos_erp/pkg/app"
 
-// @title G4H ERP/POS API
+// @title Swagger Example API
 // @version 1.0
-// @description This is a ERP/POS API for G4H.
+// @description This is a sample server Petstore server.
 // @termsOfService http://swagger.io/terms/
 
-// @contact.name G4H ERP/POS API
-// @contact.url https://github.com/aslon1213/g4h_pos_erp
-// @contact.email hamidovaslon1@gmail.com
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
-
+// @host petstore.swagger.io
+// @BasePath /v2
 func main() {
 
 	app := app.New()

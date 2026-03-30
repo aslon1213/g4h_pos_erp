@@ -36,13 +36,13 @@ go.work.sum
 # Added by goreleaser init:
 dist/
 env*
-config.yaml
 bin/main
 *.log
 migrate.ipynb
 journal_api.journals.json
 data/
 config.local.yaml
+config.yaml
 mongo-keyfile
 CaddyFile
 dump/
