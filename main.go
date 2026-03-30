@@ -20,7 +20,7 @@ func main() {
 
 	app := app.New()
 
-	app.Logger.Info().Msg("Starting server...")
+	app.Logger.Info().Msg("Starting Production server...")
 
 	app.Run()
 }
