@@ -2,6 +2,7 @@ package routes
 
 import (
 	"bytes"
+	"encoding/base64"
 	"io"
 	"net/http"
 
@@ -157,8 +158,6 @@ func BNPLRoutes(router *fiber.App, bnplController *bnpl.BNPLController, middlewa
 	api.Get("/branches/:branch_id/bnpls", bnplController.GetBNPLsOfBranch)      // get bnpls of branch
 }
 
-
-
 func ForwardProxy(c *fiber.Ctx) error {
 	log.Info().
 		Str("method", c.Method()).
@@ -177,10 +176,10 @@ func ForwardProxy(c *fiber.Ctx) error {
 	// Create target URL
 	targetURL := proxyConfig.Addr + c.OriginalURL()
 	log.Debug().Str("target_url", targetURL).Msg("Created target URL")
-	
+
 	// Create HTTP client
 	client := &http.Client{}
-	
+
 	// Create request with same method and body
 	req, err := http.NewRequest(c.Method(), targetURL, bytes.NewReader(c.Body()))
 	if err != nil {
@@ -189,7 +188,7 @@ func ForwardProxy(c *fiber.Ctx) error {
 			"error": err.Error(),
 		})
 	}
-	
+
 	// Copy headers from original request
 	for key, values := range c.GetReqHeaders() {
 		for _, value := range values {
@@ -200,7 +199,7 @@ func ForwardProxy(c *fiber.Ctx) error {
 	// set x-api-key to header
 	req.Header.Set("x-api-key", config.Server.Proxy[0].APIKey)
 	log.Debug().Interface("headers", req.Header).Msg("Copied headers to proxy request")
-	
+
 	// Make the request
 	resp, err := client.Do(req)
 	if err != nil {
@@ -210,19 +209,19 @@ func ForwardProxy(c *fiber.Ctx) error {
 		})
 	}
 	defer resp.Body.Close()
-	
+
 	log.Info().
 		Int("status_code", resp.StatusCode).
 		Str("target_url", targetURL).
 		Msg("Received response from proxy target")
-	
+
 	// Copy response headers
 	for key, values := range resp.Header {
 		for _, value := range values {
 			c.Set(key, value)
 		}
 	}
-	
+
 	// Copy response status and body
 	c.Status(resp.StatusCode)
 	log.Debug().Int("status_code", resp.StatusCode).Msg("Forwarding response to client")
@@ -249,18 +248,21 @@ func ForwardProxy(c *fiber.Ctx) error {
 // @Router /proposals [delete]
 func ProxyRoutes(router *fiber.App, middleware *middleware.Middlewares) {
 
-
 	config, err := configs.LoadConfig(".")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 
-	proxyConfig:= config.Server.Proxy[0]
+	proxyConfig := config.Server.Proxy[0]
 
 	zayavka := router.Group(proxyConfig.Path)
+	keyBytes, err := base64.StdEncoding.DecodeString(config.Server.SecretSymmetricKey)
+	if err != nil {
+		log.Fatal().Err(err).Msg("invalid symmetric key")
+	}
 	zayavka.Use(pasetoware.New(
 		pasetoware.Config{
-			SymmetricKey: []byte(config.Server.SecretSymmetricKey),
+			SymmetricKey: keyBytes,
 			// TokenPrefix:    "Bearer",
 			SuccessHandler: middleware.AuthMiddleware,
 		},

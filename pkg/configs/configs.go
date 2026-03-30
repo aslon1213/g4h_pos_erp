@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -39,9 +40,9 @@ type RedisConfig struct {
 }
 
 type ProxyConfig struct {
-	Type string `mapstructure:"type"`
-	Path string `mapstructure:"path"`
-	Addr string `mapstructure:"addr"`
+	Type   string `mapstructure:"type"`
+	Path   string `mapstructure:"path"`
+	Addr   string `mapstructure:"addr"`
 	APIKey string `mapstructure:"api_key"`
 }
 
@@ -68,6 +69,7 @@ type AdminDocsUser struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
+
 	filename := "config"
 	if strings.ToLower(os.Getenv("ENVIRONMENT")) != "production" {
 		filename = "config.local"
@@ -76,11 +78,52 @@ func LoadConfig(path string) (*Config, error) {
 		log.Info().Str("ENVIRONMENT", os.Getenv("ENVIRONMENT")).Str("filename", filename).Msg("ENVIRONMENT")
 		ENVT_TYPE_LOGGED = true
 	}
+
+	if os.Getenv("LOAD_DOT_ENV") != "" {
+		godotenv.Load()
+
+	}
+
+	log.Info().Msg("Loading Config from " + filename)
+
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_")) // to pass env variables with
 	viper.SetConfigName(filename)
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(path)
 	viper.AddConfigPath("../")
 	viper.AddConfigPath("../../")
+
+	// Explicit env bindings — this is the only reliable way
+	bindings := map[string]string{
+		"database.host":               "DATABASE_HOST",
+		"database.port":               "DATABASE_PORT",
+		"database.username":           "DATABASE_USERNAME",
+		"database.password":           "DATABASE_PASSWORD",
+		"database.database":           "DATABASE_NAME",
+		"database.max_connections":    "DATABASE_MAX_CONNECTIONS",
+		"database.min_pool_size":      "DATABASE_MIN_POOL_SIZE",
+		"database.auth":               "DATABASE_AUTH",
+		"database.replica_set":        "DATABASE_REPLICA_SET",
+		"database.url":                "DATABASE_URL",
+		"s3.region":                   "S3_REGION",
+		"s3.endpoint":                 "S3_ENDPOINT",
+		"s3.access_key_id":            "S3_ACCESS_KEY_ID",
+		"s3.secret_access_key":        "S3_SECRET_ACCESS_KEY",
+		"s3.image_bucket":             "S3_IMAGE_BUCKET",
+		"redis.host":                  "REDIS_HOST",
+		"redis.port":                  "REDIS_PORT",
+		"redis.password":              "REDIS_PASSWORD",
+		"redis.database":              "REDIS_DATABASE",
+		"server.host":                 "SERVER_HOST",
+		"server.port":                 "SERVER_PORT",
+		"server.secret_symmetric_key": "SERVER_SECRET_SYMMETRIC_KEY",
+		"server.token_expiry_hours":   "SERVER_TOKEN_EXPIRY_HOURS",
+	}
+
+	for key, env := range bindings {
+		viper.BindEnv(key, env)
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
