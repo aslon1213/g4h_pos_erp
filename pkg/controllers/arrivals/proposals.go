@@ -329,13 +329,12 @@ func (h *ProposalsHandlers) GetProposals(c *fiber.Ctx) error {
 		}
 	} else {
 
-		
 		if _, exists := filter["date"]; exists {
 			filter["date"].(bson.M)["$lte"] = time.Now()
 		} else {
 			filter["date"] = bson.M{"$lte": time.Now()}
 		}
-		
+
 	}
 
 	cursor, err := h.ProposalsCollection.Find(ctx, filter)
@@ -432,7 +431,7 @@ type EditProposalRequest struct {
 // @Tags proposals
 // @Security BearerAuth
 // @Accept json,application/x-www-form-urlencoded
-// @Produce json 
+// @Produce json
 // @Param proposal_id query string true "Proposal ID"
 // @Param body body EditProposalRequest false "Proposal update data"
 // @Success 302 {string} string "Redirect to proposals list"
