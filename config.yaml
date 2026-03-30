@@ -1,0 +1,41 @@
+database:
+  host: "mongo1"
+  port: "27017"
+  username: "admin"
+  password: "admin"
+  database: "magazin"
+  max_connections: 20
+  min_pool_size: 10
+  auth: false
+  replica_set: myReplicaSet
+  url: mongodb://onlyIknow:youdonthavetoknow@database.g4h.uz:27017/?replicate_set=myReplicaSet
+
+s3:
+  region: ""
+  endpoint: ""
+  access_key_id: ""
+  secret_access_key: ""
+  image_bucket: ""
+
+redis:
+  host: "localhost"
+  port: "6379"
+  password: ""
+  database: 0
+
+server:
+  host: localhost
+  port: ":12000"
+  secretSymmetricKey: "xxxxxxxxxxxxxxxxxxxxx"
+  token_expiry_hours: 48
+  admin_docs_users:
+    - username: "admin"
+      password: "admin"
+    - username: "dev"
+      password: "dev456"
+
+  proxy:
+    - type: "Forward" # type of proxy
+      path: "/proposals" # source domain
+      addr: "http://localhost:11000" # target domain
+      api_key: "xxxxx-yyyyy-zzzz-ddddd"
